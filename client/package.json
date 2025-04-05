@@ -1,0 +1,27 @@
+{
+  "name": "roxstar-client",
+  "version": "0.0.1",
+  "description": "RoxStar Client to load Flash in a modern browser.",
+  "main": "client.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/kleineluka/roxstar",
+  "author": "KleineLuka",
+  "license": "No use or distribution",
+  "devDependencies": {
+    "electron": "^10.4.7",
+    "electron-builder": "^22.9.1",
+    "electron-packager": "15.5.1"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "get-proxy-settings": "^0.1.12",
+    "user-agents": "^1.0.1342"
+  },
+  "build": {
+    "appId": "moe.luka",
+    "productName": "RoxStar Client",
+    "asar": "false"
+  }
+}

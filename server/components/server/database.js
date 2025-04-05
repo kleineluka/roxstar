@@ -1,9 +1,7 @@
-// imports
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const pretty = require('../utils/pretty.js');
 
-// create database connection
 const db = new sqlite3.Database(`${__dirname}/../../${global.config_server['database']}`, (err) => {
     if (err) {
         pretty.error(`Failed to connect to SQLite: ${err.message}`);
@@ -12,16 +10,18 @@ const db = new sqlite3.Database(`${__dirname}/../../${global.config_server['data
     }
 });
 
-// function to initialize the database
-function initialize() {
-
+/** 
+ * Initialise the database by running the SQL script.
+ * This will create the tables and insert any necessary data.
+ * This function should be called once at the start of the server.
+ **/
+function initialise() {
     // db script is: ../../database.sql
     const dbScriptPath = `${__dirname}/../../database.sql`;
     if (!fs.existsSync(dbScriptPath)) {
         pretty.error(`Database script not found: ${dbScriptPath}..`);
         return;
     }
-
     // set up if not set up yet
     db.exec(fs.readFileSync(dbScriptPath, 'utf-8'), (err) => {
         if (err) {
@@ -30,10 +30,14 @@ function initialize() {
             pretty.print('Database initialized successfully.', 'DATABASE');
         }
     });
-
 }
 
-// function to run SQL queries with parameters
+/** 
+ * Simple wrapper for db.run to execute a query with parameters.
+ * @param {string} query - The SQL query to execute.
+ * @param {Array} params - The parameters to bind to the query.
+ * @return {Promise} - A promise that resolves to the last ID of the inserted row.
+ **/
 function runQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.run(query, params, function (err) {
@@ -46,7 +50,12 @@ function runQuery(query, params = []) {
     });
 }
 
-// function to get data with parameters
+/**
+ * Simple wrapper for db.get to execute a query and return a single row.
+ * @param {string} query - The SQL query to execute.
+ * @param {Array} params - The parameters to bind to the query.
+ * @return {Promise} - A promise that resolves to the row returned by the query.
+ **/
 function getQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.get(query, params, (err, row) => {
@@ -59,7 +68,10 @@ function getQuery(query, params = []) {
     });
 }
 
-// function to close the database connection
+/**
+ * Close the database connection.
+ * This should be called when the server is shutting down.  
+ **/
 function close() {
     db.close((err) => {
         if (err) {
@@ -71,7 +83,7 @@ function close() {
 }
 
 module.exports = {
-    initialize,
+    initialise,
     runQuery,
     getQuery,
     close,

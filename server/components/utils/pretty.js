@@ -16,6 +16,7 @@ const header_styling = {
     "DATABASE": chalk.cyanBright,
     'ACTION': chalk.greenBright,
     'WARN': chalk.yellowBright,
+    'CACHE': chalk.cyanBright,
 };
 
 const request_styling = {

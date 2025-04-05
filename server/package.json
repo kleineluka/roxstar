@@ -1,5 +1,5 @@
 {
-  "name": "roxstar_server",
+  "name": "roxstar-server",
   "version": "0.0.0",
   "description": "RoxStar server implementation for emulating abandonedware.",
   "main": "server.js",

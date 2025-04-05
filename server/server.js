@@ -7,9 +7,11 @@ const cookieParser = require('cookie-parser');
 const pretty = require('./components/utils/pretty.js');
 
 // set up the environment
-const environment = require('./components/utils/environment.js');
+const environment = require('./components/server/environment.js');
 environment.setupEnvironment();
 
 // import servers + initialize database
-const { initialize } = require('./components/server/database.js');
-initialize();
+const database = require('./components/server/database.js');
+const cache = require('./components/server/cache.js');
+database.initialise();
+cache.initialise();
