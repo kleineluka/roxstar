@@ -3,7 +3,7 @@ const path = require('path');
 const pretty = require('../utils/pretty.js');
 
 /**
- * * Loads a configuration file from the configs directory.
+ * Loads a configuration file from the configs directory.
  * @param {*} filename - The name of the file to load.
  * @returns {Object} - The parsed JSON object from the file.
  **/
@@ -21,7 +21,7 @@ const loadStorage = (filename) => {
 }
 
 /**
- * * Sets up the environment by loading configuration and storage files into global variables.
+ * Sets up the environment by loading configuration and storage files into global variables.
  * This function should be called once at the start of the server.
  **/
 const setupEnvironment = () => {
@@ -34,6 +34,7 @@ const setupEnvironment = () => {
     global.config_starter = loadConfig('starter.json');
     global.config_garden = loadConfig('garden.json');
     global.config_provided = loadConfig('provided.json');
+    global.config_rebundles = loadConfig('rebundles.json');
     global.config_services = loadConfig('services.json');
     global.config_parse = loadConfig('parse.json');
     pretty.print('Loaded configurations into volatile memory.', 'ACTION');

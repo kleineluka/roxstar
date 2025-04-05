@@ -39,6 +39,49 @@ CREATE TABLE IF NOT EXISTS log_secret_codes (
 
 -- SECTION: USER TABLES
 
+-- user table
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
+    username_history TEXT NOT NULL DEFAULT '[]',
+    monster_name TEXT NOT NULL,
+    password TEXT NOT NULL,
+    session_key TEXT DEFAULT NULL,
+    login_key TEXT DEFAULT NULL,
+    fingerprint TEXT DEFAULT NULL,
+    register_ip TEXT NOT NULL,
+    last_ip TEXT DEFAULT NULL,
+    activation_status TEXT NOT NULL DEFAULT 'noEmail',
+    is_staff INTEGER NOT NULL DEFAULT 0,
+    gender TEXT NOT NULL DEFAULT 'm',
+    birth_date INTEGER DEFAULT NULL,
+    monster TEXT NOT NULL,
+    country TEXT NOT NULL,
+    rocks INTEGER NOT NULL DEFAULT 200,
+    rocks_today INTEGER NOT NULL DEFAULT 5000,
+    level INTEGER NOT NULL DEFAULT 1,
+    levels_today INTEGER NOT NULL DEFAULT 5000,
+    happiness INTEGER NOT NULL DEFAULT 700,
+    health INTEGER NOT NULL DEFAULT 700,
+    primary_colour INTEGER NOT NULL,
+    secondary_colour INTEGER NOT NULL,
+    views INTEGER NOT NULL DEFAULT 0,
+    medals TEXT NOT NULL DEFAULT '[0]',
+    colorama TEXT NOT NULL DEFAULT '[]',
+    profile TEXT NOT NULL DEFAULT '[0,0,0,0,0]',
+    dressup_prefix TEXT NOT NULL DEFAULT '',
+    settings TEXT NOT NULL DEFAULT '[1,3,3,3,3,3,3,3]',
+    unvisited_location_types TEXT NOT NULL DEFAULT 'shop,street,gameroom,friendroom,sellbackshop,dressuproom,dressupshop,garden,seedshop,colorama,marketplace,moshlingzoo,adoption,giftshop,roomshop,printworkshop,arcade,missionsGateway,missionsHQ,tutorial_room',
+    invisible_for_presence INTEGER NOT NULL DEFAULT 0,
+    rox_trees INTEGER NOT NULL DEFAULT 10,
+    has_claimed_daily INTEGER NOT NULL DEFAULT 0,
+    garden TEXT NOT NULL DEFAULT '0~black~-1~60000~60000~0|1~black~-1~60000~60000~0|2~black~-1~60000~60000~0',
+    creation_date INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    last_login_date INTEGER DEFAULT NULL,
+    house_style TEXT NOT NULL DEFAULT 'default'
+);
+
 -- clothing inventory table
 CREATE TABLE IF NOT EXISTS clothes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
