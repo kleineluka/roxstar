@@ -1,0 +1,17 @@
+{
+    "general": {
+        "name": "RoxStar"
+    },
+    "social": {
+        "strict_censor": true
+    },
+    "gifts": {
+        "max": 24
+    },
+    "shops": {
+        "randomize": true
+    },
+    "garden": {
+        "growth_time": 2400
+    }
+}

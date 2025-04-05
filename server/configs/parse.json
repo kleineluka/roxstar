@@ -1,0 +1,6 @@
+{
+    "/moshi/services/rest/comment/containsfriends": "json",
+    "/moshi/rmf/rmf/checkcontent": "json",
+    "/moshi/services/comment/create/*": "xml",
+    "/moshi/services/rest/user/profile/update": "xml"
+}

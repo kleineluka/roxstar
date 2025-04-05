@@ -135,5 +135,13 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# Server files
+cache/
+# Only limit temporarily
+storage/ 
+
 # Website files
-.resources/
+resources/
+
+# Database
+roxstar.db

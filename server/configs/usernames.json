@@ -1,0 +1,63 @@
+{
+    "adjectives": [
+        "yellow",
+        "pink",
+        "red",
+        "purple",
+        "blue",
+        "green",
+        "orange",
+        "cyan",
+        "magenta",
+        "teal",
+        "violet"
+    ],
+    "animals": [
+        "dog",
+        "cat",
+        "bird",
+        "fish",
+        "snake",
+        "lizard"
+    ],
+    "foods": [
+        "apple",
+        "banana",
+        "carrot",
+        "grape",
+        "pear",
+        "strawberry",
+        "watermelon",
+        "kiwi",
+        "mango",
+        "peach"
+    ],
+    "verbs": [
+        "runs",
+        "jumps",
+        "swims",
+        "flies",
+        "crawls",
+        "slithers"
+    ],
+    "adverbs": [
+        "quickly",
+        "slowly",
+        "gracefully",
+        "awkwardly",
+        "elegantly",
+        "clumsily"
+    ],
+    "numbers": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten"
+    ]
+}

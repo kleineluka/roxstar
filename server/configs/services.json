@@ -1,0 +1,22 @@
+{
+    "/services/rest/users/username/generate": "/user/suggestions",
+    "/services/rest/users/availability/*": "/user/allowed",
+    "/services/rest/users/adoption/start": "/user/adoption",
+    "/services/monster": "/user/monster",
+    "/moshi/services/monster/dressup/costume/friend/*": "/clothes/friend",
+    "/moshi/services/rest/user/missions/season/all": "/missions/seasons",
+    "/moshi/services/rest/user/missions/episode/events": "/missions/events",
+    "/moshi/services/monster/heartbeat": "/heartbeats/monster",
+    "/moshi/services/rest/comment/heartbeat": "/heartbeats/comment",
+    "/moshi/services/rest/garden/status": "/user/garden",
+    "/moshi/services/rest/user/mood": "/user/mood",
+    "/moshi/services/comments": "/pinboard/open",
+    "/moshi/services/rest/comment/containsfriends": "/pinboard/friends",
+    "/moshi/rmf/rmf/checkcontent": "/pinboard/filter",
+    "/moshi/services/rest/moshling/all": "/moshlings/minified",
+    "/moshi/services/rest/user/profile/inroomownprofile": "/user/profile",
+    "/moshi/services/rest/user/profile/update": "/user/profile",
+    "/moshi/services/garden/enter": "/garden/enter",
+    "/moshi/services/rest/users/members/newest": "/user/newest",
+    "/moshi/services/rest/moshling/egg": "/moshlings/egg"
+}
