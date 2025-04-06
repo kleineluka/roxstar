@@ -21,6 +21,18 @@ const loadStorage = (filename) => {
 }
 
 /**
+ * Loads the provided configuration file and replaces %final_url% with the final URL from the server configuration.
+ * This is used for the nullservices/rest/configuration endpoint.
+ */
+function loadProvided(config_template) {
+    let updated_provided = config_template;
+    Object.keys(updated_provided).forEach(key => {
+        updated_provided[key] = updated_provided[key].replace('%final_url%', global.config_server['final-url']);
+    });
+    return updated_provided;
+}
+
+/**
  * Sets up the environment by loading configuration and storage files into global variables.
  * This function should be called once at the start of the server.
  **/
@@ -33,7 +45,7 @@ const setupEnvironment = () => {
     global.config_trophies = loadConfig('trophies.json');
     global.config_starter = loadConfig('starter.json');
     global.config_garden = loadConfig('garden.json');
-    global.config_provided = loadConfig('provided.json');
+    global.config_provided = loadProvided(loadConfig('provided.json'));
     global.config_rebundles = loadConfig('rebundles.json');
     global.config_services = loadConfig('services.json');
     global.config_parse = loadConfig('parse.json');

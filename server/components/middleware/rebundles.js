@@ -4,7 +4,7 @@ const pretty = require('../utils/pretty.js');
  * This middleware is used to rewrite parameters from the URL into the request session.
  * It is useful for handling dynamic routes and passing parameters to the server.
  **/
-async function rewrite_parameters(requested_url, route_pattern) {
+function rewrite_parameters(requested_url, route_pattern) {
     // initialize objects and values
     let parameters = [];
     // find matches and loop through
@@ -46,9 +46,9 @@ async function rewrite_parameters(requested_url, route_pattern) {
  * This middleware is used to rewrite parameters from the URL into the request session.
  * It is useful for handling dynamic routes and passing parameters to the server.
  **/
-async function rebundler(req, res, next) {
+function rebundler(req, res, next) {
     // see if the query has been rebundled already
-    if (req.session.kr_rebundled) {
+    if (req.session.rs_rebundled) {
         next();
         return;
     }
@@ -66,7 +66,7 @@ async function rebundler(req, res, next) {
         return;
     }
     // extract the parameters and add them to the request
-    let rebundled_parameters = await rewrite_parameters(req.url, route_pattern);
+    let rebundled_parameters = rewrite_parameters(req.url, route_pattern);
     // add them all to the session
     for (let i = 0; i < rebundled_parameters.length; i++) {
         let extra_context = (rebundled_parameters[i][0] == 'rs_rebundled' ? '(roxstar internal flag, ignore for client-side debugging)' : '');

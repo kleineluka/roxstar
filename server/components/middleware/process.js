@@ -23,7 +23,7 @@ async function log_request(req, res, next) {
 /**
  * Specific processes that need to be done for certain routes.
  **/
-async function processer(app) {
+async function processor(app) {
     app.use(log_request);
     app.use('/activation.html', generate_token);
     app.use(formats.accept_url('login'), generate_token);
@@ -31,6 +31,6 @@ async function processer(app) {
 
 // export the middleware
 module.exports = {
-    processer,
+    processor,
 };
 

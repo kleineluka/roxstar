@@ -12,6 +12,7 @@ const header_styling = {
     'WARN': chalk.yellowBright,
     'CACHE': chalk.redBright,
     'SESSION MANAGER': chalk.greenBright,
+    'SERVER': chalk.blueBright,
 };
 
 const request_styling = {
