@@ -1,22 +1,17 @@
-// imports used here
 const chalk = require('chalk');
 
-// make text coloured
 const header_styling = {
     'LOGS': chalk.magentaBright,
     'DEBUG': chalk.magenta,
-    'DEBUG ALWAYS': chalk.green,
-    'DEBUG GATED': chalk.blueBright,
     'ERROR': chalk.redBright,
     "TIMESTAMP": chalk.yellowBright,
-    "DIRECTION": chalk.greenBright,
-    "SOLUTIONS": chalk.cyan,
     "REQUEST": chalk.blue,
     "REDIRECT": chalk.yellowBright,
     "DATABASE": chalk.cyanBright,
     'ACTION': chalk.greenBright,
     'WARN': chalk.yellowBright,
-    'CACHE': chalk.cyanBright,
+    'CACHE': chalk.redBright,
+    'SESSION MANAGER': chalk.greenBright,
 };
 
 const request_styling = {
@@ -29,87 +24,78 @@ const request_styling = {
     "USERAGENT": chalk.yellow,
 };
 
-// rainbow-ify text
+/**
+ * Generates a rainbow-colored string from the input message.
+ * @param {string} msg - The message to colorize.
+ * @return {string} - The rainbow-colored string.
+ */
 function pretty_rainbow(msg) {
-    // declare the colors
     let color_range = [chalk.red, chalk.yellow, chalk.green, chalk.blue, chalk.magenta, chalk.cyan];
-    // for each letter in the message
     let rainbow = '';
     for (let i = 0; i < msg.length; i++) {
-        // add the letter in the color
         rainbow += color_range[i % color_range.length](msg[i]);
     }
-    // return the rainbow
     return rainbow;
 }
 
-// print but... pretty !
-function print(msg, source = 'LOGS', append = '') {
+/**
+ * Prints a message to the console with a specific source tag.
+ * @param {string} msg - The message to print.
+ * @param {string} [source='LOGS'] - The source of the message (e.g., 'LOGS', 'DEBUG', 'ERROR').
+ */
+function print(msg, source = 'LOGS') {
+    if (!global.pretty_name) global.pretty_name = pretty_rainbow(config_server['name']);
     var header = '[';
-    header += pretty_rainbow(config_server['name']) + ' @ ';
+    header += global.pretty_name + ' @ ';
     var date = new Date();
     let formatted_date = (date.getHours() < 10 ? '0' : '') + date.getHours();
-    let formatted_append = 'AM';
-    if (formatted_date > 12) {
-        formatted_date -= 12;
-        formatted_append = 'PM';
-    }
     formatted_date += ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-    formatted_date += ':' + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
-    formatted_date += ' ' + formatted_append;
     header += header_styling['TIMESTAMP'](formatted_date) + '] -> ';
     header += header_styling[source](source) + ': ';
     header = '\x1b[1m' + header + '\x1b[0m' + msg;
-    header += append;
     console.log(header); // ta-da!
 }
 
-// debug too..
+/**
+ * Prints a debug message to the console, if debugging is enabled.
+ * @param {string} msg - The debug message to print.
+ */
 function debug(msg) {
-    print(msg, config_server['debug'], 'DEBUG ALWAYS');
+    if (global.config_server['debug']) print(msg, 'DEBUG');
 }
 
-// only sometimes print
-function gated(msg, extra_flag) {
-    print(msg, config_server['debug'] && extra_flag, 'DEBUG GATED');
+/**
+ * Prints an error message to the console.
+ * @param {string} msg - The error message to print.
+ * @param {Error} [error] - An optional error object to include in the message.
+ */
+function error(msg, error = null) {
+    if (error) msg += ' | ' + error;
+    print(msg, 'ERROR');
 }
 
-// and i guess make the errors pretty (and colored) too
-function error(msg, error = null, sol = null) {
-    let append_msg = '';
-    if (sol != null) {
-        append_msg += header_styling['DIRECTION'](' -> ') + 'But no fear! Here are some solutions.';
-        let solutions = require('../../i18n/solutions.json');
-        let solution_items = Object.keys(solutions['database']);
-        for (let i = 0; i < solution_items.length; i++) {
-            let solutionKey = solution_items[i];
-            append_msg += '\n   ' + header_styling['DIRECTION'](" -> ") + header_styling['SOLUTIONS'](i + 1 + '. ') + solutions['database'][solutionKey];
-        }
-    }
-    if (config_server['debug'] && error != null) {
-        append_msg += '\n' + header_styling['DEBUG ALWAYS']("DEBUG ENABLED") + header_styling['DIRECTION'](" -> ") + header_styling['ERROR'](error);
-    }
-    print(msg, 'ERROR', append_msg);
-}
-
-// requests
-function request(kind, user_agent, ip, url) {
-    if (kind == null || user_agent == null || ip == null || url == null) return;
+/**
+ * Prints a request message to the console.
+ * @param {string} kind - The type of request (GET, POST, etc.).
+ * @param {string} userAgent - The user agent string of the request.
+ * @param {string} ip - The IP address of the requester.
+ * @param {string} url - The requested URL.
+ */
+function request(kind, userAgent, ip, url) {
+    if (kind == null || userAgent == null || ip == null || url == null) return;
     kind = request_styling[kind](kind);
-    user_agent = 'UA: ' + request_styling['USERAGENT'](user_agent);
+    userAgent = 'UA: ' + request_styling['USERAGENT'](userAgent);
     ip = 'IP @ ' + request_styling['IP'](ip);
     url = request_styling['URL'](url);
-    let msg = 'Recieving a ' + kind + ' request from ' + ip + ' (' + user_agent + ') for ' + url + '.';
+    let msg = 'Recieving a ' + kind + ' request from ' + ip + ' (' + userAgent + ') for ' + url + '.';
     if (config_server['debug']) {
         print(msg, 'REQUEST');
     }
 }
 
-// export the functions
 module.exports = {
     print,
     debug,
-    gated,
     error,
     request
 };

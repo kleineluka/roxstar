@@ -32,20 +32,21 @@ function initialise() {
     });
 }
 
-/** 
- * Simple wrapper for db.run to execute a query with parameters.
+/**
+ * Executes a query (INSERT, UPDATE, DELETE) using db.run.
  * @param {string} query - The SQL query to execute.
  * @param {Array} params - The parameters to bind to the query.
- * @return {Promise} - A promise that resolves to the last ID of the inserted row.
+ * @return {Promise<{lastID: number, changes: number}>} - A promise that resolves with an object
+ * containing the last inserted ID and the number of rows changed.
  **/
 function runQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.run(query, params, function (err) {
             if (err) {
-                pretty.error(`Database query error: ${err.message}`);
+                pretty.error(`Database run error: ${err.message} | Query: ${query} | Params: ${JSON.stringify(params)}`);
                 return reject(err);
             }
-            resolve(this.lastID);
+            resolve({ lastID: this.lastID, changes: this.changes });
         });
     });
 }
