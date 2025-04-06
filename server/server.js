@@ -49,6 +49,7 @@ middleware_parse.parser(app);
 app.use('/', middleware_routes.router);
 app.use('/', middleware_config.router);
 middleware_services.servicer(app);
+app.use(express.static(path.join(__dirname, 'resources')));
 
 // create the server
 app.listen(config_server['port'], config_server['host'], () => {

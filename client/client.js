@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const UserAgent = require('user-agents');
 const userAgent = new UserAgent();
@@ -82,6 +82,32 @@ function createWindow() {
       partition: partition_name,
       plugins: true
     }
+  });
+
+  mainWindow.webContents.on('context-menu', () => {
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Home (/)',
+        click: () => {
+          mainWindow.loadURL('http://localhost:3000/');
+        }
+      },
+      {
+        label: 'Login (/login)',
+        click: () => {
+          mainWindow.loadURL('http://localhost:3000/login');
+        }
+      },
+      {
+        label: 'Logout (/logout)',
+        click: () => {
+          mainWindow.loadURL('http://localhost:3000/logout');
+        }
+      }
+    ]);
+    contextMenu.popup({
+      window: mainWindow
+    });
   });
 
   console.log(`Using partition: ${partition_name}`);
