@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<!-- head -->
+<head>
+    <!-- to be determined -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>%website.universal.title%</title>
+    <meta name="description" content="%website.universal.description%">
+    <meta name="keywords" content="%website.universal.keywords%">
+    <base href="/"> <!-- fix issues with resolving resources -->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!-- external imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    <!-- no third party imports -->
+    <!-- resource imports -->
+    <link rel='stylesheet' href='/assets/css/base/reset.css'>
+    <link rel='stylesheet' href='/assets/css/base/base.css'>
+    <link rel='stylesheet' href='/assets/css/base/form.css'>
+    <link rel='stylesheet' href='/assets/css/footer.css'>
+    <link rel='stylesheet' href='/assets/css/signin-widget.css'>
+    <link rel='stylesheet' href='/assets/css/header.css'>
+    <!-- internal imports -->
+    <link rel='stylesheet' href='/assets/internal/css/adopt.css'>
+    <!-- resource script imports -->
+    <script src="/assets/js/require.js"></script>
+    <!-- third party script imports -->
+    <script src='/assets/depends/js/swfobject.min.js'></script>
+</head>
+<!-- body -->
+<body>
+    <div id="container">
+        <header id="header" role="banner">
+            <div id="headerContainer">
+                <a href="../">
+                    <div id="logo"></div>
+                </a>
+                <nav role="navigation">
+                    <ul id="nav">
+                        <a href="#">
+                            <li class="news"></li>
+                        </a>
+                        <a href="#">
+                            <li class="forum"></li>
+                        </a>
+                        <a href="#">
+                            <li class="help"></li>
+                        </a>
+                        <a href="#">
+                            <li class="membership"></li>
+                        </a>
+                        <a href="#">
+                            <li class="shop"></li>
+                        </a>
+                    </ul>
+                </nav>
+                <div id="signin-widget-container">
+                    <div id="signin-widget">
+                        <div class="polaroid"></div>
+                        <div class="backing"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div id="content" role="main">
+            <div id="shellContainer">
+                <object id="shell" data="http://localhost:3000/media/game/shell/1.10/flash/shell.swf" name="shell"
+                    type="application/x-shockwave-flash" width="980" height="720">
+                    <param value="always" name="allowScriptAccess">
+                    <param name="bgcolor" value="#86b4db" />
+                    <param name="flashvars" value="siteroot=../&amp;cookie=&amp;shellmode=adoption&amp;browserurl=http://localhost:3000/adopt/&amp;forumsurl=&amp;countryCode=">
+                    <div id="no-flash"></div>
+                    </div>
+                </object>
+            </div>
+        </div>
+    </div>
+    <!-- footer -->
+    <footer id="footer" role="contentInfo"> <!-- to be filled --> </footer>
+    <!-- third party imports -->
+    <script src="/assets/depends/js/jquery-1.8.3.min.js"></script>
+    <script src='/assets/depends/js/json2.min.js'></script>
+    <!-- resource imports -->
+    <script src='/assets/js/modules/new-signin-widget.js'></script>
+    <script src='/assets/js/modules/page-view-eventing.js'></script>
+    <script src='/assets/js/modules/eventing-service.js'></script>
+</body>
+</html>

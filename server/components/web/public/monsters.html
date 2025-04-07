@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<!-- head -->
+<head>
+    <!-- to be determined -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>%website.universal.title%</title>
+    <meta name="description" content="%website.universal.description%">
+    <meta name="keywords" content="%website.universal.keywords%">
+    <base href="/"> <!-- fix issues with resolving resources -->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!-- external imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    <!-- third party imports -->
+    <link rel='stylesheet' href='/assets/depends/css/fancybox.min.css'>
+    <link rel='stylesheet' href='/assets/depends/css/lightbox.min.css'>
+    <link rel="stylesheet" href='/assets/depends/css/toastify.min.css'>
+    <!-- resource imports -->
+    <link rel='stylesheet' href='/assets/css/includes/navigation.css?v=1'>
+    <link rel='stylesheet' href='/assets/css/layout-new.css'>
+    <link rel='stylesheet' href='/assets/css/homepage-signin-widget.css'>
+    <link rel='stylesheet' href='/assets/css/base/common.css'>
+    <link rel='stylesheet' href='/assets/css/base/reset.css'>
+    <link rel='stylesheet' href='/assets/css/footer-new-layout.css'>
+    <link rel='stylesheet' href='/assets/css/monster.css'>
+    <link rel='stylesheet' href='/assets/css/moshitv.css'>
+    <link rel='stylesheet' href='/assets/css/moshitv-lightbox.css'>
+    <!-- resource script imports -->
+    <script src="/assets/js/require.js"></script>
+    <!-- third party script imports -->
+    <script src="/assets/depends/js/jquery-1.8.3.min.js"></script>
+    <script src='/assets/depends/js/swfobject.min.js'></script>
+</head>
+<!-- body -->
+<body>
+    <div id="container">
+        <header> <!-- to be filled --> </header>
+        <!-- the game itself -->
+        <div id="content" role="main">
+            <div id="game">
+                <object id="shell" data="{{shell_data}}" name="shell" type="application/x-shockwave-flash" width="950"
+                    height="527">
+                    <param value="direct" name="wmode">
+                    <param value="true" name="allowFullScreen">
+                    <param value="always" name="allowScriptAccess">
+                    <param value="true" name="allowFullScreenInteractive">
+                    <param name="bgcolor" value="#86b4db" />
+                    <param name="flashvars" value="{{flash_vars}}">
+                    <div>
+                        <a href="https://flash.pm">
+                            <div id="no-flash"></div>
+                        </a>
+                    </div>
+                </object>
+            </div>
+        </div>
+        <!-- secret code and invite menu -->
+        <div id="additional-row">
+            <a id="got-secret-code" href="/secretcode">
+                <span>Got a Secret Code?</span>
+                <div></div>
+            </a>
+            <a id="invite-friends" href="/tellafriend">
+                <span>Invite friends, get rox!</span>
+                <div></div>
+            </a>
+        </div>
+    </div>
+    <!-- footer -->
+    <!-- moshitv overlay -->
+    <div class="overlay moshitv">
+        <div class="frame">
+            <div class="close"></div>
+        </div>
+    </div>
+    <!-- resource imports -->
+    <script src='/assets/js/modules/new-signin-widget.js'></script>
+    <script src='/assets/js/modules/page-view-eventing.js'></script>
+    <script src='/assets/js/modules/eventing-service.js'></script>
+    <script src='/assets/js/modules/game.js'></script>
+    <script src='/assets/js/modules/moshitv-lightbox.js'></script>
+    <!-- third party imports -->
+    <script src="/assets/depends/js/toastify.min.js"></script>
+    <!-- toastify -->
+    {{#notification}}
+    <script>
+        var type = '{{type}}';
+        var timer = '{{timer}}';
+        var color = '{{color}}';
+        Toastify({
+            text: '{{message}}',
+            duration: timer,
+            close: true,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: color,
+            stopOnFocus: true,
+        }).showToast();
+    </script>
+    {{/notification}}
+    <!-- load modules from resources-->
+    <script type="text/javascript">
+        var externalInterfaceFunctions = require('./modules/game')
+        externalInterfaceFunctions('../g.mmcdn.net/funpark')
+    </script>
+</body>
+</html>

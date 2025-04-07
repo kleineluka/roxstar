@@ -6,18 +6,16 @@ const pretty = require('../utils/pretty.js');
  * It imports the route handlers from the specified paths and uses them in the Express app.
  */
 function servicer(app) {
-    try {
-        // loop through each route in the config and dynamically import and use the corresponding route handler
-        Object.entries(global.config_services).forEach(([routeName, routePath]) => {
-            console.log(routeName, routePath);
-            const route_handler_path = '../requests' + routePath + '.js';
-            pretty.debug('Adding route for listening -> ' + route_handler_path + ' (' + routeName + ')');
+    Object.entries(global.config_services).forEach(([routeName, routePath]) => {
+        try {
+            const route_handler_path = '../requests' + routePath;
             const route_handler = require(route_handler_path);
             app.use(routeName, route_handler);
-        });
-    } catch (error) {
-        pretty.error('Error loading SERVICE routes: ', error, 'routes');
-    }
+            pretty.print('Added service route for listening -> ' + route_handler_path + ' (' + routeName + ')', 'ROUTING');
+        } catch (err) {
+            pretty.error(`Failed to add service route '${routeName}' from '${routePath}':`, err);
+        }
+    });
 }
 
 // export the functions

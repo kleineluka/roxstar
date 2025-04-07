@@ -26,7 +26,7 @@ async function log_request(req, res, next) {
 async function processor(app) {
     app.use(log_request);
     app.use('/activation.html', generate_token);
-    app.use(formats.accept_url('login'), generate_token);
+    app.use(formats.acceptUrl('login'), generate_token);
 }
 
 // export the middleware

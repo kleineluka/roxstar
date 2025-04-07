@@ -19,6 +19,10 @@ if (use_random_partition) {
   partition_name = `persist:roxstarinst_${partitionName}`;
 }
 
+app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, 'flash/pepflashplayer64_34_0_0_308'));
+app.commandLine.appendSwitch('ppapi-flash-version', '34.0.0.308');
+app.commandLine.appendSwitch("disable-http-cache");
+
 const singleLock = app.requestSingleInstanceLock();
 if (!singleLock) {
   console.log("Another instance is running, quitting this one.");
@@ -34,9 +38,6 @@ if (!singleLock) {
 
   app.whenReady().then(() => {
     console.log("App is ready! Creating window...");
-    app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, 'flash/pepflashplayer64_34_0_0_308'));
-    app.commandLine.appendSwitch('ppapi-flash-version', '34.0.0.308');
-    app.commandLine.appendSwitch("disable-http-cache");
     createWindow();
     app.on('activate', function () {
       console.log("Activate event triggered.");
@@ -77,31 +78,146 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: false,
-      sandbox: false,
-      webSecurity: false,
+      // sandbox: false,
+      sandbox: true,
+      enableRemoteModule: true,
+      // webSecurity: false,
+      webSecurity: true,
       partition: partition_name,
+      session: null,
       plugins: true
     }
   });
 
-  mainWindow.webContents.on('context-menu', () => {
+  mainWindow.webContents.on('context-menu', (event, params) => { 
     const contextMenu = Menu.buildFromTemplate([
+      // --- Navigation Submenu ---
       {
-        label: 'Home (/)',
+        label: 'Shortcuts',
+        submenu: [
+          {
+            label: 'Home (/)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/');
+            }
+          },
+          {
+            label: 'Login (/login)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/login');
+            }
+          },
+          {
+            label: 'Logout (/logout)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/logout');
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Adopt (/adopt)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/adopt');
+            }
+          },
+          {
+            label: 'Activation (/activation)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/activation');
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Game (/monsters)',
+            click: () => {
+              mainWindow.loadURL('http://localhost:3000/monsters');
+            }
+          }
+        ]
+      },
+      { type: 'separator' }, 
+      // --- Page Control ---
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
         click: () => {
-          mainWindow.loadURL('http://localhost:3000/');
+          mainWindow.webContents.reload();
         }
       },
       {
-        label: 'Login (/login)',
+        label: 'Toggle Fullscreen',
+        accelerator: 'F11', // Common accelerator
         click: () => {
-          mainWindow.loadURL('http://localhost:3000/login');
+          mainWindow.setFullScreen(!mainWindow.isFullScreen());
+          console.log(`Fullscreen ${mainWindow.isFullScreen() ? 'enabled' : 'disabled'}`);
+        }
+      },
+      { type: 'separator' },
+      // --- Audio Control ---
+      {
+        label: 'Raise Volume',
+        click: () => {
+          // Added logic to ensure volume exists before adjusting
+          const currentVolume = mainWindow.webContents.getAudioVolume ? mainWindow.webContents.getAudioVolume() : 1;
+          const newVolume = Math.min(1, currentVolume + 0.1).toFixed(1);
+          mainWindow.webContents.setAudioVolume(parseFloat(newVolume)); 
+          mainWindow.webContents.setAudioMuted(false);
+          console.log(`Volume set to ${newVolume}`);
         }
       },
       {
-        label: 'Logout (/logout)',
+        label: 'Lower Volume',
         click: () => {
-          mainWindow.loadURL('http://localhost:3000/logout');
+          const currentVolume = mainWindow.webContents.getAudioVolume ? mainWindow.webContents.getAudioVolume() : 1;
+          const newVolume = Math.max(0, currentVolume - 0.1).toFixed(1);
+          mainWindow.webContents.setAudioVolume(parseFloat(newVolume));
+          mainWindow.webContents.setAudioMuted(false);
+          console.log(`Volume set to ${newVolume}`);
+        }
+      },
+      {
+        label: 'Mute/Unmute',
+        click: () => {
+          // Use getAudioMuted if available, otherwise assume not muted
+          const isMuted = mainWindow.webContents.isAudioMuted ? mainWindow.webContents.isAudioMuted() : false;
+          mainWindow.webContents.setAudioMuted(!isMuted);
+          console.log(`Audio ${!isMuted ? 'muted' : 'unmuted'}`);
+        }
+      },
+      { type: 'separator' },
+      // --- Developer Tools ---
+      {
+        label: 'Toggle DevTools',
+        accelerator: 'CmdOrCtrl+Shift+I',
+        click: () => {
+          mainWindow.webContents.toggleDevTools();
+        }
+      },
+      {
+        label: 'Inspect Element',
+        click: () => {
+          mainWindow.webContents.inspectElement(params.x, params.y);
+        }
+      },
+      { type: 'separator' }, 
+      // --- Cache & App Control ---
+      {
+        label: 'Clear Cache and Reload',
+        click: () => {
+          mainWindow.webContents.session.clearCache().then(() => {
+            console.log("Cache cleared.");
+            mainWindow.webContents.reload();
+          }).catch(err => {
+            console.error("Failed to clear cache:", err);
+          });
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        click: () => {
+          app.quit();
         }
       }
     ]);

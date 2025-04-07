@@ -37,8 +37,8 @@ function rewrite_parameters(requested_url, route_pattern) {
         parameters.push([final_parameter_name, param_value]);
         pretty.debug('Rebundled parameter -> ' + final_parameter_name + ' = ' + param_value);
     }
-    // also add an obligatory ?kr_rebundled=true so we know not to redirect again
-    parameters.push(['kr_rebundled', 'true']);
+    // also add an obligatory ?rs_rebundled=true so we know not to redirect again
+    parameters.push(['rs_rebundled', 'true']);
     return parameters;
 }
 

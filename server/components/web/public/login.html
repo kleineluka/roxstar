@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<!-- head -->
+<head>
+    <!-- to be determined -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>%website.universal.title%</title>
+    <meta name="description" content="%website.universal.description%">
+    <meta name="keywords" content="%website.universal.keywords%">
+    <base href="/"> <!-- fix issues with resolving resources -->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!-- external imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    <!-- third party imports -->
+    <link rel='stylesheet' href='/assets/depends/css/lightbox.min.css'>
+    <link rel="stylesheet" href='/assets/depends/css/toastify.min.css'>
+    <!-- resource imports -->
+    <link rel='stylesheet' href='/assets/css/layout.css'>
+    <link rel='stylesheet' href='/assets/css/login.css'>
+    <!-- internal imports -->
+    <link rel="stylesheet" href="/assets/internal/css/login.css">
+</head>
+<!-- body -->
+<body>
+    <!-- main container -->
+    <div id="container">
+        <header> <!-- to be filled --> </header>
+        <div id="content" role="main">
+            <!-- log in text -->
+            <div id="panel-top" class="panel-element">
+                <h1>Log In</h1>
+                <h2 class="subtitle"></h2>
+            </div>
+            <!-- main focus -->
+            <div id="panel-centre" class="panel-element">
+                <div id="panel-content">
+                    <!-- submission form -->
+                    <article id="loginForm">
+                        <div id="login-box" class="column column-spacer">
+                            <form action="" id="login" method="post">
+                                <!-- username -->
+                                <div>
+                                    <label for="username">Username</label>
+                                    <div class="text-clarification">Please note: this is your username, not monster
+                                        name!</div>
+                                    <input id="username" name="username" type="text">
+                                </div>
+                                <!-- password -->
+                                <div class="password-field-container">
+                                    <label for="password">Password</label>
+                                    <div class="text-clarification text-warning">Never share your password or enter it
+                                        anywhere but here.</div>
+                                    <input id="password" name="password" type="password">
+                                </div>
+                                <!-- optionally, remember the user -->
+                                <div id="remember-me">
+                                    <input id="remember-me-checkbox" type="checkbox" name="remember-me"
+                                        class="remember-me-checkbox">
+                                    <label for="remember-me-checkbox">Remember my login details for a while.</label>
+                                </div>
+                                <br>
+                                <!-- login button -->
+                                <div id="actions-container"><input id="login-btn" name="submit" type="submit"
+                                        value="Log In" class="img-replace inline"></div>
+                            </form>
+                        </div>
+                        <!-- also allow the user to adopt a monster instead, if they are new -->
+                        <div id="adopt-new-monster-container" class="column">
+                            <p class="intro-text">If you're new to Moshi Monsters you will need to 'Adopt A Monster' to
+                                begin!</p>
+                            <img src="/assets/img/login/login-monsters.jpg" class="splash"><a href="../adopt"
+                                class="img-replace get-a-new-monster">Get A New Monster</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div id="panel-bottom" class="panel-element"></div>
+        </div>
+    </div>
+    <!-- footer -->
+    <footer id="footer" role="contentInfo"> <!-- to be filled --> </footer>
+    <!-- warning overlay for saving the password -->
+    <div class="overlay remember-me">
+        <div class="frame">
+            <div class="close"></div>
+            <div class="remember-me-warning">
+                <!-- please don't steal my rox -->
+                <h1>Wait a second!</h1>
+                <p class="storing-password">Storing your password means anyone on this computer will be able to get
+                    their paws on...</p>
+                <ul class="things-to-steal">
+                    <li>
+                        <img src="/assets/img/remember-me/rox.png">
+                        <h3>Your Rox!</h3>
+                    </li>
+                    <li>
+                        <img src="/assets/img/remember-me/stuff.png">
+                        <h3>Your Stuff!</h3>
+                    </li>
+                    <li>
+                        <img src="/assets/img/remember-me/messages.png">
+                        <h3>Your Messages</h3>
+                    </li>
+                </ul>
+                <div class="remember-details">
+                    <p>If you think someone might mess with your monster, 
+                    <br>try remembering your details instead!</p>
+                </div>
+                <div class="buttons">
+                    <button class="dont-save img-replace inline">Don't save my details</button>
+                    <button class="save img-replace inline">Save my details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- resource imports -->
+    <script src="/assets/js/require.js"></script>
+    <script src='/assets/js/modules/new-signin-widget.js'></script>
+    <!-- third party imports -->
+    <script src="/assets/depends/js/jquery-1.8.3.min.js"></script>
+    <script src="/assets/depends/js/focus.min.js"></script>
+    <script src="/assets/depends/js/json2.min.js"></script>
+    <script src="/assets/depends/js/rememberme.min.js"></script>
+    <script src="/assets/depends/js/toastify.min.js"></script>
+    <!-- toastify -->
+    {{#notification}}
+    <script>
+        var type = '{{type}}';
+        var timer = '{{timer}}';
+        var color = '{{color}}';
+        Toastify({
+            text: '{{message}}',
+            duration: timer,
+            close: true,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: color,
+            stopOnFocus: true,
+        }).showToast();
+    </script>
+    {{/notification}}
+</body>
+
+</html>

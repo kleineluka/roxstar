@@ -1,7 +1,16 @@
 const crypto = require('crypto');
-const database = require('../database.js');
+const database = require('./database.js');
 const pretty = require('../utils/pretty.js');
 const clock = require('../utils/clock.js');
+
+/**
+ * Generates a random string of bytes.
+ * @param {number} byteLength - The length of the random string in bytes.
+ * @returns {string} - The generated random string (hex encoded).
+ **/
+function getRandomBytes(byteLength = 16) {
+    return crypto.randomBytes(byteLength).toString('hex');
+}
 
 /**
  * Generates a cryptographically secure random key string.
@@ -60,7 +69,7 @@ async function confirmKey(username, key) {
 
 // Assume database.js has executeQuery returning { changes: this.changes }
 async function updateUserSession(id, sessKey, logKey, ip) {
-    const timestamp = await clock.get_timestamp(); // Get timestamp ONCE!
+    const timestamp = await clock.getTimestamp(); // Get timestamp ONCE!
     try {
         const updateQuery = `
             UPDATE users
@@ -98,7 +107,7 @@ async function getUserAuthentication(req, res, next) {
             throw new Error('User not logged in');
         }
         // set the user id and username in the request object
-        req.user_id = req.cookies.id;
+        req.userID = req.cookies.id;
         req.username = req.cookies.username;
         next();
     } catch (error) {
@@ -109,6 +118,7 @@ async function getUserAuthentication(req, res, next) {
 
 // export the functions
 module.exports = {
+    getRandomBytes,
     makeKey,
     confirmKey,
     updateUserSession,

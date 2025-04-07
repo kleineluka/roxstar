@@ -13,6 +13,7 @@ const header_styling = {
     'CACHE': chalk.redBright,
     'SESSION MANAGER': chalk.greenBright,
     'SERVER': chalk.blueBright,
+    'ROUTING': chalk.yellowBright,
 };
 
 const request_styling = {

@@ -1,14 +1,14 @@
 /**
  * Returns the current timestamp in seconds.
  */
-function get_timestamp() {
+function getTimestamp() {
     return Math.floor(Date.now() / 1000);
 }
 
 /**
  * Returns the timestamp for 24 hours ago in seconds.
  */
-function get_timestamp_daily() {
+function getTimestampDaily() {
     return Math.floor(Date.now() / 1000) - (24 * 3600);
 }
 
@@ -17,7 +17,7 @@ function get_timestamp_daily() {
  * @param {string} string - The timestamp in seconds.
  * @returns {string} - The formatted date string.
  */
-function get_unix(string) {
+function getUnixTime(string) {
     const timestamp = string * 1000;
     const date = new Date(timestamp);
     const formattedDate = date.toLocaleString('en-US', {
@@ -32,7 +32,7 @@ function get_unix(string) {
 }
 
 module.exports = {
-    get_timestamp,
-    get_timestamp_daily,
-    get_unix
+    getTimestamp,
+    getTimestampDaily,
+    getUnixTime
 };

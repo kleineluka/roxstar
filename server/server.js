@@ -17,8 +17,8 @@ database.initialise();
 cache.initialise();
 
 // allocate the body parsers (BEFORE routing)
-let body_parser = require('body-parser');
-require('body-parser-xml')(body_parser);
+global.body_parser = require('body-parser');
+require('body-parser-xml')(global.body_parser);
 
 // import middleware
 const middleware_rebundles = require('./components/middleware/rebundles.js'); 
