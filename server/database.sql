@@ -47,17 +47,16 @@ CREATE TABLE IF NOT EXISTS users (
     username_history TEXT NOT NULL DEFAULT '[]',
     monster_name TEXT NOT NULL,
     password TEXT NOT NULL,
-    session_key TEXT DEFAULT NULL,
-    login_key TEXT DEFAULT NULL,
-    fingerprint TEXT DEFAULT NULL,
+    session_key TEXT DEFAULT NULL, -- for short term login
+    remember_me TEXT DEFAULT NULL, -- for long term login
     register_ip TEXT NOT NULL,
     last_ip TEXT DEFAULT NULL,
-    activation_status TEXT NOT NULL DEFAULT 'noEmail',
-    is_staff INTEGER NOT NULL DEFAULT 0,
+    activation_status TEXT NOT NULL DEFAULT 'needsActivation',
+    staff INTEGER NOT NULL DEFAULT 0,
     gender TEXT NOT NULL DEFAULT 'm',
-    birth_date INTEGER DEFAULT NULL,
+    birthday INTEGER DEFAULT NULL,
     monster TEXT NOT NULL,
-    country TEXT NOT NULL,
+    country TEXT,
     rocks INTEGER NOT NULL DEFAULT 200,
     rocks_today INTEGER NOT NULL DEFAULT 5000,
     level INTEGER NOT NULL DEFAULT 1,
@@ -78,7 +77,7 @@ CREATE TABLE IF NOT EXISTS users (
     has_claimed_daily INTEGER NOT NULL DEFAULT 0,
     garden TEXT NOT NULL DEFAULT '0~black~-1~60000~60000~0|1~black~-1~60000~60000~0|2~black~-1~60000~60000~0',
     creation_date INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    last_login_date INTEGER DEFAULT NULL,
+    last_active INTEGER DEFAULT NULL,
     house_style TEXT NOT NULL DEFAULT 'default'
 );
 

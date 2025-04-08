@@ -1,3 +1,5 @@
+const xmlbuilder = require('xmlbuilder');
+
 /**
  * Accept URls with or without .html extension
  * @param {*} name - The name of the URL to accept
@@ -38,11 +40,27 @@ function getRandomItem(arr) {
 
 /**
  * Validate an email address using regex
+ * @param {*} email - The email address to validate
+ * @returns {string} - The email address if valid, 'invalid' if not
  */
-function validate_email(email) {
+function validateEmail(email) {
     // regex to match an email
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     return isValid ? email : 'invalid';
+}
+
+/**
+ * Build an XML response with a status code and text
+ * @param {*} code - The status code
+ * @param {*} text - The status text
+ * @param {*} prettyPrint - Whether to pretty print the XML (default is false)
+ * @returns {string} - The XML response string
+ */
+//const xml_success = xmlbuilder.create('xml').ele('status', { code: '0', text: 'success' }).end({ pretty: true });
+function buildXmlResponse(code, text, prettyPrint = false) {
+    return xmlbuilder.create('xml')
+        .ele('status', { code: code.toString(), text })
+        .end({ prettyPrint });
 }
 
 module.exports = {
@@ -50,4 +68,6 @@ module.exports = {
     sanitiseString,
     getRandomItems,
     getRandomItem,
+    validateEmail,
+    buildXmlResponse,
 };

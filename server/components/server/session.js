@@ -67,33 +67,47 @@ async function confirmKey(username, key) {
     }
 }
 
-// Assume database.js has executeQuery returning { changes: this.changes }
-async function updateUserSession(id, sessKey, logKey, ip) {
-    const timestamp = await clock.getTimestamp(); // Get timestamp ONCE!
+/**
+ * Updates the user's session information in the database, optionally including 'remember_me'.
+ * @param {number} id - The user ID.
+ * @param {string} sessionKey - The new session key.
+ * @param {string} ip - The user's IP address.
+ * @param {string} rememberMe - Optional. If true, updates the 'remember_me' field in the database.
+ **/
+async function updateUserSession(id, sessionKey, ip, rememberMe = null) {
+    const timestamp = await clock.getTimestamp();
     try {
-        const updateQuery = `
+        // parameters to always include
+        let updateQuery = `
             UPDATE users
             SET last_ip = ?,
-                last_login_date = ?,
-                session_key = ?,
-                login_key = ?
-            WHERE id = ?
+                last_active = ?,
+                session_key = ?
         `;
-        const result = await database.runQuery(updateQuery, [ip, timestamp, sessKey, logKey, id]);
-        if (result.changes === 0) {
+        let queryParams = [ip, timestamp, sessionKey];
+        // if rememberMe is provided, add it to the query and params
+        if (rememberMe) {
+            updateQuery += `, remember_me = ?`;
+            queryParams.push(rememberMe); 
+        }
+        updateQuery += ` WHERE id = ?`; 
+        queryParams.push(id);
+        const result = await database.runQuery(updateQuery, queryParams);
+        if (result && result.changes > 0) { 
+            pretty.debug(`Successfully updated user ${id} session info${rememberMe === true ? ' and set remember_me.' : '.'}`); // Conditional debug message
+            return true;
+        } else {
             pretty.warn(`User update attempt failed for ID ${id}. User not found or data unchanged.`);
             return false;
         }
-        pretty.debug(`Successfully updated user ${id} login info.`);
-        return true;
     } catch (error) {
-        console.error(`Error updating user ${id} login:`, error);
+        console.error(`Error updating user ${id} session:`, error);
         throw error;
     }
 }
 
 /**
- * * Middleware to check if the user is authenticated.
+ * Middleware to check if the user is authenticated.
  */
 async function getUserAuthentication(req, res, next) {
     try {

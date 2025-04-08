@@ -71,11 +71,10 @@ async function giveRoom(userId) {
  * Populates a user's first room with starter items.
  * @param {number} userId - The ID of the user.
  * @param {number} roomId - The ID of the room to add items to.
- * @param {object} starterConfig - The starter configuration object (e.g., global.config_starter).
  * @returns {Promise<boolean>} - True if successful, false otherwise.
  */
-async function giveStarterHouse(userId, roomId, starterConfig) {
-    if (!starterConfig || !starterConfig.house || starterConfig.house.length === 0) {
+async function giveStarterHouse(userId, roomId) {
+    if (!global.config_starter || !global.config_starter.house || global.config_starter.house.length === 0) {
         pretty.warn(`No starter house items found in config for user ID ${userId}.`);
         return true; 
     }
@@ -86,7 +85,7 @@ async function giveStarterHouse(userId, roomId, starterConfig) {
     let success = true;
     const timestamp = clock.getTimestamp(); 
     try {
-        for (const startingItem of starterConfig.house) {
+        for (const startingItem of global.config_starter.house) {
             pretty.debug(`Adding starter item ${startingItem.itemId} to room ${roomId} for user ${userId}`);
             const sql = `
                 INSERT INTO items (user_id, item_id, room_id, x, y, z, date)
@@ -113,7 +112,6 @@ async function giveStarterHouse(userId, roomId, starterConfig) {
             pretty.warn(`Finished adding starter items for user ${userId} to room ${roomId}, but some items failed to insert.`);
         }
         return success;
-
     } catch (error) {
         pretty.error(`Error giving starter house items to user ID ${userId}, room ID ${roomId}:`, error);
         return false;
@@ -131,17 +129,13 @@ function formatRoomItems(roomItemsData) {
     if (!roomItemsData || roomItemsData.length === 0) {
         return [];
     }
-    if (!global_storage.items) {
-        pretty.error("Cannot format room items: global.global_storage.items is not loaded.");
-        return [];
-    }
     const itemdata = [];
     for (const room_item of roomItemsData) {
         const item_id = room_item.item_id;
-        const baseItem = global_storage.items[item_id];
+        const baseItem = global.storage_items[item_id];
 
         if (!baseItem) {
-            pretty.warn(`Could not find base item details in global_storage.items for item_id: ${item_id}. Skipping item row ID ${room_item.id}.`);
+            pretty.warn(`Could not find base item details in global.storage_items for item_id: ${item_id}. Skipping item row ID ${room_item.id}.`);
             continue;
         }
         // combine database row data (position, instance id) with base item data (name, asset, etc.)
@@ -174,25 +168,21 @@ function formatRoomItems(roomItemsData) {
 }
 
 /**
- * Formats room data fetched from the database.
- * (This function does not query the database itself).
+ * Formats room data fetched from the database (doesn't query database itself).
  * @param {Array<object>} userRoomData - Array of room rows fetched from the 'rooms' table for a user.
  * @returns {Array<object>} - Array of formatted room objects for client/XML use.
  */
-function formatUserHouseData(userRoomData) { // Renamed, removed async
+function formatUserHouseData(userRoomData) {
     if (!userRoomData || userRoomData.length === 0) {
         return [];
     }
-    // The original function hardcoded location and name. Adapt if needed.
     return userRoomData.map(room_data => ({
-        "@id": room_data.id, // The unique ID of the room row
-        "@location": 1, // Seems hardcoded, maybe related to a zone?
-        "@name": "Default monster room" // Seems hardcoded
-        // Add other fields from room_data if necessary
+        "@id": room_data.id,
+        "@location": 1, // todo: hard coded for now
+        "@name": "Default monster room" // todo: hardcoded for now
     }));
 }
 
-// --- Exports ---
 module.exports = {
     getRoomCount,
     getNextRoomStatus,

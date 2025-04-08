@@ -1,16 +1,5 @@
 const crypto = require('crypto');
 const pretty = require('../utils/pretty.js');
-const formats = require('../utils/formats.js');
-
-/**
- * Middleware to generate a temporary token.
- **/
-function generate_token(req, res, next) {
-    if (!req.session.tkn) {
-        req.session.tkn = crypto.randomBytes(config_server['temp-key-bytes']).toString('hex');
-    }
-    next();
-}
 
 /**
  * Middleware to log requests.
@@ -25,8 +14,6 @@ async function log_request(req, res, next) {
  **/
 async function processor(app) {
     app.use(log_request);
-    app.use('/activation.html', generate_token);
-    app.use(formats.acceptUrl('login'), generate_token);
 }
 
 // export the middleware

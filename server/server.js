@@ -23,7 +23,6 @@ require('body-parser-xml')(global.body_parser);
 // import middleware
 const middleware_rebundles = require('./components/middleware/rebundles.js'); 
 const middleware_process = require('./components/middleware/process.js');
-const middleware_routes = require('./components/middleware/routes.js');
 const middleware_config = require('./components/middleware/config.js');
 const middleware_services = require('./components/middleware/services.js');
 const middleware_parse = require('./components/middleware/parse.js');
@@ -46,7 +45,6 @@ app.use(cookieParser());
 app.use(middleware_rebundles.rebundler);
 middleware_process.processor(app);
 middleware_parse.parser(app);
-app.use('/', middleware_routes.router);
 app.use('/', middleware_config.router);
 middleware_services.servicer(app);
 app.use(express.static(path.join(__dirname, 'resources')));

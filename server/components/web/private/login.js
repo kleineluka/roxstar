@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const pretty = require('../../utils/pretty.js');
 const database = require('../../server/database.js');
 const session = require('../../server/session.js');
 const notifs = require('../../utils/notifs.js'); 
@@ -16,10 +17,6 @@ async function login(req, res) {
         notifs.sendToast(req, res, 'Please make sure you entered your username and password!', '#be9ddf', '../public/login.html');
         return 'no_redirect'; 
     }
-    if (!req.session.tkn) {
-        notifs.sendToast(req, res, 'Your session is invalid, please try restarting!', '#be9ddf', '../public/login.html');
-        return 'no_redirect';
-    }
     try {
         const userRow = await database.getQuery(`SELECT * FROM users WHERE username = ?`, [req.body.username]);
         if (!userRow) {
@@ -34,37 +31,27 @@ async function login(req, res) {
         if (!password_match) {
             notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', '../public/login.html');
             return 'no_redirect';
-        }
-        const key_session = req.sessionID;
-        const key_login = await session.makeKey(global.config_server['login-key-length']);
-        req.session.loggedIn = true;
-        req.session.username = userRow.username;
-        req.session.userId = userRow.id; 
-        req.session.save((err) => {
-            if (err) {
-                pretty.error("Session save error:", err); 
-                notifs.toast(req, res, 'Failed to save session.', '#FF0000', '../public/login.html'); 
-                return; 
-            }
+        } else {
+            // store data client-side
+            req.session.loggedIn = true;
+            req.session.username = userRow.username;
+            req.session.userId = userRow.id; 
+            let sessionKey = session.makeKey(global.config_server['login-key-length']);
+            req.session.sessionKey = sessionKey;
+            req.session.save();
+            // optionally, store a cookie to remember the user
+            let rememberMe = req.body['remember-me'] === 'on' ? session.makeKey(32) : null;
             res.cookie('username', userRow.username, { maxAge: session_clock * 1000, httpOnly: true, path: '/' });
-            res.cookie('id', userRow.id, { maxAge: session_clock * 1000, httpOnly: true, path: '/' }); 
-            res.cookie('lastUsername', userRow.username, { maxAge: session_clock * 1000, httpOnly: true, path: '/' });
-            res.cookie('rsAuth', `${userRow.id}|${sessions.getRandomBytes()}|User|${userRow.username}`, { maxAge: session_clock * 1000, httpOnly: true, path: '/' }); 
-            session.updateUserSession(userRow.id, key_session, key_login, req.ip)
-                .then(() => {
-                    if (userRow.activation_status === 'active') { 
-                        res.redirect('../public/monsters.html');
-                    } else if (userRow.activation_status === 'needsActivation') {
-                        res.redirect('../public/activation.html');
-                    } else {
-                        res.redirect('../public/login.html'); 
-                    }
-                })
-                .catch(updateError => {
-                    pretty.error("Failed to update user session:", updateError); 
-                    notifs.toast(req, res, 'Login failed during final update.', '#FF0000', '../public/login.html');
-                });
-        });
+            res.cookie('id', userRow.id, { maxAge: session_clock * 1000, httpOnly: true, path: '/' });
+            res.cookie('rememberMe', rememberMe, { maxAge: session_clock * 1000, httpOnly: true, path: '/' });
+            await session.updateUserSession(userRow.id, sessionKey, req.ip, rememberMe);
+            // redirect the user based on activation status
+            if (userRow.activation_status === 'active') {
+                return 'monsters'; // redirect to monsters page
+            } else {
+                return 'needsActivation'; // redirect to activation page
+            }
+        }
     } catch (error) {
         pretty.error('Login function encountered an error:', error);
         notifs.sendToast(req, res, 'An internal error occurred during login. Please try again.', '#FF0000', '../public/login.html');

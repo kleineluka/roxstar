@@ -27,5 +27,6 @@
     "forums-url": "",
     "pretty-print-replies": true,
     "bff-news-log": true,
-    "database": "roxstar.db"
+    "database": "roxstar.db",
+    "password-salt-rounds": 10
 }
