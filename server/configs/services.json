@@ -5,7 +5,7 @@
     "/login": "/user/login.js",
     "/adopt": "/user/adopt.js",
     "/activation": "/user/activation.js",
-    "/services/monster": "/user/monster.js",
+    "/monsters": "/user/monsters.js",
     "/moshi/services/monster/dressup/costume/friend/*": "/clothes/friend.js",
     "/moshi/services/rest/user/missions/season/all": "/missions/seasons.js",
     "/moshi/services/rest/user/missions/episode/events": "/missions/events.js",

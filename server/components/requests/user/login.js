@@ -30,21 +30,21 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
     let session_clock = (req.body['remember-me'] === 'on') ? global.config_server['session-remember-me-true'] : global.config_server['session-remember-me-false'];
     if (!req.body.username || !req.body.password) {
         notifs.sendToast(req, res, 'Please make sure you entered your username and password!', '#be9ddf', '../../web/login.html');
-        loginResult = 'no_redirect';
+        return;
     } else {
         try {
             const userRow = await database.getQuery(`SELECT * FROM users WHERE username = ?`, [req.body.username]);
             if (!userRow) {
                 notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', '../../web/login.html');
-                loginResult = 'no_redirect';
+                return;
             } else if (userRow.activation_status === 'banned') {
                 notifs.sendToast(req, res, 'Your account is banned.', '#be9ddf', '../../web/login.html');
-                loginResult = 'no_redirect';
+                return;
             } else {
                 const password_match = await bcrypt.compare(req.body.password, userRow.password);
                 if (!password_match) {
                     notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', '../../web/login.html');
-                    loginResult = 'no_redirect';
+                    return;
                 } else {
                     // store data client-side
                     req.session.loggedIn = true;
@@ -60,7 +60,7 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
                     res.cookie('rememberMe', rememberMe, { maxAge: session_clock * 1000, httpOnly: true, path: '/' });
                     await session.updateUserSession(userRow.id, sessionKey, req.ip, rememberMe);
                     // redirect the user based on activation status
-                    if (userRow.activation_status === 'active') {
+                    if (userRow.activation_status === 'Member') {
                         loginResult = 'monsters'; // redirect to monsters page
                     } else {
                         loginResult = 'needsActivation'; // redirect to activation page
@@ -70,13 +70,13 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
         } catch (error) {
             pretty.error('Login function encountered an error:', error);
             notifs.sendToast(req, res, 'An internal error occurred during login. Please try again.', '#FF0000', '../../web/login.html');
-            loginResult = 'no_redirect';
+            return;
         }
     }
-    if (loginResult != 'no_redirect') {
-        const redirection = (loginResult !== 'needsActivation') ? '/monsters' : '/activation';
-        res.redirect(redirection);
-    }
+    // should be safe to redirect now!
+    console.log(`User ${req.body.username} logged in successfully. Redirecting to ${loginResult}.`);
+    const redirection = (loginResult !== 'needsActivation') ? '../../monsters' : '../../activation';
+    res.redirect(redirection);
 });
 
 module.exports = router;
