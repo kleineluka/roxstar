@@ -77,6 +77,16 @@ function error(msg, error = null) {
 }
 
 /**
+ * Prints a warning message to the console.
+ * @param {string} msg - The warning message to print.
+ * @param {Error} [error] - An optional error object to include in the message.
+ */
+function warn(msg, error = null) {
+    if (error) msg += ' | ' + error;
+    print(msg, 'WARN');
+}
+
+/**
  * Prints a request message to the console.
  * @param {string} kind - The type of request (GET, POST, etc.).
  * @param {string} userAgent - The user agent string of the request.
@@ -99,5 +109,6 @@ module.exports = {
     print,
     debug,
     error,
+    warn,
     request
 };
