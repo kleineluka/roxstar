@@ -70,6 +70,24 @@ function getQuery(query, params = []) {
 }
 
 /**
+ * Simple wrapper for db.all to execute a query and return all rows.
+ * @param {string} query - The SQL query to execute.
+ * @param {Array} params - The parameters to bind to the query.
+ * @return {Promise<Array<object>>} - A promise that resolves to an array of rows.
+ **/
+function getAllQuery(query, params = []) {
+    return new Promise((resolve, reject) => {
+        db.all(query, params, (err, rows) => { // Use db.all
+            if (err) {
+                pretty.error(`Database query error: ${err.message} | Query: ${query} | Params: ${JSON.stringify(params)}`);
+                return reject(err);
+            }
+            resolve(rows); // Resolve with the array of rows
+        });
+    });
+}
+
+/**
  * Close the database connection.
  * This should be called when the server is shutting down.  
  **/
@@ -87,5 +105,6 @@ module.exports = {
     initialise,
     runQuery,
     getQuery,
+    getAllQuery,
     close,
 };

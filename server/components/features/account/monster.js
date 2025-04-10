@@ -64,7 +64,108 @@ function validateMonsterName(monsterName) {
     return true;
 }
 
+// Add this function somewhere in the file
+/**
+ * Parses the colorama JSON string and formats it for XML attributes.
+ * @param {string|null} coloramaJson - The JSON string from the database (e.g., '["#FF0000", "#00FF00", "#0000FF"]').
+ * @returns {object} - An object with '@customcolour1', '@customcolour2', '@customcolour3' keys, or an empty object if invalid.
+ */
+function getUserColoramaData(coloramaJson) {
+    if (!coloramaJson || typeof coloramaJson !== 'string') {
+        return {};
+    }
+    try {
+        const colors = JSON.parse(coloramaJson);
+        if (Array.isArray(colors) && colors.length >= 3) {
+            // only take the first three colors, ensure they are strings
+            const color1 = typeof colors[0] === 'string' ? colors[0] : null;
+            const color2 = typeof colors[1] === 'string' ? colors[1] : null;
+            const color3 = typeof colors[2] === 'string' ? colors[2] : null;
+            // only include attributes if the color is valid
+            const attributes = {};
+            if (color1) attributes['@customcolour1'] = color1;
+            if (color2) attributes['@customcolour2'] = color2;
+            if (color3) attributes['@customcolour3'] = color3;
+            return attributes;
+        } else {
+            pretty.debug(`Parsed colorama data is not an array or has less than 3 elements: ${coloramaJson}`);
+            return {};
+        }
+    } catch (error) {
+        pretty.warn(`Failed to parse colorama JSON: "${coloramaJson}"`, error);
+        return {}; 
+    }
+}
+
+
+/**
+ * Gets the list of body parts and layers for a specific monster type.
+ * @param {string} monsterType - The type of monster (e.g., 'katsuma', 'poppet').
+ * @returns {Array<object>} - An array of part objects for XML building.
+ */
+function getMonsterParts(monsterType) {
+    let parts = [];
+    switch (monsterType) {
+        case 'zommer':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farArm', '@layer': '1' } },
+                { part: { '@id': 'farLeg', '@layer': '1' } }, { part: { '@id': 'tail', '@layer': '1' } },
+                { part: { '@id': 'nearLeg', '@layer': '1' } }, { part: { '@id': 'body', '@layer': '1' } },
+                { part: { '@id': 'nearArm', '@layer': '1' } }, { part: { '@id': 'farEar', '@layer': '1' } },
+                { part: { '@id': 'headShape', '@layer': '1' } }, { part: { '@id': 'nearEar', '@layer': '1' } }
+            ];
+            break;
+        case 'luvli':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farWing', '@layer': '1' } },
+                { part: { '@id': 'farLeg', '@layer': '1' } }, { part: { '@id': 'nearLeg', '@layer': '1' } },
+                { part: { '@id': 'frontGreen', '@layer': '1' } }, { part: { '@id': 'body', '@layer': '1' } },
+                { part: { '@id': 'nearWing', '@layer': '1' } }
+            ];
+            break;
+        case 'katsuma':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farArm', '@layer': '1' } },
+                { part: { '@id': 'farLeg', '@layer': '1' } }, { part: { '@id': 'tail', '@layer': '1' } },
+                { part: { '@id': 'nearLeg', '@layer': '1' } }, { part: { '@id': 'body', '@layer': '1' } },
+                { part: { '@id': 'nearArm', '@layer': '1' } }, { part: { '@id': 'farEar', '@layer': '1' } },
+                { part: { '@id': 'headShape', '@layer': '1' } }, { part: { '@id': 'nearEar', '@layer': '1' } }
+            ];
+            break;
+        case 'poppet':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farLeg', '@layer': '1' } },
+                { part: { '@id': 'farArm', '@layer': '1' } }, { part: { '@id': 'tail', '@layer': '1' } },
+                { part: { '@id': 'nearLeg', '@layer': '1' } }, { part: { '@id': 'body', '@layer': '1' } },
+                { part: { '@id': 'nearArm', '@layer': '1' } }, { part: { '@id': 'headShape', '@layer': '1' } }
+            ];
+            break;
+        case 'furi':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farArm', '@layer': '1' } },
+                { part: { '@id': 'farFoot', '@layer': '1' } }, { part: { '@id': 'nearFoot', '@layer': '1' } },
+                { part: { '@id': 'body', '@layer': '1' } }, { part: { '@id': 'nearArm', '@layer': '1' } }
+            ];
+            break;
+        case 'diavlo':
+            parts = [
+                { part: { '@id': 'none', '@layer': '1' } }, { part: { '@id': 'farWing', '@layer': '1' } },
+                { part: { '@id': 'farArm', '@layer': '1' } }, { part: { '@id': 'tail', '@layer': '1' } },
+                { part: { '@id': 'body', '@layer': '1' } }, { part: { '@id': 'nearWing', '@layer': '1' } },
+                { part: { '@id': 'nearArm', '@layer': '1' } }, { part: { '@id': 'farLeg', '@layer': '1' } },
+                { part: { '@id': 'nearLeg', '@layer': '1' } }
+            ];
+            break;
+        default:
+            pretty.warn(`Unknown monster type "${monsterType}" requested for parts.`);
+            parts = [{ part: { '@id': 'none', '@layer': '1' } }]; // Default empty structure
+    }
+    return parts;
+}
+
 module.exports = {
     changeUserMonster,
     validateMonsterName,
+    getUserColoramaData,
+    getMonsterParts,
 };

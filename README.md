@@ -1,1 +1,4 @@
-may not be used in any production environments or redistributed in any form
+- May not be used in any production environments or redistributed in any form
+- Not secure in current stage
+- Fan project and not affiliated with any other project
+- Only original code is contained in this repository

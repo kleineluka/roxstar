@@ -63,6 +63,33 @@ function buildXmlResponse(code, text, prettyPrint = false) {
         .end({ prettyPrint });
 }
 
+/**
+ * Calculates the age in years from a Unix timestamp (seconds).
+ * @param {number|null} birthTimestamp - The user's birthday as a Unix timestamp in seconds, or null/undefined.
+ * @returns {number} - The user's age in years, or 0 if the timestamp is invalid.
+ */
+function getUserAge(birthTimestamp) {
+    if (!birthTimestamp || typeof birthTimestamp !== 'number' || birthTimestamp <= 0) {
+        pretty.debug('getUserAge: Invalid or missing birthTimestamp, returning age 0.');
+        return 0; // assume 0 on invalid input
+    }
+    try {
+        const birthDate = new Date(birthTimestamp * 1000); // convert seconds to milliseconds
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        // adjust age if the birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 0 ? age : 0; // ensure age is not negative.. somehow..
+    } catch (error) {
+        pretty.error('Error calculating age from timestamp:', error);
+        return 0; // assume 0 on error
+    }
+}
+
+
 module.exports = {
     acceptUrl,
     sanitiseString,
@@ -70,4 +97,5 @@ module.exports = {
     getRandomItem,
     validateEmail,
     buildXmlResponse,
+    getUserAge,
 };

@@ -94,8 +94,130 @@ async function deleteUserItem(userId, itemInstanceId) {
     }
 }
 
+/**
+ * Formats clothing item data fetched from the database using global storage details.
+ * @param {Array<object>} clothesData - Array of item rows from the 'clothes' table (needs id, item_id).
+ * @returns {Array<object>} - Array of formatted clothing item objects for client/XML use.
+ */
+function formatUserClothes(clothesData) {
+    if (!clothesData || clothesData.length === 0) {
+        return [];
+    }
+    if (!global.storage_clothes) {
+        pretty.error("global.storage_clothes is not loaded. Cannot format clothes.");
+        return [];
+    }
+    const formattedClothes = [];
+    for (const clothingItem of clothesData) {
+        const baseItem = global.storage_clothes[clothingItem.item_id];
+        if (!baseItem) {
+            pretty.warn(`Could not find base clothing details for item_id: ${clothingItem.item_id}. Skipping item row ID ${clothingItem.id}.`);
+            continue;
+        }
+        // combine database row id with base item details
+        formattedClothes.push({
+            item: { 
+                '@id': clothingItem.id,
+                '@srcId': clothingItem.item_id,
+                '@name': baseItem.name,
+                '@description': baseItem.description || '',
+                '@asset': baseItem.asset,
+                '@type': baseItem.type || 'clothing', 
+                '@zone': baseItem.zone || '',
+                '@animated': baseItem.animated || 'false',
+                '@handler': baseItem.handler || '',
+                '@args': baseItem.args || '',
+                '@health': baseItem.health || 0,
+                '@happiness': baseItem.happiness || 0,
+            }
+        });
+    }
+    return formattedClothes;
+}
+
+/**
+ * Formats seed item data fetched from the database using global storage details.
+ * @param {Array<object>} seedData - Array of item rows from the 'seeds' table (needs id, item_id).
+ * @returns {Array<object>} - Array of formatted seed item objects for client/XML use.
+ */
+function formatUserSeeds(seedData) {
+    if (!seedData || seedData.length === 0) {
+        return [];
+    }
+    if (!global.storage_seeds) {
+        pretty.error("global.storage_seeds is not loaded. Cannot format seeds.");
+        return [];
+    }
+    const formattedSeeds = [];
+    for (const seedItem of seedData) {
+        const baseItem = global.storage_seeds[seedItem.item_id];
+        if (!baseItem) {
+            pretty.warn(`Could not find base seed details for item_id: ${seedItem.item_id}. Skipping item row ID ${seedItem.id}.`);
+            continue;
+        }
+        // combine database row id with base item details
+        formattedSeeds.push({
+            item: { 
+                '@id': seedItem.id,
+                '@srcId': seedItem.item_id,
+                '@name': baseItem.name,
+                '@description': baseItem.description || '',
+                '@asset': baseItem.asset,
+                '@type': baseItem.type || 'seed',
+                '@subscription': baseItem.subscription || 'false',
+                '@rocks': baseItem.rocks || 0,
+                '@level': baseItem.level || 1,
+                '@locationId': baseItem.locationId || -1,
+                '@health': baseItem.health || 0,
+                '@happiness': baseItem.happiness || 0,
+            }
+        });
+    }
+    return formattedSeeds;
+}
+
+/**
+ * Formats currently worn dressup items for XML output.
+ * @param {Array<object>} dressupData - Array of rows from the 'dressup' table for the user.
+ * @returns {Array<object>} - Array of formatted dressup item objects for client/XML use.
+ */
+function formatUserCostume(dressupData) {
+    if (!dressupData || dressupData.length === 0) {
+        return [];
+    }
+    const formattedCostume = [];
+    for (const item of dressupData) {
+        formattedCostume.push({
+            dressupitem: {
+                '@id': item.item_id,
+                '@costumeitemId': item.id,
+                '@x': item.x,
+                '@y': item.y,
+                '@z': item.z,
+                '@xscale': item.xscale,
+                '@yscale': item.yscale,
+                '@rotation': item.rotation,
+                '@layer': item.layer,
+                '@boneName': item.boneName,
+                '@direction': item.direction,
+                localTransform: {
+                    '@rotation': item.rotation,
+                    '@x': item.x,
+                    '@xscale': item.xscale,
+                    '@y': item.y,
+                    '@yscale': item.yscale
+                }
+            }
+        });
+    }
+    return formattedCostume;
+}
+
 module.exports = {
     giveStarterInventory,
     giveItemToUser,
     deleteUserItem,
+    formatUserClothes,
+    formatUserSeeds,
+    formatUserCostume,
 };

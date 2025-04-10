@@ -17,9 +17,7 @@ router.get('/', async (req, res) => {
     }
     try {
         const userRow = await database.getQuery(
-            `SELECT username, activation_status, settings FROM users WHERE id = ?`,
-            [userId]
-        );
+            `SELECT username, activation_status, settings FROM users WHERE id = ?`, [userId]);
         if (!userRow) {
             pretty.warn(`User ID ${userId} found in session but not in database. Invalidating session.`);
             req.session.destroy((err) => {

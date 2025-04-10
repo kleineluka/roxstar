@@ -1,6 +1,7 @@
 const fs = require('fs');
 const express = require('express');
 const router = express.Router();
+const pretty = require('../utils/pretty.js');
 
 /**
  * Sets the headers for the response.
@@ -29,6 +30,14 @@ router.get('/nullservices/rest/configuration', async (req, res) => {
     const pretty_json = JSON.stringify(global.config_provided, null, 4);
     res = await set_headers(res, 89);
     res.type('text/plain').send(pretty_json);
+});
+
+/**
+ * Send an OK response to eventing requests. Probably just in the client for analytics.
+ */
+router.post('/services/eventing/pageView', (req, res) => {
+    pretty.debug(`Received pageView event for path: ${req.headers.referer || 'Unknown'}`);
+    res.sendStatus(200);
 });
 
 module.exports = {

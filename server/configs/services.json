@@ -6,20 +6,7 @@
     "/adopt": "/user/adopt.js",
     "/activation": "/user/activation.js",
     "/monsters": "/user/monsters.js",
-    "/moshi/services/monster/dressup/costume/friend/*": "/clothes/friend.js",
-    "/moshi/services/rest/user/missions/season/all": "/missions/seasons.js",
-    "/moshi/services/rest/user/missions/episode/events": "/missions/events.js",
-    "/moshi/services/monster/heartbeat": "/heartbeats/monster.js",
-    "/moshi/services/rest/comment/heartbeat": "/heartbeats/comment.js",
-    "/moshi/services/rest/garden/status": "/user/garden.js",
-    "/moshi/services/rest/user/mood": "/user/mood.js",
-    "/moshi/services/comments": "/pinboard/open.js",
-    "/moshi/services/rest/comment/containsfriends": "/pinboard/friends.js",
-    "/moshi/rmf/rmf/checkcontent": "/pinboard/filter.js",
-    "/moshi/services/rest/moshling/all": "/moshlings/minified.js",
-    "/moshi/services/rest/user/profile/inroomownprofile": "/user/profile.js",
-    "/moshi/services/rest/user/profile/update": "/user/profile.js",
-    "/moshi/services/garden/enter": "/garden/enter.js",
-    "/moshi/services/rest/users/members/newest": "/user/newest.js",
-    "/moshi/services/rest/moshling/egg": "/moshlings/egg"
+    "/services/monster": "/user/monster.js",
+    "/moshi/medals/game/moshi/user": "/user/medals.js",
+    "/moshi/services/monster/dressup/costume/friend": "/clothing/friend.js"
 }

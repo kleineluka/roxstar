@@ -1,4 +1,5 @@
 {
+    "/moshi/medals/game/moshi/user/*": "json",
     "/moshi/services/rest/comment/containsfriends": "json",
     "/moshi/rmf/rmf/checkcontent": "json",
     "/moshi/services/comment/create/*": "xml",

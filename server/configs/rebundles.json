@@ -3,10 +3,6 @@
         "route_pattern": "/services/rest/users/availability/detailed/%username%?noCache=",
         "route_out": "/services/rest/users/availability/detailed/"
     },
-    "/moshi/services/monster/dressup/costume/friend": {
-        "route_pattern": "/moshi/services/monster/dressup/costume/friend/%username%?noCache=",
-        "route_out": "/moshi/services/monster/dressup/costume/friend"
-    },
     "/moshi/services/rest/moshling/egg": {
         "route_pattern": "/moshi/services/rest/moshling/egg?noCache=",
         "route_out": "/moshi/services/rest/moshling/egg"
