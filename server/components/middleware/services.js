@@ -11,7 +11,7 @@ function servicer(app) {
             const route_handler_path = '../requests' + routePath;
             const route_handler = require(route_handler_path);
             app.use(routeName, route_handler);
-            pretty.print('Added service route for listening -> ' + route_handler_path + ' (' + routeName + ')', 'ROUTING');
+            pretty.print('Added route for listening -> ' + route_handler_path + ' (' + routeName + ')', 'ROUTING');
         } catch (err) {
             pretty.error(`Failed to add service route '${routeName}' from '${routePath}':`, err);
         }

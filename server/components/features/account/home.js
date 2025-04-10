@@ -183,6 +183,31 @@ function formatUserHouseData(userRoomData) {
     }));
 }
 
+/**
+ * Formats all available house styles for XML output.
+ * @returns {Array<object>} An array of formatted style objects.
+ */
+function formatAllHouseStyles() {
+    if (!global.storage_housestyles) {
+        pretty.error("House styles storage (global.storage_housestyles) not loaded.");
+        return [];
+    }
+    const formattedStyles = [];
+    for (const styleId in global.storage_housestyles) {
+        const style = global.storage_housestyles[styleId];
+        formattedStyles.push({
+            style: {
+                '@cost': style.cost || 0,
+                '@id': styleId, 
+                '@level': style.level || 1,
+                '@name': style.name || 'Unknown Style',
+                '@path': style.path || ''
+            }
+        });
+    }
+    return formattedStyles;
+}
+
 module.exports = {
     getRoomCount,
     getNextRoomStatus,
@@ -190,4 +215,5 @@ module.exports = {
     giveStarterHouse,
     formatRoomItems, 
     formatUserHouseData,
+    formatAllHouseStyles,
 };

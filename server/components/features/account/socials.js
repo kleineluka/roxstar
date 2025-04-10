@@ -131,6 +131,37 @@ async function logBffNews(userId, type, value) {
     }
 }
 
+/**
+ * Gets the user's current mood ID from their profile data.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<number>} - The user's mood ID (index 1 of profile array), or 0 as default if not set/error.
+ */
+async function getUserMood(userId) {
+    const defaultMood = 0; // default mood id
+    if (typeof userId !== 'number') {
+        pretty.warn(`getUserMood called with invalid userId: ${userId}`);
+        return defaultMood;
+    }
+    try {
+        const user = await database.getQuery('SELECT profile FROM users WHERE id = ?', [userId]);
+        if (!user || !user.profile) {
+            pretty.debug(`No profile data found for user ID ${userId} when getting mood.`);
+            return defaultMood;
+        }
+        const profileArray = JSON.parse(user.profile);
+        if (Array.isArray(profileArray) && profileArray.length > 1 && typeof profileArray[1] !== 'undefined') {
+            const moodId = Number(profileArray[1]);
+            return !isNaN(moodId) ? moodId : defaultMood;
+        } else {
+            pretty.warn(`Invalid profile format or missing mood for user ID ${userId}. Profile: ${user.profile}`);
+            return defaultMood;
+        }
+    } catch (error) {
+        pretty.error(`Error getting user mood for ID ${userId}:`, error);
+        return defaultMood;
+    }
+}
+
 module.exports = {
     getFriendCount,
     getPendingFriendCount,
@@ -138,4 +169,5 @@ module.exports = {
     getPendingCommentCount,
     calculateRating,
     logBffNews,
+    getUserMood,
 };

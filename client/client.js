@@ -187,10 +187,16 @@ function createWindow() {
       { type: 'separator' },
       // --- Developer Tools ---
       {
-        label: 'Toggle DevTools',
+        label: 'Open DevTools (Internal)',
         accelerator: 'CmdOrCtrl+Shift+I',
         click: () => {
           mainWindow.webContents.toggleDevTools();
+        }
+      },
+      {
+        label: 'Open DevTools (Docked)',
+        click: () => {
+          mainWindow.webContents.openDevTools({ mode: 'detach' });
         }
       },
       {

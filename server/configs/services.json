@@ -8,5 +8,10 @@
     "/monsters": "/user/monsters.js",
     "/services/monster": "/user/monster.js",
     "/moshi/medals/game/moshi/user": "/user/medals.js",
-    "/moshi/services/monster/dressup/costume/friend": "/clothing/friend.js"
+    "/moshi/services/monster/dressup/costume/friend": "/clothing/friend.js",
+    "/moshi/services/rest/user/missions/season/all": "/missions/seasons.js",
+    "/moshi/services/rest/user/missions/episode/events": "/missions/events.js",
+    "/moshi/services/monster/heartbeat": "/heartbeats/monster.js",
+    "/moshi/services/rest/comment/heartbeat": "/heartbeats/comment.js",
+    "/moshi/services/rest/world/location": "/world/location.js"
 }
