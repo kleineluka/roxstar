@@ -17,5 +17,6 @@
     "/moshi/mynews/mynews/user": "/social/news.js",
     "/moshi/services/rest/users/members/newest": "/user/newest.js",
     "/moshi/services/garden/enter": "/garden/enter.js",
-    "/moshi/services/rest/moshling/sets": "/moshling/sets.js"
+    "/moshi/services/rest/moshling/sets": "/moshling/sets.js",
+    "/moshi/services/monster/item/save": "/inventory/save.js"
 }

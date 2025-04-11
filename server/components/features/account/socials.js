@@ -1,5 +1,7 @@
+const crypto = require('crypto');
 const database = require('../../server/database.js');
 const pretty = require('../../utils/pretty.js');
+const clock = require('../../utils/clock.js');
 
 /**
  * Gets the number of friends a user has.
