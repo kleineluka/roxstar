@@ -18,5 +18,7 @@
     "/moshi/services/rest/users/members/newest": "/user/newest.js",
     "/moshi/services/garden/enter": "/garden/enter.js",
     "/moshi/services/rest/moshling/sets": "/moshling/sets.js",
-    "/moshi/services/monster/item/save": "/inventory/save.js"
+    "/moshi/services/monster/item/save": "/inventory/save.js",
+    "/moshi/services/rest/garden/status": "/garden/status.js",
+    "/moshi/services/rest/user/mood": "/user/mood.js"
 }
