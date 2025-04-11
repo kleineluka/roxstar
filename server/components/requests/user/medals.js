@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
  * Handles POST requests to award a medal to a user.
  * Validates the request and updates the user's medals in the database.
  */
-router.post('/:id', async (req, res) => {
+/*router.post('/:id', async (req, res) => {
     const userId = parseInt(req.params.id, 10);
     const medalId = parseInt(req.query.medal, 10);
     const loggedInUserId = req.session.userId;
@@ -103,6 +103,62 @@ router.post('/:id', async (req, res) => {
             pretty.debug(`User ${userId} already has medal ${medalId}.`);
             // medal already exists, just return the current list
             res.json({ achievements: currentMedals });
+        }
+    } catch (error) {
+        pretty.error(`Error awarding medal ${medalId} to user ID ${userId}:`, error);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});*/
+
+/**
+ * Handles POST requests to award a medal to a user using a different endpoint.
+ * This is a more generic endpoint that allows specifying the medal ID in the URL.
+ */
+router.post('/:userId/:medalId', async (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
+    const medalId = parseInt(req.params.medalId, 10);
+    const loggedInUserId = req.session.userId;
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID." });
+    }
+    if (isNaN(medalId)) {
+        // shouldn't be possible?
+        return res.status(400).json({ error: "Invalid medal ID." });
+    }
+    if (!loggedInUserId || loggedInUserId !== userId) {
+        pretty.warn(`Medal award attempt mismatch: Logged in user ${loggedInUserId} tried to award medal ${medalId} to user ${userId}`);
+        return res.status(403).json({ error: "Forbidden: Cannot award medals to other users." });
+    }
+    const authToken = req.body?.authToken; 
+    if (!authToken) { // check if authToken exists and is not empty/null/undefined
+        pretty.debug(`Medal award attempt for user ${userId}, medal ${medalId} missing authToken in body.`);
+    }
+    try {
+        const user = await database.getQuery('SELECT medals FROM users WHERE id = ?', [userId]);
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+        let currentMedals = parseMedals(user.medals);
+        if (!currentMedals.includes(medalId)) {
+            currentMedals.push(medalId);
+            // sort medals numerically for consistency
+            currentMedals.sort((a, b) => a - b);
+            const updatedMedalsJson = JSON.stringify(currentMedals);
+            const updateResult = await database.runQuery(
+                'UPDATE users SET medals = ? WHERE id = ?',
+                [updatedMedalsJson, userId]
+            );
+            if (updateResult && updateResult.changes > 0) {
+                pretty.print(`Awarded medal ${medalId} to user ${userId}.`, 'ACTION');
+                await socialUtils.logBffNews(userId, 'achievement', medalId);
+                res.json({ achievements: currentMedals }); // return updated list
+            } else {
+                pretty.error(`Failed to update medals for user ID ${userId}.`);
+                res.status(500).json({ error: "Failed to update medals." });
+            }
+        } else {
+            pretty.debug(`User ${userId} already has medal ${medalId}.`);
+            res.json({ achievements: currentMedals }); // return current list
         }
     } catch (error) {
         pretty.error(`Error awarding medal ${medalId} to user ID ${userId}:`, error);

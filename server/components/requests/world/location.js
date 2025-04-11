@@ -47,14 +47,24 @@ router.get('/:locationId', async (req, res) => {
     try {
         switch (locationType) {
             case 'street':
-                const pedestrians = await pedestrianUtils.getStreetPedestrians(userId);
+                const pedestrians = await pedestrianUtils.getStreetPedestrians(userId); // gets array of { pedestrian: {...} }
                 const overrides = locationUtils.formatLocationOverrides(baseLocationData.overrides);
                 dynamicData = {
                     dynamic: {
-                        actors: { pedestrians: pedestrians }, // array of {pedestrian: {...}}
-                        overrides: overrides // Array of {content: {...}} or {structure: {...}}
+                        actors: {
+                            pedestrians: pedestrians // array of { pedestrian: {...} }
+                        },
+                        overrides: overrides
                     }
                 };
+                // handle empty pedestrians case
+                if (!pedestrians || pedestrians.length === 0) {
+                    dynamicData.dynamic.actors.pedestrians = {}; // creates <pedestrians/>
+                }
+                // handle empty overrides
+                if (!overrides || overrides.length === 0) {
+                    dynamicData.dynamic.overrides = {}; // creates <overrides/>
+                }
                 break;
             // these are all handled the same way below (except giftshop which comes with gifts)
             case 'shop':

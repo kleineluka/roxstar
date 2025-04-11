@@ -84,7 +84,8 @@ async function getStreetPedestrians(excludeUserId, limit = 5) {
     } catch (error) {
         pretty.error(`Error fetching street pedestrians (excluding ${excludeUserId}):`, error);
     }
-    return pedestrians.map(p => ({ pedestrian: p })); // Ensure final structure has <pedestrian> wrapper
+    return pedestrians;
+    //return pedestrians.map(p => ({ pedestrian: p })); // ensure final structure has <pedestrian> wrapper
 }
 
 module.exports = {

@@ -68,7 +68,64 @@ function formatUserMoshlings(allUserMoshlings, uniqueMoshlingCount) {
     return formatted;
 }
 
+/**
+ * Augments the base zoo structure with the user's owned Moshling counts.
+ * Creates a deep copy of the base zoo structure to avoid modifying the global object.
+ * @param {number} userId - The ID of the user whose counts to fetch.
+ * @returns {Promise<object>} - The augmented zoo structure object.
+ */
+async function getUserZooData(userId) {
+    // deep copy the base zoo structure
+    if (!global.storage_zoo) {
+        pretty.error("Zoo storage (global.storage_zoo) not loaded.");
+        return {}; // return empty object on error
+    }
+    const userZooData = JSON.parse(JSON.stringify(global.storage_zoo));
+    try {
+        // get user's owned counts per srcId
+        const ownedCounts = await database.getAllQuery(
+            `SELECT srcId, COUNT(srcId) as quantity
+             FROM moshlings
+             WHERE user_id = ?
+             GROUP BY srcId`,
+            [userId]
+        );
+        if (!ownedCounts || ownedCounts.length === 0) {
+            // user owns no moshlings, return the base structure (with potentially 0 quantities)
+            if (userZooData.moshlingSets && Array.isArray(userZooData.moshlingSets)) {
+                for (const set of userZooData.moshlingSets) {
+                    if (set.moshlings && Array.isArray(set.moshlings)) {
+                        set.moshlings.forEach(m => m.quantity = 0);
+                    }
+                }
+            }
+            return userZooData;
+        }
+        // create a Map for quick lookup of owned counts
+        const ownedMap = new Map();
+        ownedCounts.forEach(item => {
+            ownedMap.set(item.srcId, item.quantity);
+        });
+        // iterate through the copied zoo structure and inject quantities
+        if (userZooData.moshlingSets && Array.isArray(userZooData.moshlingSets)) {
+            for (const set of userZooData.moshlingSets) {
+                if (set.moshlings && Array.isArray(set.moshlings)) {
+                    for (const moshling of set.moshlings) {
+                        // get quantity from map or default to 0 if not owned
+                        moshling.quantity = ownedMap.get(moshling.srcId) || 0;
+                    }
+                }
+            }
+        }
+        return userZooData;
+    } catch (error) {
+        pretty.error(`Error fetching user zoo data for user ID ${userId}:`, error);
+        return userZooData; // return the (potentially partially modified) structure on error
+    }
+}
+
 module.exports = {
     getMoshlingCount,
     formatUserMoshlings,
+    getUserZooData,
 };

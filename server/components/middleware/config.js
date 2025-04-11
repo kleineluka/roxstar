@@ -40,6 +40,16 @@ router.post('/services/eventing/pageView', (req, res) => {
     res.sendStatus(200);
 });
 
+/**
+ * Sends the static Moshling egg status XML response.
+ */
+router.get('/moshi/services/rest/moshling/egg', async (req, res) => {
+    const staticXmlResponse = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><eggStatus allowedToPolish="false" availableForCollection="false" eggInHatchery="false"/>';
+    res = await set_headers(res, 89);
+    res.type('text/xml').send(staticXmlResponse);
+    pretty.debug('Sent static Moshling egg status.');
+});
+
 module.exports = {
     router
 };
