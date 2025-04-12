@@ -1,0 +1,119 @@
+{
+    "5": {
+        "name": "Ice-Scream",
+        "roxMulti": 0.25,
+        "expMulti": 0.25,
+        "maxRox": 200,
+        "maxExp": 100,
+        "minScore": 10,
+        "maxScore": 1500
+    },
+    "6": {
+        "name": "Moshling Boshling",
+        "roxMulti": 10.0,
+        "expMulti": 5.0,
+        "maxRox": 40,
+        "maxExp": 20,
+        "minScore": 1,
+        "maxScore": 3
+    },
+    "7": {
+        "name": "Cleanup Moshlings",
+        "roxMulti": 4.0,
+        "expMulti": 2.0,
+        "maxRox": 20,
+        "maxExp": 10,
+        "minScore": 2,
+        "maxScore": 3
+    },
+    "10": {
+        "name": "Quack Attack",
+        "roxMulti": 0.3,
+        "expMulti": 0.15,
+        "maxRox": 50,
+        "maxExp": 25,
+        "minScore": 50,
+        "maxScore": 150
+    },
+    "21": {
+        "name": "Beanstalk",
+        "roxMulti": 0.05,
+        "expMulti": 0.025,
+        "maxRox": 150,
+        "maxExp": 150,
+        "minScore": 1000,
+        "maxScore": 250000
+    },
+    "13": {
+        "name": "Shouty Shack",
+        "roxMulti": 1.0,
+        "expMulti": 0.5,
+        "maxRox": 50,
+        "maxExp": 25,
+        "minScore": 4,
+        "maxScore": 5
+    },
+    "4": {
+        "name": "Underground Disco",
+        "roxMulti": 2.5,
+        "expMulti": 2.5,
+        "maxRox": 200,
+        "maxExp": 200,
+        "minScore": 10,
+        "maxScore": 30
+    },
+    "2": {
+        "name": "En-Gen",
+        "roxMulti": 0.1,
+        "expMulti": 0.1,
+        "maxRox": 100,
+        "maxExp": 1000,
+        "minScore": 2000,
+        "maxScore": 100000
+    },
+    "11": {
+        "name": "Thump Glump",
+        "roxMulti": 0.005,
+        "expMulti": 0.0025,
+        "maxRox": 100,
+        "maxExp": 50,
+        "minScore": 2500,
+        "maxScore": 200000
+    },
+    "1": {
+        "name": "Flutterby Field",
+        "roxMulti": 0.25,
+        "expMulti": 0.25,
+        "maxRox": 150,
+        "maxExp": 150,
+        "minScore": 100,
+        "maxScore": 10000
+    },
+    "22": {
+        "name": "Moshi vs Ghost",
+        "roxMulti": 0.15,
+        "expMulti": 0.15,
+        "maxRox": 15,
+        "maxExp": 15,
+        "minScore": 20,
+        "maxScore": 100
+    },
+    "100": {
+        "name": "Daily Challenge",
+        "roxMulti": 20.0,
+        "expMulti": 20.0,
+        "maxRox": 300,
+        "maxExp": 300,
+        "minScore": 3,
+        "maxScore": 30
+    },
+    "1000": {
+        "name": "Puzzle Palace Practice",
+        "roxMulti": 0.25,
+        "expMulti": 0.0,
+        "maxRox": 5,
+        "maxExp": 0,
+        "minScore": 3,
+        "maxScore": 30
+    }
+}

@@ -14,6 +14,8 @@ function servicer(app) {
             pretty.print('Added route for listening -> ' + route_handler_path + ' (' + routeName + ')', 'ROUTING');
         } catch (err) {
             pretty.error(`Failed to add service route '${routeName}' from '${routePath}':`, err);
+            // print stack trace
+            console.error(err.stack);
         }
     });
 }

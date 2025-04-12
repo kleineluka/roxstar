@@ -14,11 +14,19 @@
     "/moshi/services/monster/heartbeat": "/heartbeats/monster.js",
     "/moshi/services/rest/comment/heartbeat": "/heartbeats/comment.js",
     "/moshi/services/rest/world/location": "/world/location.js",
-    "/moshi/mynews/mynews/user": "/social/news.js",
+    "/moshi/mynews/mynews/user": "/friends/news.js",
     "/moshi/services/rest/users/members/newest": "/user/newest.js",
     "/moshi/services/garden/enter": "/garden/enter.js",
     "/moshi/services/rest/moshling/sets": "/moshling/sets.js",
     "/moshi/services/monster/item/save": "/inventory/save.js",
     "/moshi/services/rest/garden/status": "/garden/status.js",
-    "/moshi/services/rest/user/mood": "/user/mood.js"
+    "/moshi/services/rest/user/mood": "/user/mood.js",
+    "/moshi/services/rest/user/friends": "/friends/index.js",
+    "/moshi/services/comments": "/pinboard/open.js",
+    "/moshi/services/rest/user/find": "/user/find.js",
+    "/moshi/services/rest/comment/containsfriends": "/pinboard/contains.js",
+    "/moshi/rmf/rmf/checkcontent": "/pinboard/filter.js",
+    "/moshi/services/rest/user/friends/add": "/friends/add.js",
+    "/moshi/services/minigame/start": "/minigames/start.js",
+    "/moshi/services/minigame/score": "/minigames/score.js"
 }

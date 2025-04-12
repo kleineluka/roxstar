@@ -10,7 +10,6 @@ const session = require('../../server/session.js');
  * This handles /login GET requests from the client.
  */
 router.get("/", async (req, res) => { 
-    console.log('Login page accessed. Checking session for toast message.');
     if (req.session.toast) {
         let toast_message = req.session.toast.message;
         let toast_color = req.session.toast.color;

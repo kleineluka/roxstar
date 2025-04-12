@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
                 overallProgress = progress;
             }
             // track the latest planting time to determine the 'next' completion date
-            if (plot.plantTime > nextCompletionTimestamp) { // PHP logic used rsort, effectively finding max plantTime
+            if (plot.plantTime > nextCompletionTimestamp) { 
                 nextCompletionTimestamp = plot.plantTime;
             }
         }

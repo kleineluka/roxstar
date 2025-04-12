@@ -82,7 +82,7 @@ router.get('/', async (req, res) => {
                 '@name': user.monster_name,
                 '@primarycolour': user.primary_colour,
                 '@secondarycolour': user.secondary_colour,
-                ...coloramaData, // spread colorama
+                ...coloramaData,
                 '@progress': userLevelProgress,
                 '@rocks': user.rocks,
                 '@totalrocks': user.rocks,

@@ -10,6 +10,7 @@ if (require('electron-squirrel-startup')) {
 
 let mainWindow;
 const use_random_partition = false;
+const allow_multiple_instances = true;
 function generateRandomString(length) {
   return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
 }
@@ -22,20 +23,27 @@ if (use_random_partition) {
 app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, 'flash/pepflashplayer64_34_0_0_308'));
 app.commandLine.appendSwitch('ppapi-flash-version', '34.0.0.308');
 app.commandLine.appendSwitch("disable-http-cache");
-
-const singleLock = app.requestSingleInstanceLock();
-if (!singleLock) {
-  console.log("Another instance is running, quitting this one.");
-  app.quit();
+if (!allow_multiple_instances) {
+  const singleLock = app.requestSingleInstanceLock();
+  if (!singleLock) {
+    console.log("Another instance is running, quitting this one.");
+    app.quit();
+  } else {
+    handleAppReadyAndActivation();
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      console.log("Second instance detected, focusing main window.");
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      }
+    });
+  }
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    console.log("Second instance detected, focusing main window.");
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
+  console.log("Multiple instances allowed. Launching without lock.");
+  handleAppReadyAndActivation();
+}
 
+function handleAppReadyAndActivation() {
   app.whenReady().then(() => {
     console.log("App is ready! Creating window...");
     createWindow();
@@ -46,7 +54,7 @@ if (!singleLock) {
         createWindow();
       } else {
         console.log("Windows already open.");
-        if(mainWindow) mainWindow.focus();
+        if (mainWindow) mainWindow.focus();
       }
     });
   }).catch(err => {
@@ -157,7 +165,6 @@ function createWindow() {
       {
         label: 'Raise Volume',
         click: () => {
-          // Added logic to ensure volume exists before adjusting
           const currentVolume = mainWindow.webContents.getAudioVolume ? mainWindow.webContents.getAudioVolume() : 1;
           const newVolume = Math.min(1, currentVolume + 0.1).toFixed(1);
           mainWindow.webContents.setAudioVolume(parseFloat(newVolume)); 
@@ -178,7 +185,6 @@ function createWindow() {
       {
         label: 'Mute/Unmute',
         click: () => {
-          // Use getAudioMuted if available, otherwise assume not muted
           const isMuted = mainWindow.webContents.isAudioMuted ? mainWindow.webContents.isAudioMuted() : false;
           mainWindow.webContents.setAudioMuted(!isMuted);
           console.log(`Audio ${!isMuted ? 'muted' : 'unmuted'}`);

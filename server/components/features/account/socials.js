@@ -164,6 +164,16 @@ async function getUserMood(userId) {
     }
 }
 
+/**
+ * Checks BFF status from a pre-fetched map.
+ * @param {Map<number, string>} bffMap - A Map where key is friend_user_id and value is the bff status ('true'/'false').
+ * @param {number} friendId - The ID of the friend to check.
+ * @returns {string} 'true' or 'false'.
+ */
+function checkBffStatusFromMap(bffMap, friendId) {
+    return bffMap.get(friendId) === 'true' ? 'true' : 'false';
+}
+
 module.exports = {
     getFriendCount,
     getPendingFriendCount,
@@ -172,4 +182,5 @@ module.exports = {
     calculateRating,
     logBffNews,
     getUserMood,
+    checkBffStatusFromMap,
 };

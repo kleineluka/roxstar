@@ -1,4 +1,5 @@
 const xmlbuilder = require('xmlbuilder');
+const pretty = require('./pretty.js');
 
 /**
  * Accept URls with or without .html extension
@@ -16,6 +17,15 @@ function acceptUrl(name) {
  */
 function sanitiseString(input) {
     return input.replace(/[^a-zA-Z0-9 !?#\-+*$%,"=()\'&]/g, '');
+}
+
+/**
+ * Sanitize a string to only allow alphanumeric characters
+ * @param {*} input - The string to sanitize
+ * @returns {string} - The sanitized string
+ */
+function alphaNumericString(input) {
+    return input.replace(/[^a-zA-Z0-9]/g, '');
 }
 
 /**
@@ -70,7 +80,7 @@ function buildXmlResponse(code, text, prettyPrint = false) {
  */
 function getUserAge(birthTimestamp) {
     if (!birthTimestamp || typeof birthTimestamp !== 'number' || birthTimestamp <= 0) {
-        pretty.debug('getUserAge: Invalid or missing birthTimestamp, returning age 0.');
+        pretty.debug(`getUserAge: Invalid or missing birthTimestamp: ${birthTimestamp}. Returning age 0.`);
         return 0; // assume 0 on invalid input
     }
     try {
@@ -89,13 +99,28 @@ function getUserAge(birthTimestamp) {
     }
 }
 
+/** Decode base64 string to utf8 string
+ * @param {string} base64String - The base64 encoded string to decode.
+ * @returns {string} - The decoded utf8 string.
+ */
+function decodeBase64(base64String) {
+    try {
+        const buffer = Buffer.from(base64String, 'base64');
+        return buffer.toString('utf8');
+    } catch (error) {
+        pretty.error('Error decoding base64 string:', error);
+        return null;
+    }
+}
 
 module.exports = {
     acceptUrl,
     sanitiseString,
+    alphaNumericString,
     getRandomItems,
     getRandomItem,
     validateEmail,
     buildXmlResponse,
     getUserAge,
+    decodeBase64,
 };

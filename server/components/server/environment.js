@@ -38,8 +38,10 @@ function loadProvided(config_template) {
  **/
 const setupEnvironment = () => {
     global.config_censor = loadConfig('censor.json');
+    global.config_difficulty = loadConfig('difficulty.json');
     global.config_server = loadConfig('server.json');
     global.config_game = loadConfig('game.json');
+    global.config_minigames = loadConfig('minigames.json');
     global.config_monstar = loadConfig('monstar.json');
     global.config_levels = loadConfig('levels.json');
     global.config_trophies = loadConfig('trophies.json');
