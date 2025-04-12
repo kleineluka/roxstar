@@ -4,14 +4,16 @@ const xmlbuilder = require('xmlbuilder');
 const crypto = require('crypto');
 const database = require('../../server/database.js');
 const pretty = require('../../utils/pretty.js');
-const levelUtils = require('../../features/account/levels.js');
+const levelUtils = require('../../features/account/levels.js'); // Corrected path assumption
 const rewardUtils = require('../../features/minigames/rewards.js');
 const highscoreUtils = require('../../features/minigames/highscores.js');
 
 /**
- * Handles GET requests to submit a minigame score.
+ * Core logic for processing a minigame score submission.
+ * @param {object} req - The Express request object.
+ * @param {object} res - The Express response object.
  */
-router.get('/:gameId/:difficulty', async (req, res) => {
+async function processMinigameScore(req, res) {
     const userId = req.session.userId;
     const gameId = parseInt(req.params.gameId, 10);
     const difficulty = req.params.difficulty;
@@ -21,31 +23,42 @@ router.get('/:gameId/:difficulty', async (req, res) => {
         pretty.warn('Minigame score request without user session.');
         return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
     }
-    if (isNaN(gameId) || isNaN(score) || !receivedHash) { // it's okay if we don't have difficulty, it's optional
-        pretty.warn(`Minigame score request missing parameters for user ${userId}. GameID: ${gameId}, Score: ${score}, Hash: ${receivedHash}`);
+    // check all required parameters (difficulty might be optional depending on game/client?)
+    if (isNaN(gameId) || isNaN(score) || !receivedHash) { // difficulty = optionaL
+        pretty.warn(`Minigame score request missing parameters for user ${userId}. GameID: ${gameId}, Difficulty: ${difficulty}, Score: ${score}, Hash: ${receivedHash}`);
         return res.status(400).type('text/xml').send('<error code="INVALID_PARAMS">Missing parameters</error>');
     }
-    // validate the minigame session
     const expectedSessionData = req.session.minigameSessionData;
     if (!expectedSessionData) {
         pretty.warn(`Minigame score submission for user ${userId}, game ${gameId} failed: No minigame session data found.`);
         return res.status(403).type('text/xml').send('<error code="INVALID_SESSION">Invalid minigame session</error>');
     }
     const serverHash = crypto.createHash('md5').update(expectedSessionData).digest('hex');
-    const clientStringToHash = String(gameId) + String(difficulty) + String(score) + serverHash; // the algorithm the game uses before sendig the hash
+    const clientStringToHash = String(gameId) + String(difficulty) + String(score) + serverHash; // equation used by client before sending back
     const expectedHash = crypto.createHash('md5').update(clientStringToHash).digest('hex');
     if (expectedHash !== receivedHash) {
         pretty.warn(`Minigame score submission for user ${userId}, game ${gameId} failed: Hash mismatch. Expected ${expectedHash}, received ${receivedHash}`);
         return res.status(403).type('text/xml').send('<error code="INVALID_HASH">Session hash mismatch</error>');
     }
-    // clear the hash from the session
     delete req.session.minigameSessionData;
-    req.session.save(err => { if (err) pretty.error(`Session save error after clearing minigame data for user ${userId}:`, err); });
+    // wait for safety and save session
     try {
-        // calculate rewards
+        await new Promise((resolve, reject) => {
+            req.session.save(err => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+        pretty.debug(`Session saved after clearing minigame data for user ${userId}.`);
+    } catch (sessionError) {
+        pretty.error(`Session save error after clearing minigame data for user ${userId}:`, sessionError);
+        const xmlError = xmlbuilder.create({ xml: { status: { '@code': 1, '@text': 'Session Save Error' } } }).end();
+        return res.status(500).type('text/xml').send(xmlError);
+    }
+    // get the score and rewards etc
+    try {
         const roxEarned = rewardUtils.calculateRox(gameId, score, difficulty);
         const expEarned = rewardUtils.calculateExp(gameId, score, difficulty);
-        // check highscore
         const [isNewHigh, currentHighscore] = await Promise.all([
             highscoreUtils.isNewHighscore(userId, gameId, score),
             highscoreUtils.getMinigameHighscore(userId, gameId)
@@ -59,23 +72,23 @@ router.get('/:gameId/:difficulty', async (req, res) => {
         let actualExpAwarded = 0;
         let remainingRoxToday = user.rocks_today;
         let remainingLevelsToday = user.levels_today;
-        // apply daily limits
+        // rox daily limit
         if (remainingRoxToday > 0) {
             actualRoxAwarded = Math.min(roxEarned, remainingRoxToday);
-            const roxDelta = actualRoxAwarded >= 0 ? actualRoxAwarded : 0; // non-negative update value
-            remainingRoxToday = Math.max(0, remainingRoxToday - roxDelta); // prevent going below 0
+            const roxDelta = actualRoxAwarded >= 0 ? actualRoxAwarded : 0;
+            remainingRoxToday = Math.max(0, remainingRoxToday - roxDelta);
         } else {
             pretty.debug(`User ${userId} hit daily Rox limit.`);
         }
-        // apply Level limit
+        // exp daily limit
         if (remainingLevelsToday > 0) {
             actualExpAwarded = Math.min(expEarned, remainingLevelsToday);
-            const expDelta = actualExpAwarded >= 0 ? actualExpAwarded : 0; // non-negative update value
-            remainingLevelsToday = Math.max(0, remainingLevelsToday - expDelta); // prevent going below 0
+            const expDelta = actualExpAwarded >= 0 ? actualExpAwarded : 0;
+            remainingLevelsToday = Math.max(0, remainingLevelsToday - expDelta);
         } else {
             pretty.debug(`User ${userId} hit daily Level limit.`);
         }
-        // update user in db
+        // update database-side
         if (actualRoxAwarded > 0 || actualExpAwarded > 0) {
             const roxToAdd = actualRoxAwarded > 0 ? actualRoxAwarded : 0;
             const expToAdd = actualExpAwarded > 0 ? actualExpAwarded : 0;
@@ -89,15 +102,15 @@ router.get('/:gameId/:difficulty', async (req, res) => {
                 pretty.debug(`Awarded ${roxToAdd} Rox, ${expToAdd} XP to user ${userId}.`);
             }
         }
-        // log new score
+        // log score
         await highscoreUtils.logMinigameScore(userId, gameId, score, receivedHash);
         const responseData = {
             status: { '@code': 0, '@text': 'success' },
             result: {
-                '@rocks': actualRoxAwarded > 0 ? actualRoxAwarded : 0, // ensure non-negative in response
-                '@progress': levelUtils.getUserLevelProgress(user.level + (actualExpAwarded > 0 ? actualExpAwarded : 0)), // use actual XP awarded
-                '@isNewHighscore': String(isNewHigh), // 'true' or 'false'
-                '@highscore': isNewHigh ? score : currentHighscore // return new score if it's the highscore
+                '@rocks': actualRoxAwarded > 0 ? actualRoxAwarded : 0,
+                '@progress': levelUtils.getUserLevelProgress(user.level + (actualExpAwarded > 0 ? actualExpAwarded : 0)),
+                '@isNewHighscore': String(isNewHigh),
+                '@highscore': isNewHigh ? score : currentHighscore
             }
         };
         const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8', standalone: true })
@@ -109,6 +122,8 @@ router.get('/:gameId/:difficulty', async (req, res) => {
             .end({ pretty: global.config_server['pretty-print-replies'] });
         res.status(500).type('text/xml').send(xmlError);
     }
-});
+}
 
+router.get('/:gameId/:difficulty', processMinigameScore);
+router.post('/:gameId/:difficulty', processMinigameScore);
 module.exports = router;

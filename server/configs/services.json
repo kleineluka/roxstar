@@ -28,5 +28,6 @@
     "/moshi/rmf/rmf/checkcontent": "/pinboard/filter.js",
     "/moshi/services/rest/user/friends/add": "/friends/add.js",
     "/moshi/services/minigame/start": "/minigames/start.js",
-    "/moshi/services/minigame/score": "/minigames/score.js"
+    "/moshi/services/minigame/score": "/minigames/score.js",
+    "/moshi/services/monster/item/buy": "/inventory/buy.js"
 }
