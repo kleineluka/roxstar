@@ -171,8 +171,44 @@ async function deductRoxForPurchase(userId, cost) {
     }
 }
 
+/**
+ * Adds Rox to a user's account after a sale.
+ * @param {number} userId - The ID of the user.
+ * @param {number} amount - The amount of Rox to add.
+ * @returns {Promise<number|null>} - The user's new Rox balance, or null on failure.
+ */
+async function addRoxFromSale(userId, amount) {
+    if (typeof amount !== 'number' || amount < 0) {
+        pretty.warn(`Invalid amount provided for Rox addition: ${amount}`);
+        return null; // invalid amount
+    }
+    if (amount === 0) {
+        const currentRox = await database.getQuery('SELECT rocks FROM users WHERE id = ?', [userId]);
+        return currentRox?.rocks ?? null;
+    }
+    try {
+        // perform the update
+        const updateResult = await database.runQuery(
+            'UPDATE users SET rocks = rocks + ? WHERE id = ?',
+            [amount, userId]
+        );
+        if (updateResult && updateResult.changes > 0) {
+            // get the new balance
+            const newBalance = await database.getQuery('SELECT rocks FROM users WHERE id = ?', [userId]);
+            return newBalance?.rocks ?? null; // Return new balance or null if fetch fails
+        } else {
+            pretty.error(`Failed to add ${amount} Rox for user ${userId}. Update changes: ${updateResult?.changes}`);
+            return null;
+        }
+    } catch (error) {
+        pretty.error(`Database error adding Rox for user ${userId}:`, error);
+        return null;
+    }
+}
+
 module.exports = {
     formatShopItems,
     checkShopPurchaseValidity,
     deductRoxForPurchase,
+    addRoxFromSale,
 };

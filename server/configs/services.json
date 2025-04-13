@@ -29,5 +29,8 @@
     "/moshi/services/rest/user/friends/add": "/friends/add.js",
     "/moshi/services/minigame/start": "/minigames/start.js",
     "/moshi/services/minigame/score": "/minigames/score.js",
-    "/moshi/services/monster/item/buy": "/inventory/buy.js"
+    "/moshi/services/monster/item/buy": "/inventory/buy.js",
+    "/moshi/services/monster/dressup/costume/buy": "/clothing/buy.js",
+    "/moshi/services/rest/world/locationtype": "/world/type.js",
+    "/moshi/services/monster/seed/buy": "/garden/buy.js"
 }

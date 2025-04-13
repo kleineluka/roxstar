@@ -213,6 +213,36 @@ function formatUserCostume(dressupData) {
     return formattedCostume;
 }
 
+/**
+ * Adds a clothing item to a user's clothing inventory.
+ * @param {number} userId - The ID of the user.
+ * @param {number|string} itemId - The ID of the clothing item type to give (from storage_clothes).
+ * @returns {Promise<number|null>} - The database ID of the newly inserted clothing item instance, or null on failure.
+ */
+async function giveUserClothes(userId, itemId) {
+    if (!userId || itemId === undefined || itemId === null) {
+        pretty.error(`giveUserClothes called with invalid userId (${userId}) or itemId (${itemId}).`);
+        return null;
+    }
+    try {
+        const timestamp = clock.getTimestamp();
+        const sql = `INSERT INTO clothes (user_id, item_id, date) VALUES (?, ?, ?)`;
+        const params = [userId, itemId, timestamp];
+        const result = await database.runQuery(sql, params);
+
+        if (result && result.lastID > 0) {
+            pretty.debug(`Successfully gave clothing item ${itemId} to user ${userId}. New clothes instance ID: ${result.lastID}`);
+            return result.lastID; // return the unique ID of this specific clothing instance
+        } else {
+            pretty.warn(`Failed to insert clothing item ${itemId} for user ID ${userId}. Result: ${JSON.stringify(result)}`);
+            return null;
+        }
+    } catch (error) {
+        pretty.error(`Error giving clothing item ${itemId} to user ID ${userId}:`, error);
+        return null;
+    }
+}
+
 module.exports = {
     giveStarterInventory,
     giveItemToUser,
@@ -220,4 +250,5 @@ module.exports = {
     formatUserClothes,
     formatUserSeeds,
     formatUserCostume,
+    giveUserClothes,
 };
