@@ -243,6 +243,67 @@ async function giveUserClothes(userId, itemId) {
     }
 }
 
+/**
+ * Adds a seed item to a user's seed inventory.
+ * @param {number} userId - The ID of the user.
+ * @param {number|string} itemId - The ID of the seed type to give (from storage_seeds).
+ * @returns {Promise<number|null>} - The database ID of the newly inserted seed instance, or null on failure.
+ */
+async function giveUserSeed(userId, itemId) {
+    if (!userId || itemId === undefined || itemId === null) {
+        pretty.error(`giveUserSeed called with invalid userId (${userId}) or itemId (${itemId}).`);
+        return null;
+    }
+    try {
+        const timestamp = clock.getTimestamp();
+        const sql = `
+            INSERT INTO seeds (user_id, item_id, date)
+            VALUES (?, ?, ?)
+        `;
+        // ensure itemId is passed correctly (might be string from param)
+        const params = [userId, itemId, timestamp];
+        const result = await database.runQuery(sql, params);
+
+        if (result && result.lastID > 0) {
+            pretty.debug(`Successfully gave seed ${itemId} to user ${userId}. New seed instance ID: ${result.lastID}`);
+            return result.lastID; // return the unique ID of this specific item instance
+        } else {
+            pretty.warn(`Failed to insert seed ${itemId} for user ID ${userId}. runQuery result: ${JSON.stringify(result)}`);
+            return null;
+        }
+    } catch (error) {
+        pretty.error(`Error giving seed ${itemId} to user ID ${userId}:`, error);
+        return null;
+    }
+}
+
+/**
+ * Deletes a specific seed instance from a user's inventory.
+ * @param {number} userId - The ID of the user who owns the seed.
+ * @param {number} seedInstanceId - The unique ID of the seed row in the 'seeds' table to delete.
+ * @returns {Promise<boolean>} - True if the seed was deleted, false otherwise.
+ */
+async function deleteUserSeedInstance(userId, seedInstanceId) {
+    if (!userId || !seedInstanceId) {
+        pretty.error(`deleteUserSeedInstance called with invalid userId (${userId}) or seedInstanceId (${seedInstanceId}).`);
+        return false;
+    }
+    try {
+        const sql = "DELETE FROM seeds WHERE user_id = ? AND id = ?";
+        const result = await database.runQuery(sql, [userId, seedInstanceId]);
+        if (result && result.changes > 0) {
+            pretty.debug(`Successfully deleted seed instance ID ${seedInstanceId} for user ID ${userId}.`);
+            return true;
+        } else {
+            pretty.warn(`Could not delete seed instance ID ${seedInstanceId} for user ID ${userId}. Item might not exist or belong to user. Changes: ${result?.changes}`);
+            return false;
+        }
+    } catch (error) {
+        pretty.error(`Error deleting seed instance ID ${seedInstanceId} for user ID ${userId}:`, error);
+        return false;
+    }
+}
+
 module.exports = {
     giveStarterInventory,
     giveItemToUser,
@@ -251,4 +312,6 @@ module.exports = {
     formatUserSeeds,
     formatUserCostume,
     giveUserClothes,
+    giveUserSeed,
+    deleteUserSeedInstance,
 };

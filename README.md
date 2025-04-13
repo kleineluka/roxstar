@@ -13,6 +13,12 @@ Are you ready for the show?
 
 This code is provided under the terms listed above, otherwise, all rights reserved.
 
+## Features 🔮
+- [x] Minigame Rewards & Scores
+- [x] Clothing, Item, & Seed Purchasing
+- [x] Room Decoration
+- [x] Location Visiting & Pedestrian Walking
+
 ## Code Structure 💎
 - `/features/` hosts reusable helper functions for various tasks (ex. getting a user's level)
 - `/middleware/` hosts the stack that processes requests to the server (ex. routing requests or parsing data)

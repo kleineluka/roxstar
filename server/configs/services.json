@@ -17,7 +17,8 @@
     "/moshi/mynews/mynews/user": "/friends/news.js",
     "/moshi/services/rest/users/members/newest": "/user/newest.js",
     "/moshi/services/garden/enter": "/garden/enter.js",
-    "/moshi/services/rest/moshling/sets": "/moshling/sets.js",
+    "/services/garden/enter": "/garden/enter.js",
+    "/moshi/services/rest/moshling/sets": "/moshlings/sets.js",
     "/moshi/services/monster/item/save": "/inventory/save.js",
     "/moshi/services/rest/garden/status": "/garden/status.js",
     "/moshi/services/rest/user/mood": "/user/mood.js",
@@ -32,5 +33,9 @@
     "/moshi/services/monster/item/buy": "/inventory/buy.js",
     "/moshi/services/monster/dressup/costume/buy": "/clothing/buy.js",
     "/moshi/services/rest/world/locationtype": "/world/type.js",
-    "/moshi/services/monster/seed/buy": "/garden/buy.js"
+    "/moshi/services/monster/seed/buy": "/garden/buy.js",
+    "/moshi/services/garden/plant": "/garden/plant.js",
+    "/services/rest/moshling/bio": "/moshlings/bio.js",
+    "/services/rest/moshling/target": "/moshlings/target.js",
+    "/moshi/services/garden/digup/": "/garden/dig.js"
 }

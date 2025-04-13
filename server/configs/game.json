@@ -11,9 +11,6 @@
     "shops": {
         "randomize": true
     },
-    "garden": {
-        "growth_time": 2400
-    },
     "gamble_odds": {
         "1": 10,
         "2": 20,

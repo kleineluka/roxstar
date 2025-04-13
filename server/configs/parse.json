@@ -5,5 +5,7 @@
     "/moshi/services/comment/create/*": "xml",
     "/moshi/services/rest/user/profile/update": "xml",
     "/moshi/services/monster/item/save": "xml",
-    "/moshi/services/rest/user/friends/add": "xml"
+    "/moshi/services/rest/user/friends/add": "xml",
+    "/moshi/services/garden/plant": "xml",
+    "/services/rest/moshling/target": "json"
 }

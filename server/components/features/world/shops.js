@@ -158,7 +158,7 @@ async function deductRoxForPurchase(userId, cost) {
             [cost, userId, cost]
         );
         if (updateResult && updateResult.changes > 0) {
-            // Fetch the new balance
+            // fetch the new balance
             const newBalance = await database.getQuery('SELECT rocks FROM users WHERE id = ?', [userId]);
             return newBalance?.rocks ?? null; // return new balance or null if fetch fails
         } else {
@@ -195,7 +195,7 @@ async function addRoxFromSale(userId, amount) {
         if (updateResult && updateResult.changes > 0) {
             // get the new balance
             const newBalance = await database.getQuery('SELECT rocks FROM users WHERE id = ?', [userId]);
-            return newBalance?.rocks ?? null; // Return new balance or null if fetch fails
+            return newBalance?.rocks ?? null; // return new balance or null if fetch fails
         } else {
             pretty.error(`Failed to add ${amount} Rox for user ${userId}. Update changes: ${updateResult?.changes}`);
             return null;

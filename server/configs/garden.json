@@ -1,4 +1,9 @@
 {
+    "default_plot": "0~black~-1~0~0~0|1~black~-1~0~0~0|2~black~-1~0~0~0",
+    "reference_plot": "plot~colour~seedId~plantTime~priorTime~active",
+    "default_segment": "{position}~black~-1~0~0~0",
+    "reference_segment": "segment~colour~seedId~plantTime~priorTime~active",
+    "growth_time": 20,
     "seeds": [
         "yellow",
         "black",

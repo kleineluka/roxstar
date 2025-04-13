@@ -1,3 +1,4 @@
+const database = require('../../server/database.js');
 const pretty = require('../../utils/pretty.js');
 
 /**

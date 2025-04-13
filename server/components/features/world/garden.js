@@ -4,8 +4,6 @@ const pretty = require('../../utils/pretty.js');
 const clock = require('../../utils/clock.js');
 const formats = require('../../utils/formats.js');
 
-const DEFAULT_GARDEN_STRING = '0~black~-1~0~0~0|1~black~-1~0~0~0|2~black~-1~0~0~0'; // Default: plot~color~seedId~plantTime~priorTime~active
-
 /**
  * Parses the garden string from the database into a structured array.
  * @param {string|null} gardenString - The garden string from the users table.
@@ -14,7 +12,7 @@ const DEFAULT_GARDEN_STRING = '0~black~-1~0~0~0|1~black~-1~0~0~0|2~black~-1~0~0~
 function parseGardenString(gardenString) {
     const plots = [];
     const defaultPlot = { color: 'black', seedId: -1, plantTime: 0, priorTime: 0, active: 0 };
-    const inputString = gardenString || DEFAULT_GARDEN_STRING;
+    const inputString = gardenString || global.config_garden.default_plot;
     try {
         const plotStrings = inputString.split('|');
         for (let i = 0; i < 3; i++) { // ensure 3 plots
@@ -429,6 +427,7 @@ async function updateGardenPriorTime(userId, currentGardenString) {
 
 module.exports = {
     parseGardenString,
+    getGardenGrowthTime,
     calculateFlowerProgress,
     calculatePriorFlowerProgress,
     suggestMoshlingUUID,
