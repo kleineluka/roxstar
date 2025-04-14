@@ -42,6 +42,26 @@ async function getRoomGiftCounts(userId) {
     return counts;
 }
 
+/**
+ * Gets the number of gifts a user has received (opened).
+ * TODO: Move this to a more appropriate util file like features/account/gifts.js if created.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<number>} - The count of opened gifts.
+ */
+async function getOpenedGiftCount(userId) {
+    try {
+        const row = await database.getQuery(
+            "SELECT COUNTy (*) AS count FROM gifts WHERE reciever = ? AND has_opened = 1",
+            [userId]
+        );
+        return row?.count || 0;
+    } catch (error) {
+        pretty.error(`Error getting opened gift count for user ID ${userId}:`, error);
+        return 0;
+    }
+}
+
 module.exports = {
-    getRoomGiftCounts
+    getRoomGiftCounts,
+    getOpenedGiftCount,
 };

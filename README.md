@@ -9,15 +9,11 @@ Are you ready for the show?
 - This project will never assist in finding files that aren't part of its original code
 - Schemas are likely to change as developed, so old databases will break
 - Developed with clean room philosophy— contributions are generally not accepted to maintain this approach
+- You may not use this project for any monetary gain or profit
 - I will not provide any support, help, or liability for any code here
+- I never owned an account on the original game
 
 This code is provided under the terms listed above, otherwise, all rights reserved.
-
-## Features 🔮
-- [x] Minigame Rewards & Scores
-- [x] Clothing, Item, & Seed Purchasing
-- [x] Room Decoration
-- [x] Location Visiting & Pedestrian Walking
 
 ## Code Structure 💎
 - `/features/` hosts reusable helper functions for various tasks (ex. getting a user's level)

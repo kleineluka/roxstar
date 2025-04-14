@@ -37,5 +37,7 @@
     "/moshi/services/garden/plant": "/garden/plant.js",
     "/services/rest/moshling/bio": "/moshlings/bio.js",
     "/services/rest/moshling/target": "/moshlings/target.js",
-    "/moshi/services/garden/digup/": "/garden/dig.js"
+    "/moshi/services/garden/digup/": "/garden/dig.js",
+    "/moshi/services/rest/moshling/all": "/moshlings/all.js",
+    "/moshi/services/rest/user/profile": "/user/profile.js"
 }
