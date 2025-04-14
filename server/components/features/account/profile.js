@@ -5,7 +5,7 @@ const formatUtils = require('../../utils/formats.js');
 const levelUtils = require('./levels.js');
 const monstarUtils = require('./monstar.js');
 const socialUtils = require('./socials.js');
-const puzzleUtils = require('./puzzles.js');
+const puzzleUtils = require('../minigames/puzzles.js');
 const homeUtils = require('./home.js');
 const giftUtils = require('./gifts.js');
 

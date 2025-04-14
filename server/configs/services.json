@@ -41,5 +41,7 @@
     "/moshi/services/rest/moshling/all": "/moshlings/all.js",
     "/moshi/services/rest/user/profile": "/user/profile.js",
     "/moshi/services/comment/create": "/pinboard/create.js",
-    "/moshi/services/rest/user/friends/update": "/friends/update.js"
+    "/moshi/services/rest/user/friends/update": "/friends/update.js",
+    "/moshi/services/puzzles/handshake": "/puzzles/handshake.js",
+    "/moshi/services/puzzles/startchallenge": "/puzzles/challenge.js"
 }

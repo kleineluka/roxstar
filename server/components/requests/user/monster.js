@@ -11,7 +11,7 @@ const socialUtils = require('../../features/account/socials.js');
 const levelUtils = require('../../features/account/levels.js');
 const monstarUtils = require('../../features/account/monstar.js');
 const moshlingUtils = require('../../features/account/moshlings.js');
-const puzzleUtils = require('../../features/account/puzzles.js');
+const puzzleUtils = require('../../features/minigames/puzzles.js');
 
 /**
  * Handles GET requests to load the main monster data.
