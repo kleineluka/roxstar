@@ -39,5 +39,7 @@
     "/services/rest/moshling/target": "/moshlings/target.js",
     "/moshi/services/garden/digup/": "/garden/dig.js",
     "/moshi/services/rest/moshling/all": "/moshlings/all.js",
-    "/moshi/services/rest/user/profile": "/user/profile.js"
+    "/moshi/services/rest/user/profile": "/user/profile.js",
+    "/moshi/services/comment/create": "/pinboard/create.js",
+    "/moshi/services/rest/user/friends/update": "/friends/update.js"
 }

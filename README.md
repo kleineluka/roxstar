@@ -11,6 +11,7 @@ Are you ready for the show?
 - Developed with clean room philosophy— contributions are generally not accepted to maintain this approach
 - You may not use this project for any monetary gain or profit
 - I will not provide any support, help, or liability for any code here
+- I do not/will not deploy this code to a live or public environment
 - I never owned an account on the original game
 
 This code is provided under the terms listed above, otherwise, all rights reserved.

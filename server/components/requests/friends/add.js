@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
         return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
     }
     // get attributes from <request> tag
-    const requestData = req.body?.friendRequests?.request;
+    const requestData = req.body.friendRequests.request[0].$;
     if (!requestData || !requestData.userId) {
         pretty.warn(`Friend add request for user ${loggedInUserId} received invalid XML body. Body: ${JSON.stringify(req.body)}`);
         const responseXml = buildFriendRequestResponse('failure', 1, 'Invalid request format');
