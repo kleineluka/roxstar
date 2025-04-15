@@ -1,4 +1,3 @@
-// components/features/account/profile.js
 const database = require('../../server/database.js');
 const pretty = require('../../utils/pretty.js');
 const formatUtils = require('../../utils/formats.js');

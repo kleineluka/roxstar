@@ -174,6 +174,52 @@ function checkBffStatusFromMap(bffMap, friendId) {
     return bffMap.get(friendId) === 'true' ? 'true' : 'false';
 }
 
+/**
+ * Adds a visit record if the visitor hasn't visited the target in the last 24 hours.
+ * Increments the target user's view count only on the first visit within 24 hours.
+ * @param {number} visitorUserId - The ID of the user visiting.
+ * @param {number} targetUserId - The ID of the user being visited.
+ * @returns {Promise<number>} - The target user's current view count.
+ */
+async function addProfileView(visitorUserId, targetUserId) {
+    let currentViews = 0;
+    try {
+        // get target's current views first
+        const targetUser = await database.getQuery('SELECT views FROM users WHERE id = ?', [targetUserId]);
+        if (!targetUser) return 0; // target doesn't exist
+        currentViews = targetUser.views;
+        // check if visitor has visited target recently
+        const twentyFourHoursAgo = clock.getTimestampDaily();
+        const recentVisit = await database.getQuery(
+            'SELECT 1 FROM logs_rate WHERE user_id = ? AND rate_visit_user_id = ? AND type = "visit" AND date >= ? LIMIT 1',
+            [visitorUserId, targetUserId, twentyFourHoursAgo]
+        );
+        if (!recentVisit) {
+            // first visit within 24 hours: log visit and increment count
+            pretty.debug(`Logging first visit in 24h from ${visitorUserId} to ${targetUserId}.`);
+            const timestamp = clock.getTimestamp();
+            // update concurrent views and log the visit in a transaction
+            await Promise.all([
+                database.runQuery(
+                    'INSERT INTO logs_rate (user_id, rate_visit_user_id, type, date) VALUES (?, ?, "visit", ?)',
+                    [visitorUserId, targetUserId, timestamp]
+                ),
+                database.runQuery(
+                    'UPDATE users SET views = views + 1 WHERE id = ?',
+                    [targetUserId]
+                )
+            ]);
+            currentViews++; // increment the count we already fetched
+        } else {
+            pretty.debug(`User ${visitorUserId} already visited ${targetUserId} recently. Not incrementing views.`);
+        }
+        return currentViews; // return the (potentially incremented) view count
+    } catch (error) {
+        pretty.error(`Error adding profile view from ${visitorUserId} to ${targetUserId}:`, error);
+        return currentViews;
+    }
+}
+
 module.exports = {
     getFriendCount,
     getPendingFriendCount,
@@ -183,4 +229,5 @@ module.exports = {
     logBffNews,
     getUserMood,
     checkBffStatusFromMap,
+    addProfileView,
 };

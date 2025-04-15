@@ -173,9 +173,41 @@ async function updateBffs(userId, bffIdString) {
     }
 }
 
+/**
+ * Checks the relationship status between two users.
+ * @param {number} viewingUserId - The ID of the user viewing the profile.
+ * @param {number} targetUserId - The ID of the profile being viewed.
+ * @returns {Promise<object>} - An object representing the relationship tag for XML, or empty object.
+ */
+async function checkFriendshipStatus(viewingUserId, targetUserId) {
+    // no need to check if viewing self
+    if (viewingUserId === targetUserId) return {};
+    try {
+        // check relationship in both directions
+        const relation = await database.getQuery(
+            `SELECT status FROM friends
+             WHERE (user_id = ? AND friend_user_id = ?) OR (user_id = ? AND friend_user_id = ?)
+             LIMIT 1`,
+            [viewingUserId, targetUserId, targetUserId, viewingUserId]
+        );
+        if (!relation) {
+            return {};
+        }
+        if (relation.status === 'friend') {
+            return { relationship: { '@status': 3 } }; // 3 = friends
+        } else {
+            return {};
+        }
+    } catch (error) {
+        pretty.error(`Error checking friendship status between ${viewingUserId} and ${targetUserId}:`, error);
+        return {};
+    }
+}
+
 module.exports = {
     acceptFriendRequest,
     deleteFriendship,
     blockUser,
     updateBffs,
+    checkFriendshipStatus,
 };
