@@ -51,7 +51,7 @@ async function getRoomGiftCounts(userId) {
 async function getOpenedGiftCount(userId) {
     try {
         const row = await database.getQuery(
-            "SELECT COUNTy (*) AS count FROM gifts WHERE reciever = ? AND has_opened = 1",
+            "SELECT COUNT(*) AS count FROM gifts WHERE reciever = ? AND has_opened = 1",
             [userId]
         );
         return row?.count || 0;
