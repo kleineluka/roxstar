@@ -12,7 +12,6 @@ const pretty = require('../../utils/pretty.js');
 router.post('/', global.body_parser.xml(), async (req, res) => {
     // ensure that the request body is valid XML and contains the required fields
     if (!req.body || !req.body.adoption) {
-        console.log(req.body);
         pretty.error("Adoption request failed: Missing or invalid XML body.");
         const xmlError = formats.buildXmlResponse(1, 'Invalid request format.', global.config_server['pretty-print-replies']);
         return res.status(400).type('application/xml').send(xmlError);

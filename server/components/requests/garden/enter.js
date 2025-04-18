@@ -51,9 +51,7 @@ router.get('/', async (req, res) => {
         // check for caught moshling (only if no target was explicitly set)
         let caughtMoshlingElement = {};
         if (!targetUuid) { // only check if user didn't just target something
-            console.log(`Checking for caught moshling for user ${userId}...`);
             const caughtMoshlingData = await gardenUtils.checkCatchableMoshling(req, userId, parsedGarden);
-            console.log(`Caught moshling data: ${JSON.stringify(caughtMoshlingData)}`);
             if (caughtMoshlingData) {
                 caughtMoshlingElement = { moshlings: caughtMoshlingData };
                 displayTargetElement = {};

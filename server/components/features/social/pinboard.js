@@ -14,7 +14,6 @@ function formatPinboardMessages(messages, senderDetailsMap) {
     }
     const formattedMessages = [];
     // print out the messages
-    console.log('Messages:', messages);
     for (const message of messages) {
         const sender = senderDetailsMap.get(message.sender);
         if (!sender) {

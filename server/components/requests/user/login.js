@@ -73,7 +73,6 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
         }
     }
     // should be safe to redirect now!
-    console.log(`User ${req.body.username} logged in successfully. Redirecting to ${loginResult}.`);
     const redirection = (loginResult !== 'needsActivation') ? '../../monsters' : '../../activation';
     res.redirect(redirection);
 });
