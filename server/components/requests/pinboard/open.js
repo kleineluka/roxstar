@@ -6,40 +6,22 @@ const pretty = require('../../utils/pretty.js');
 const pinboardUtils = require('../../features/social/pinboard.js');
 
 /**
- * Handles GET requests to fetch messages for the Pinboard.
- * Defaults to the logged-in user. Uses 'user' query param for others.
+ * Core logic to fetch and format pinboard messages.
+ * @param {number|null} targetUserId - The ID of the user whose pinboard to fetch.
+ * @param {number|null} loggedInUserId - The ID of the user viewing the pinboard.
+ * @param {object} res - The Express response object.
  */
-router.get('/', async (req, res) => {
-    const loggedInUserId = req.session.userId;
-    let targetUserId = loggedInUserId;
-    let isOwnBoard = true;
-    // check if viewing someone else's board
-    if (req.query.user) {
-        const requestedId = parseInt(req.query.user, 10);
-        if (!isNaN(requestedId) && requestedId !== loggedInUserId) {
-            targetUserId = requestedId;
-            isOwnBoard = false;
-            pretty.debug(`Pinboard request targeting user ID from query: ${targetUserId}`);
-        } else if (requestedId === loggedInUserId) {
-            pretty.debug(`Pinboard request explicitly targeting self.`);
-        } else {
-            pretty.warn(`Invalid user ID in 'user' query parameter: ${req.query.user}. Defaulting to logged-in user.`);
-        }
+async function sendPinboardResponse(targetUserId, loggedInUserId, res) {
+    if (!targetUserId || !loggedInUserId) {
+        pretty.error(`sendPinboardResponse called with invalid IDs: target=${targetUserId}, loggedIn=${loggedInUserId}`);
+        const xmlError = xmlbuilder.create({ xml: { status: { '@code': 1, '@text': 'Internal Server Error' } } }).end();
+        return res.status(500).type('text/xml').send(xmlError);
     }
-    if (!loggedInUserId) {
-        pretty.warn('Pinboard request without user session.');
-        return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
-    }
-    if (!targetUserId) {
-        pretty.error('Could not determine target user ID for pinboard request.');
-        return res.status(500).type('text/xml').send('<error code="SERVER_ERROR">Internal error</error>');
-    }
+    const isOwnBoard = (targetUserId === loggedInUserId);
     try {
-        // fetch messages
         let messages;
-        const messageLimit = 108; // default to this limit, maybe customise?
+        const messageLimit = global.config_game.social.pinboard_history || 100;
         if (isOwnBoard) {
-            // get all non-deleted/non-reported messages for own board
             messages = await database.getAllQuery(
                 `SELECT * FROM message_board
                  WHERE reciever = ? AND status NOT IN ('deleted', 'reported')
@@ -48,7 +30,6 @@ router.get('/', async (req, res) => {
                 [targetUserId, messageLimit]
             );
         } else {
-            // get only 'accepted' messages for someone else's board
             messages = await database.getAllQuery(
                 `SELECT * FROM message_board
                  WHERE reciever = ? AND status = 'accepted'
@@ -57,18 +38,16 @@ router.get('/', async (req, res) => {
                 [targetUserId, messageLimit]
             );
         }
-
+        // no messages
         if (!messages || messages.length === 0) {
             pretty.debug(`No messages found for pinboard of user ${targetUserId} (isOwnBoard: ${isOwnBoard})`);
-            // send empty list response
             const emptyResponse = { status: { '@code': 0, '@text': 'success' }, messages: { '@showtutorial': 'false' } };
             const xml = xmlbuilder.create({ xml: emptyResponse }).end({ pretty: global.config_server['pretty-print-replies'] });
             return res.type('text/xml').send(xml);
         }
-        // get sender ids
+        // get sender details
         const senderIds = new Set(messages.map(msg => msg.sender));
         const uniqueSenderIds = Array.from(senderIds);
-        // get sender details
         let senderDetailsMap = new Map();
         if (uniqueSenderIds.length > 0) {
             const sendersData = await database.getAllQuery(
@@ -80,19 +59,17 @@ router.get('/', async (req, res) => {
                 sendersData.forEach(user => senderDetailsMap.set(user.id, user));
             }
         }
-        // format messages and send
+        // format them
         const formattedMessages = pinboardUtils.formatPinboardMessages(messages, senderDetailsMap);
         const responseData = {
             status: { '@code': 0, '@text': 'success' },
             messages: {
-                '@showtutorial': 'false', // constant value for now
-                // this structure ensures <messages><message>...</message><message>...</message></messages>
-                message: formattedMessages.map(m => m.message) // extract inner message object
+                '@showtutorial': 'false',
+                message: formattedMessages
             }
         };
-        // handle case where formattedMessages is empty (e.g., all senders were deleted)
         if (formattedMessages.length === 0) {
-            delete responseData.messages.message; // remove the empty message array if xmlbuilder requires it
+            delete responseData.messages.message;
         }
         const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8', standalone: true })
             .end({ pretty: global.config_server['pretty-print-replies'] });
@@ -103,6 +80,42 @@ router.get('/', async (req, res) => {
             .end({ pretty: global.config_server['pretty-print-replies'] });
         res.status(500).type('text/xml').send(xmlError);
     }
+}
+
+/**
+ * Handles GET requests for a specific user's Pinboard using ID in path.
+ * e.g., /moshi/services/comments/4
+ */
+router.get('/:targetUserId', async (req, res) => {
+    const loggedInUserId = req.session.userId;
+    const targetUserIdParam = req.params.targetUserId;
+    pretty.debug(`Pinboard request routing for specific ID: ${targetUserIdParam}`);
+    if (!loggedInUserId) {
+        pretty.warn('Pinboard request (specific ID) without user session.');
+        return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
+    }
+    const targetUserId = parseInt(targetUserIdParam, 10);
+    if (isNaN(targetUserId)) {
+        pretty.warn(`Invalid user ID in pinboard route parameter: ${targetUserIdParam}`);
+        const xmlError = xmlbuilder.create({ xml: { status: { '@code': 1, '@text': 'Invalid User ID Parameter' } } }).end();
+        return res.status(400).type('text/xml').send(xmlError);
+    }
+    await sendPinboardResponse(targetUserId, loggedInUserId, res);
 });
+
+/**
+ * Handles GET requests for the logged-in user's own Pinboard (base path).
+ * e.g., /moshi/services/comments
+ */
+router.get('/', async (req, res) => {
+    const loggedInUserId = req.session.userId;
+    pretty.debug(`Pinboard request routing for base path (user ID: ${loggedInUserId}). Assuming own board.`);
+    if (!loggedInUserId) {
+        pretty.warn('Pinboard request (base path) without user session.');
+        return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
+    }
+    await sendPinboardResponse(loggedInUserId, loggedInUserId, res);
+});
+
 
 module.exports = router;

@@ -5,8 +5,6 @@ const database = require('../../server/database.js');
 const pretty = require('../../utils/pretty.js');
 const clock = require('../../utils/clock.js');
 const formats = require('../../utils/formats.js');
-const gardenUtils = require('../../features/world/garden.js');
-const inventoryUtils = require('../../features/account/inventory.js');
 
 /**
  * Handles POST requests to plant seeds in the garden.
@@ -18,82 +16,132 @@ router.post('/', async (req, res) => {
         pretty.warn('Garden plant request without user session.');
         return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
     }
+    const availableColors = global.config_garden?.seeds;
+    const defaultGardenStr = global.config_garden?.default_plot;
+    if (!availableColors || !Array.isArray(availableColors) || availableColors.length === 0 || !defaultGardenStr) {
+        pretty.error("Garden plant failed: Garden color config/default missing.");
+        return res.status(500).type('text/xml').send('<error code="SERVER_ERROR">Server config error</error>');
+    }
+    if (!global.storage_seeds) {
+        pretty.error("Garden plant failed: Seed storage not loaded.");
+        return res.status(500).type('text/xml').send('<error code="SERVER_ERROR">Server config error</error>');
+    }
+    // get seed data from request
     const seedsToPlant = req.body?.plantseeds?.seeds?.[0]?.seed;
     if (!seedsToPlant) {
         pretty.warn(`Garden plant request for user ${userId} received empty or invalid XML body. Body: ${JSON.stringify(req.body)}`);
         const successXml = xmlbuilder.create({ xml: { status: { '@code': 0, '@text': 'success' } } }).end();
-        return res.type('text/xml').send(successXml); // no seeds to plant? maybe need to change
+        return res.type('text/xml').send(successXml);
     }
     const plantList = Array.isArray(seedsToPlant) ? seedsToPlant : [seedsToPlant];
-    if (!global.config_garden?.seeds || global.config_garden.seeds.length === 0 || !global.config_garden.default_plot) {
-        pretty.error("Garden plant failed: Garden color config and/or default garden config missing or empty.");
-        return res.status(500).type('text/xml').send('<error code="SERVER_ERROR">Server configuration error</error>');
-    }
-    if (!global.storage_seeds) {
-        pretty.error("Garden plant failed: Seed storage not loaded.");
-        return res.status(500).type('text/xml').send('<error code="SERVER_ERROR">Server configuration error</error>');
-    }
     try {
-        // current garden state
-        const user = await database.getQuery('SELECT garden FROM users WHERE id = ?', [userId]);
-        const currentGardenString = user?.garden || defaultGardenStr;
-        const parsedGarden = gardenUtils.parseGardenString(currentGardenString);
-        let gardenWasModified = false;
-        // each seed gets planted
+        // fetch garden status + process each seed
+        let currentGardenString = (await database.getQuery('SELECT garden FROM users WHERE id = ?', [userId]))?.garden || defaultGardenStr;
         for (const seedElement of plantList) {
             const attributes = seedElement.$;
-            if (!attributes || !attributes.type || attributes.position === undefined) {
+            if (!attributes || attributes.type === undefined || attributes.position === undefined) {
                 pretty.warn(`Skipping invalid seed plant entry for user ${userId}: ${JSON.stringify(seedElement)}`);
                 continue;
             }
-            // IMPORTANT: The 'type' attribute from the client is the INSTANCE ID of the seed in the user's inventory (seeds table)
-            const seedInstanceId = parseInt(attributes.type, 10);
+            const instanceId = parseInt(attributes.type, 10); // seed?
             const plotPosition = parseInt(attributes.position, 10);
-            if (isNaN(seedInstanceId) || isNaN(plotPosition) || plotPosition < 0 || plotPosition > 2) {
+            if (isNaN(instanceId) || isNaN(plotPosition) || plotPosition < 0 || plotPosition > 2) {
                 pretty.warn(`Skipping seed plant with invalid instance ID (${attributes.type}) or position (${attributes.position}) for user ${userId}.`);
                 continue;
             }
-            // make sure they own the seed instance
-            const ownedSeed = await database.getQuery(
-                'SELECT item_id FROM seeds WHERE id = ? AND user_id = ?',
-                [seedInstanceId, userId]
-            );
-            if (!ownedSeed) {
-                pretty.warn(`User ${userId} attempted to plant seed instance ${seedInstanceId} which they do not own. Skipping.`);
-                continue; // skip this seed
+            //  assign random colour
+            let plotColor = formats.getRandomItem(availableColors);
+            let plotSeedTypeId = instanceId;
+            // split current garden string 
+            currentGardenString = (await database.getQuery('SELECT garden FROM users WHERE id = ?', [userId]))?.garden || defaultGardenStr;
+            let gardenPositions = currentGardenString.split('|');
+            let foundPlot = false;
+            for (let i = 0; i < gardenPositions.length; i++) {
+                let gardenPositionData = gardenPositions[i].split('~');
+                const currentPlotPos = parseInt(gardenPositionData[0], 10);
+                if (currentPlotPos === plotPosition) {
+                    foundPlot = true;
+                    // check if plot is already occupied
+                    if (parseInt(gardenPositionData[2], 10) !== -1) {
+                        pretty.warn(`User ${userId} trying to plant in occupied plot ${plotPosition}.`);
+                        break; // break inner loop, move to next seed in outer loop
+                    }
+                    // parse swf (super flawed but oh well..)
+                    const initialSeedData = global.storage_seeds[plotSeedTypeId];
+                    if (initialSeedData && initialSeedData.asset) {
+                        const assetParts = initialSeedData.asset.split('_');
+                        // check against known colours
+                        let colorFoundInPath = null;
+                        for (const color of availableColors) {
+                            // match like "_color.swf"
+                            if (initialSeedData.asset.includes(`_${color}.swf`)) {
+                                colorFoundInPath = color;
+                                break;
+                            }
+                        }
+                        if (colorFoundInPath) {
+                            plotColor = colorFoundInPath;
+                            pretty.debug(`Overriding random color with parsed color: ${plotColor}`);
+                            const basePath = initialSeedData.asset.replace(`_${colorFoundInPath}.swf`, '.swf');
+                            let actualSeedTypeId = -1; // default if not found
+                            for (const typeId in global.storage_seeds) {
+                                if (global.storage_seeds[typeId].asset === basePath) {
+                                    actualSeedTypeId = parseInt(typeId, 10);
+                                    break;
+                                }
+                            }
+                            if (actualSeedTypeId !== -1) {
+                                plotSeedTypeId = actualSeedTypeId; // correct the seed type ID
+                                pretty.debug(`Corrected seed type ID based on SWF parse: ${plotSeedTypeId}`);
+                            } else {
+                                pretty.warn(`Could not find seed type ID matching base path ${basePath} derived from ${initialSeedData.asset}`);
+                            }
+                        }
+                    } else {
+                        pretty.warn(`Could not find initial seed data or asset for potentially incorrect type ID: ${plotSeedTypeId}`);
+                    }
+                    // update the garden's plot
+                    gardenPositionData[1] = plotColor;
+                    gardenPositionData[2] = String(plotSeedTypeId); // store the type id and pray it's correct
+                    gardenPositionData[3] = String(clock.getTimestamp());
+                    gardenPositionData[4] = '0'; // prior time
+                    gardenPositionData[5] = '1'; // active (1=active?)
+                    // reconstruct the segment and update the array
+                    gardenPositions[i] = gardenPositionData.join('~');
+                    currentGardenString = gardenPositions.join('|');
+                    // update database
+                    await database.runQuery('UPDATE users SET garden = ? WHERE id = ?', [currentGardenString, userId]);
+                    pretty.debug(`Updated garden for user ${userId} after planting in plot ${plotPosition}. New state: ${currentGardenString}`);
+                    // delete seed regardless of what happens because, for some amazing reason
+                    // they decided that the client is in control of buying and managing stock here
+                    try {
+                        const seedToDelete = await database.getQuery(
+                            'SELECT id FROM seeds WHERE user_id = ? AND item_id = ? LIMIT 1',
+                            [userId, instanceId]
+                        );
+                        if (seedToDelete) {
+                            const deleteResult = await database.runQuery(
+                                'DELETE FROM seeds WHERE id = ? AND user_id = ?',
+                                [seedToDelete.id, userId]
+                            );
+                            if (deleteResult && deleteResult.changes > 0) {
+                                pretty.debug(`Deleted seed instance ID ${seedToDelete.id} for user ${userId}.`);
+                            } else {
+                                pretty.warn(`Failed to delete seed instance ID ${seedToDelete.id} for user ${userId}. Instance ID sent by client: ${instanceId}`);
+                            }
+                        } else {
+                            pretty.warn(`Could not find seed to delete for user ${userId} (item_id = instance_id ${instanceId}).`);
+                        }
+                    } catch (deleteError) {
+                        pretty.error(`Error during flawed seed deletion for user ${userId}:`, deleteError);
+                    }
+                    break; // end inner loop
+                } // end currentPlotPos === plotPosition
+            } // end outer loop
+            if (!foundPlot) {
+                pretty.warn(`Plot ${plotPosition} not found in garden string for user ${userId}. String: ${currentGardenString}`);
             }
-            const seedTypeId = ownedSeed.item_id; // this is the actual type ID from storage_seeds
-            // make sure the plot is empty
-            const targetPlot = parsedGarden.find(p => p.position === plotPosition);
-            if (!targetPlot || targetPlot.seedId !== -1) {
-                pretty.warn(`User ${userId} attempted to plant seed instance ${seedInstanceId} in non-empty plot ${plotPosition}. Skipping.`);
-                continue; // plot not found or already occupied
-            }
-            // choose a random color from the config
-            const randomColor = formats.getRandomItem(global.config_garden.seeds);
-            // update the parsedGarden state
-            targetPlot.seedId = seedTypeId;
-            targetPlot.color = randomColor; // assign random color
-            targetPlot.plantTime = clock.getTimestamp();
-            targetPlot.priorTime = 0; // reset prior time
-            targetPlot.active = 1; // mark as active
-            gardenWasModified = true;
-            // remove the seed from the user's inventory
-            const deleted = await inventoryUtils.deleteUserSeedInstance(userId, seedInstanceId);
-            if (!deleted) {
-                pretty.error(`Failed to delete seed instance ${seedInstanceId} for user ${userId} after planting. Garden state might be inconsistent.`);
-            } else {
-                pretty.debug(`Planted seed type ${seedTypeId} (Instance: ${seedInstanceId}) in plot ${plotPosition} for user ${userId} with color ${randomColor}.`);
-            }
-        } // end of for loop
-        // update database if needed
-        if (gardenWasModified) {
-            const updatedGardenString = parsedGarden.map(p =>
-                `${p.position}~${p.color}~${p.seedId}~${p.plantTime}~${p.priorTime}~${p.active}`
-            ).join('|');
-            await database.runQuery('UPDATE users SET garden = ? WHERE id = ?', [updatedGardenString, userId]);
-            pretty.print(`Updated garden state for user ${userId}.`, 'ACTION');
-        }
+        } // end initial loop
         const successXml = xmlbuilder.create({ xml: { status: { '@code': 0, '@text': 'success' } } }).end();
         res.type('text/xml').send(successXml);
     } catch (error) {

@@ -3,7 +3,8 @@
         "name": "RoxStar"
     },
     "social": {
-        "strict_censor": true
+        "strict_censor": true,
+        "pinboard_history": 100
     },
     "gifts": {
         "max": 24

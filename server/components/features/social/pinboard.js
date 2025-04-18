@@ -13,6 +13,8 @@ function formatPinboardMessages(messages, senderDetailsMap) {
         return [];
     }
     const formattedMessages = [];
+    // print out the messages
+    console.log('Messages:', messages);
     for (const message of messages) {
         const sender = senderDetailsMap.get(message.sender);
         if (!sender) {
@@ -20,28 +22,26 @@ function formatPinboardMessages(messages, senderDetailsMap) {
             continue; // skip message if sender details are missing
         }
         formattedMessages.push({
-            message: {
-                '@colour': message.colour,
-                '@id': message.id,
-                '@sentdate': message.date * 1000, // convert to milliseconds
-                '@status': message.status,
-                '@watermark': message.watermark,
-                body: message.message || '', // ensure body exists, default to empty string
-                user: {
-                    '@id': sender.id,
-                    '@age': formatUtils.getUserAge(sender.birthday),
-                    '@gender': sender.gender,
-                    '@username': sender.username,
-                    '@country': sender.country || '',
-                },
-                monster: {
-                    '@name': sender.monster_name,
-                    '@type': sender.monster,
-                    '@primarycolour': sender.primary_colour,
-                    '@secondarycolour': sender.secondary_colour,
-                    ...monsterUtils.getUserColoramaData(sender.colorama),
-                    '@b': 'true'
-                }
+            '@colour': message.colour,
+            '@id': message.id,
+            '@sentdate': message.date * 1000,
+            '@status': message.status,
+            '@watermark': message.watermark,
+            body: message.message || '',
+            user: {
+                '@id': sender.id,
+                '@age': formatUtils.getUserAge(sender.birthday),
+                '@gender': sender.gender,
+                '@username': sender.username,
+                '@country': sender.country || '',
+            },
+            monster: {
+                '@name': sender.monster_name,
+                '@type': sender.monster,
+                '@primarycolour': sender.primary_colour,
+                '@secondarycolour': sender.secondary_colour,
+                ...monsterUtils.getUserColoramaData(sender.colorama),
+                '@b': 'true' // hardcoded
             }
         });
     }

@@ -35,8 +35,9 @@ router.post('/:targetUserId', async (req, res) => {
         pretty.warn(`Comment create request for user ${loggedInUserId} to ${targetUserId} missing attributes. Atts: ${JSON.stringify(attributes)}`);
     }
     // sanitise and censor
-    const sanitizedMessage = formats.sanitiseString(messageText);
-    const censoredMessage = censor.filterWords(sanitizedMessage, global.config_censor);
+    const decodedMessage = formats.decodeBase64(messageText);
+    const sanitizedMessage = formats.sanitiseString(decodedMessage);
+    const censoredMessage = censor.filterWords(sanitizedMessage, global.config_censor).filtered;
     const status = (loggedInUserId === targetUserId) ? 'accepted' : 'pending';
     try {
         // make sure the target user exists

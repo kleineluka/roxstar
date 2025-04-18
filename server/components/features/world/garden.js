@@ -197,7 +197,7 @@ async function formatCaughtMoshlingData(req, moshlingSrcId) {
  * @param {Array<object>} parsedGarden - The parsed garden state array.
  * @returns {Promise<object|null>} Formatted caught Moshling data if caught, otherwise null.
  */
-async function checkCatchableMoshling(req, parsedGarden) {
+async function checkCatchableMoshling(req, userId, parsedGarden) {
     // check if all plots are planted and grown
     let allGrown = true;
     const plantedSeeds = [];
@@ -283,27 +283,37 @@ async function checkCatchableMoshling(req, parsedGarden) {
  */
 function checkSeedCombination(planted, required) {
     if (planted.length !== 3 || required.length !== 3) return false;
-    // create lookup maps for easier comparison
-    const plantedMap = new Map(); // key: assetPath, value: count
-    for (const p of planted) {
-        const baseSeed = global.storage_seeds[p.seedId];
-        if (!baseSeed) return false; // should not happen if data is consistent
-        let assetPath = baseSeed.asset;
-        if (p.color && p.color !== 'any' && p.color !== 'black') { // todo: fix checking types for defaults
-            assetPath = assetPath.replace('.swf', `_${p.color}.swf`);
+    // create a copy of the planted array to modify during matching
+    const availablePlanted = [...planted];
+    // go through each required seed
+    for (const req of required) {
+        let matchFound = false;
+        // go through each available planted seed
+        for (let i = 0; i < availablePlanted.length; i++) {
+            const plant = availablePlanted[i];
+            const baseSeed = global.storage_seeds?.[plant.seedId];
+            if (!baseSeed) continue; // skip if base seed data missing
+            // check base asset path match (ignoring colour)
+            const reqBasePath = req.path.replace(/_(red|blue|yellow|black|pink|purple)\.swf$/, '.swf');
+            if (baseSeed.asset !== reqBasePath) {
+                continue; // base seed type doesn't match
+            }
+            // check colour match
+            const requiredColor = req.colour; // colour name from requirement ('red', 'black', 'any', etc.)
+            const plantedColor = plant.color; // actual colour planted
+            if (requiredColor === 'any' || requiredColor === plantedColor) {
+                matchFound = true;
+                availablePlanted.splice(i, 1); // remove the matched seed
+                break; // move to the next required seed
+            }
+            // if colorus don't match (and required isn't 'any'), continue checking other planted seeds
+        } // end inner loop
+        if (!matchFound) {
+            // better luck next time
+            return false;
         }
-        plantedMap.set(assetPath, (plantedMap.get(assetPath) || 0) + 1);
-    }
-    const requiredMap = new Map(); // key: path, value: count
-    for (const r of required) {
-        requiredMap.set(r.path, (requiredMap.get(r.path) || 0) + 1);
-    }
-    // compare maps
-    if (plantedMap.size !== requiredMap.size) return false;
-    for (const [path, count] of requiredMap) {
-        if (plantedMap.get(path) !== count) return false;
-    }
-    return true;
+    } // end outer loop
+    return availablePlanted.length === 0;
 }
 
 /**
