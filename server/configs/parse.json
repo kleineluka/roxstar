@@ -9,5 +9,6 @@
     "/moshi/services/rest/user/friends/update": "xml",
     "/moshi/services/garden/plant": "xml",
     "/services/rest/moshling/target": "json",
-    "/moshi/services/moshling/keep": "xml"
+    "/moshi/services/moshling/keep": "xml",
+    "/moshi/services/zoo/save": "xml"
 }
