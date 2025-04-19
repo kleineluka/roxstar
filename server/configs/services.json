@@ -47,5 +47,6 @@
     "/moshi/services/rest/world/location/friends": "/world/friend.js",
     "/moshi/services/moshling/keep": "/moshlings/keep.js",
     "/moshi/services/moshling/free": "/moshlings/free.js",
-    "/moshi/services/zoo/save": "/world/zoo.js"
+    "/moshi/services/zoo/save": "/world/zoo.js",
+    "/moshi/services/rest/user/gifts": "/gifts/list.js"
 }

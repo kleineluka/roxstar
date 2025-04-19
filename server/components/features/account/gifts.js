@@ -61,7 +61,52 @@ async function getOpenedGiftCount(userId) {
     }
 }
 
+/**
+ * Formats gift data and sender details for the Gift Room XML response.
+ * @param {Array<object>} gifts - Array of gift rows from the gifts table.
+ * @param {Map<number, object>} senderDetailsMap - A Map where key is sender ID and value is the sender's user data object.
+ * @returns {Array<object>} - An array of formatted gift objects ready for XML.
+ */
+function formatGiftRoomGifts(gifts, senderDetailsMap) {
+    if (!gifts || gifts.length === 0) {
+        return [];
+    }
+    if (!global.storage_gifts) {
+        pretty.error("Gift storage (global.storage_gifts) not loaded.");
+        return [];
+    }
+    const formattedGifts = [];
+    for (const gift of gifts) {
+        const sender = senderDetailsMap.get(gift.sender);
+        const baseGift = global.storage_gifts[gift.gift_id]; // gift_id = key
+        if (!sender) {
+            pretty.warn(`Sender details not found for gift ID ${gift.id}, sender ID ${gift.sender}. Skipping gift.`);
+            continue;
+        }
+        if (!baseGift) {
+            pretty.warn(`Base gift data not found for gift ID ${gift.id}, gift_id ${gift.gift_id}. Skipping gift.`);
+            continue;
+        }
+        formattedGifts.push({
+            gift: {
+                '@senderName': sender.username || 'Unknown',
+                '@receivedDate': gift.date,
+                '@viewed': String(gift.has_opened === 1 || gift.has_opened === true || gift.has_opened === 'true'), // convert to 'true'/'false' string
+                '@name': baseGift.name || 'Unknown Gift',
+                '@payloadPath': baseGift.payloadPath || '',
+                '@message': gift.message || '',
+                '@rox': baseGift.rox || 0,
+                '@id': gift.id, // unique ID of this gift instance
+                '@srcId': gift.gift_id, // type ID from storage_gifts
+                '@displayClipPath': baseGift.displayClipPath || ''
+            }
+        });
+    }
+    return formattedGifts;
+}
+
 module.exports = {
     getRoomGiftCounts,
     getOpenedGiftCount,
+    formatGiftRoomGifts,
 };
