@@ -1,4 +1,4 @@
-*Are you ready for the show?* RoxStar is a `/client/` and `/server/` implementation of an abandonware API, written in NodeJS. The client is a minimal Electron application that has Flash support enabled, and the server runs through Express, Mustache, and Sqlite3. **By using, copying, or modifying this software you are agreeing to the terms laid out below.** This is a love letter to the game that shaped many childhoods across the world.
+*Are you ready for the show?* RoxStar is a `/client/` and `/server/` implementation of the Moshi Monsters api, written in NodeJS. The client is a minimal Electron application that has Flash support enabled, and the server runs through Express, Mustache, and Sqlite3. **By using, copying, or modifying this software you are agreeing to the terms laid out below.** This is a love letter to the game that shaped many childhoods across the world.
 
 ## Notice, License and Terms ‼️
 - May not be used on public-facing networks or redistributed in any form
