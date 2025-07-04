@@ -1,24 +1,28 @@
-*Are you ready for the show?* RoxStar is a `/client/` and `/server/` implementation of the Moshi Monsters api, written in NodeJS. The client is a minimal Electron application that has Flash support enabled, and the server runs through Express, Mustache, and Sqlite3. **By using, copying, or modifying this software you are agreeing to the terms laid out below.** This is a love letter to the game that shaped many childhoods across the world.
+*Are you ready for the show?* RoxStar is a `/client/` and `/server/` implementation of the Moshi Monsters flash game api written in NodeJS. The client is a minimal Electron application that has Flash support enabled and the server runs through Express, Mustache, and Sqlite3. This is a love letter to the game that shaped many childhoods across the world.
 
-## Notice, License and Terms ‼️
-- May not be used on public-facing networks or redistributed in any form
-- Not secure in current stage and may have vulnerabilities
-- Created for local testing, fan archival, and server research
-- Fan project and not affiliated with any other project
-- Only original code for this project is contained in this repository
-- This project will never assist in finding files that aren't part of its original code
-- Schemas are likely to change as developed, so old databases will break
-- Developed with clean room philosophy— contributions are generally not accepted to maintain this approach
-- You may not use this project for any monetary gain or profit
-- You may not use this project for anything that violates your local laws or regulations
-- You may not use this project for anything that could invoke harm to others (ex. spreading malware or hate)
-- You must make it known that this is a fan project, and you may not impersonate the original game or its developers
-- This project may only be used so long as the original game is not available to play, and you must cease using it if the original game is made available again
-- I will not provide any support, help, or liability for any code here
-- I do not/will not deploy this code to a live or public environment
-- I never owned an account on the original game
-- I can take down this project at any time, for any reason, and you must cease using it if I do so
-- I can change these terms at any time, and you must cease using this project if I do so (unless you agree to the new terms)
+**By using, copying, or modifying this software you are agreeing to the terms laid out below.**
+ 
+## Notice & Usage Terms 😇
+This project is a fan-made, local-use-only tool created for archival, testing, and server research purposes. It is not affiliated with or endorsed by the original game's developers in any way. Please read the terms below carefully:
+
+### Restrictions and Limitations
+- This project must not be used on public-facing networks, hosted servers, or redistributed in any form.
+- It is not secure in its current state and may contain vulnerabilities.
+- No assistance or support is offered for setup or usage.
+- Monetary gain or commercial use is strictly prohibited.
+- The schemas and structure may change frequently — old databases will likely break.
+- Do not use this project to violate local laws, spread malware, or cause harm to others in any way.
+- You must clearly identify this as a fan project and must not impersonate the original developers or game.
+- You must immediately cease use of this project if:
+    - The original game becomes available to play again
+    - The project is taken down or the terms are changed and you disagree with them
+ 
+### Development and License
+- The project follows a clean-room philosophy: contributions are not accepted to maintain this approach.
+- Only original code written specifically for this project is included in this repository.
+- This project does not assist in finding or using any files beyond the code provided.
+- You must stop using this project if the license terms change and you do not agree to the new ones.
+- Outside of any other specified terms, the code is licensed under **GNU General Public License v3.0**
 
 This code is provided under the terms listed above, otherwise, all rights reserved. **Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.**
 
@@ -33,4 +37,4 @@ This code is provided under the terms listed above, otherwise, all rights reserv
 ## Acknowledgements 🥰
 - `FFDec` for reverse-engineering AS3 code
 - `Wayback Machine / Archive` for hosting old web files and network requests
-- `My spouse` whom I build this for, a momento of how we met
+- The original `game creators` for making something worth keeping alive
