@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
         // fetch active gifts sort by unopened first
         const gifts = await database.getAllQuery(
             `SELECT * FROM gifts
-             WHERE reciever = ? AND status = 'active'
+             WHERE receiver = ? AND status = 'active'
              ORDER BY has_opened ASC, date DESC -- Show unopened first (0), then by date
              LIMIT ?`,
             [targetUserId, global.config_game.gifts.max]

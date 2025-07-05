@@ -72,7 +72,7 @@ router.get('/:username', async (req, res) => {
             socialUtils.getPendingCommentCount(targetUserId),
             socialUtils.calculateRating(targetUserId),
             giftUtils.getOpenedGiftCount(targetUserId),
-            database.getQuery("SELECT COUNT(*) AS count FROM gifts WHERE reciever = ? AND has_opened = 0 AND status = 'active'", [targetUserId]).then(r => (r?.count || 0) > 0 ? 'true' : 'false'),
+            database.getQuery("SELECT COUNT(*) AS count FROM gifts WHERE receiver = ? AND has_opened = 0 AND status = 'active'", [targetUserId]).then(r => (r?.count || 0) > 0 ? 'true' : 'false'),
             friendUtils.checkFriendshipStatus(loggedInUserId, targetUserId)
         ]);
         const uniqueMoshlingCount = moshlingUtils.getMoshlingCount(moshlingData);

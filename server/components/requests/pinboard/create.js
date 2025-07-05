@@ -48,7 +48,7 @@ router.post('/:targetUserId', async (req, res) => {
         }
         const timestamp = clock.getTimestamp();
         const insertResult = await database.runQuery(
-            `INSERT INTO message_board (sender, reciever, message, status, watermark, colour, date)
+            `INSERT INTO message_board (sender, receiver, message, status, watermark, colour, date)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [loggedInUserId, targetUserId, censoredMessage, status, watermark, colour, timestamp]
         );

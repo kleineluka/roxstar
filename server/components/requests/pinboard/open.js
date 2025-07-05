@@ -24,7 +24,7 @@ async function sendPinboardResponse(targetUserId, loggedInUserId, res) {
         if (isOwnBoard) {
             messages = await database.getAllQuery(
                 `SELECT * FROM message_board
-                 WHERE reciever = ? AND status NOT IN ('deleted', 'reported')
+                 WHERE receiver = ? AND status NOT IN ('deleted', 'reported')
                  ORDER BY date DESC
                  LIMIT ?`,
                 [targetUserId, messageLimit]
@@ -32,7 +32,7 @@ async function sendPinboardResponse(targetUserId, loggedInUserId, res) {
         } else {
             messages = await database.getAllQuery(
                 `SELECT * FROM message_board
-                 WHERE reciever = ? AND status = 'accepted'
+                 WHERE receiver = ? AND status = 'accepted'
                  ORDER BY date DESC
                  LIMIT ?`,
                 [targetUserId, messageLimit]

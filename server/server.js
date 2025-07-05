@@ -21,6 +21,7 @@ global.body_parser = require('body-parser');
 require('body-parser-xml')(global.body_parser);
 
 // import middleware
+const middleware_partials = require('./components/middleware/partials.js');
 const middleware_rebundles = require('./components/middleware/rebundles.js'); 
 const middleware_process = require('./components/middleware/process.js');
 const middleware_config = require('./components/middleware/config.js');
@@ -42,6 +43,7 @@ app.set('views', __dirname + '/components/web/public');
 app.use(cookieParser());
 
 // apply middleware stack
+app.use(middleware_partials.inject);
 app.use(middleware_rebundles.rebundler);
 middleware_process.processor(app);
 middleware_parse.parser(app);

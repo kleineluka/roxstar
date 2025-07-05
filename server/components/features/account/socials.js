@@ -48,7 +48,7 @@ async function getPendingFriendCount(userId) {
 async function getCommentCount(userId) {
     try {
         const row = await database.getQuery(
-            "SELECT COUNT(*) AS count FROM message_board WHERE reciever = ? AND status != 'pending' AND status != 'deleted' AND status != 'reported'",
+            "SELECT COUNT(*) AS count FROM message_board WHERE receiver = ? AND status != 'pending' AND status != 'deleted' AND status != 'reported'",
             [userId]
         );
         return row?.count || 0;
@@ -66,7 +66,7 @@ async function getCommentCount(userId) {
 async function getPendingCommentCount(userId) {
     try {
         const row = await database.getQuery(
-            "SELECT COUNT(*) AS count FROM message_board WHERE reciever = ? AND status = 'pending'",
+            "SELECT COUNT(*) AS count FROM message_board WHERE receiver = ? AND status = 'pending'",
             [userId]
         );
         return row?.count || 0;
