@@ -15,9 +15,9 @@ router.get("/", async (req, res) => {
         let toast_color = req.session.toast.color;
         delete req.session.toast;
         await req.session.save();
-        notifs.sendToast(req, res, toast_message, toast_color, '../../web/login.html');
+        notifs.sendToast(req, res, toast_message, toast_color, 'login.html');
     } else {
-        res.render('../../web/login.html');
+        res.render('login.html');
     }
 });
 
@@ -28,21 +28,21 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
     let loginResult;
     let session_clock = (req.body['remember-me'] === 'on') ? global.config_server['session-remember-me-true'] : global.config_server['session-remember-me-false'];
     if (!req.body.username || !req.body.password) {
-        notifs.sendToast(req, res, 'Please make sure you entered your username and password!', '#be9ddf', '../../web/login.html');
+        notifs.sendToast(req, res, 'Please make sure you entered your username and password!', '#be9ddf', 'login.html');
         return;
     } else {
         try {
             const userRow = await database.getQuery(`SELECT * FROM users WHERE username = ?`, [req.body.username]);
             if (!userRow) {
-                notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', '../../web/login.html');
+                notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', 'login.html');
                 return;
             } else if (userRow.activation_status === 'banned') {
-                notifs.sendToast(req, res, 'Your account is banned.', '#be9ddf', '../../web/login.html');
+                notifs.sendToast(req, res, 'Your account is banned.', '#be9ddf', 'login.html');
                 return;
             } else {
                 const password_match = await bcrypt.compare(req.body.password, userRow.password);
                 if (!password_match) {
-                    notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', '../../web/login.html');
+                    notifs.sendToast(req, res, 'Your username or password is incorrect.', '#be9ddf', 'login.html');
                     return;
                 } else {
                     // store data client-side
@@ -68,7 +68,7 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
             }
         } catch (error) {
             pretty.error('Login function encountered an error:', error);
-            notifs.sendToast(req, res, 'An internal error occurred during login. Please try again.', '#FF0000', '../../web/login.html');
+            notifs.sendToast(req, res, 'An internal error occurred during login. Please try again.', '#FF0000', 'login.html');
             return;
         }
     }

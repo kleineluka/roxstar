@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
         pretty.debug("Monsters page access attempt without userId in session. Redirecting to login.");
         req.session.toast = { message: 'Please log in to access your monster.', color: '#be9ddf' };
         await new Promise(resolve => req.session.save(resolve));
-        return res.redirect('../../web/login.html');
+        return res.redirect('/login.html');
     }
     try {
         const userRow = await database.getQuery(
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
                 if (err) {
                     pretty.error("Error destroying invalid session:", err);
                 }
-                res.redirect('../../web/login.html');
+                res.redirect('/login.html');
             });
             return;
         }
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
             pretty.debug(`Banned user ID ${userId} attempted to access monsters page.`);
             req.session.toast = { message: 'Your account is banned.', color: '#be9ddf' };
             await new Promise(resolve => req.session.save(resolve));
-            return res.redirect('../../web/login.html');
+            return res.redirect('/login.html');
         }
         if (userRow.activation_status !== 'Member') {
             pretty.debug(`User ID ${userId} attempted to access monsters page with status "${userRow.activation_status}". Redirecting.`);
@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
                 pretty.error(`Error parsing settings JSON for user ID ${userId}:`, parseError);
                 req.session.toast = { message: 'Failed to load your settings. Please try logging in again.', color: '#ffaaaa' };
                 await new Promise(resolve => req.session.save(resolve));
-                return res.redirect('../../web/login.html');
+                return res.redirect('/login.html');
             }
         }
         const userName = userRow.username;
@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
         const flashVars = `siteroot=../&clientroot=${global.config_server['final-url']}/media/game/&cookie=mcAuth=${userId}|User|${userName}|${userId}; lastUsername=${userName}; trgt=Yj0w&shellmode=ownMonster&browserurl=${global.config_server['final-url']}/monsters&forumsurl=${global.config_server['forums-url']}&quality=${userQuality}&sound=${userSound}`;
         const shellData = `${global.config_server['final-url']}/media/game/shell/1.10/flash/shell.swf`;
         pretty.debug(`Rendering monsters page for user ID ${userId} (${userName}).`);
-        res.render('../../web/monsters.html', {
+        res.render('monsters.html', {
             shell_data: shellData,
             flash_vars: flashVars
         });
@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
         pretty.error(`Error loading monsters page for user ID ${userId}:`, error);
         req.session.toast = { message: 'An internal server error occurred while loading the game. Please try again.', color: '#ffaaaa' };
         try { await new Promise(resolve => req.session.save(resolve)); } catch (saveErr) { pretty.error("Failed to save session during error handling:", saveErr); }
-        res.redirect('../../web/login');
+        res.redirect('/login');
     }
 });
 

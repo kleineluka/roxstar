@@ -39,7 +39,7 @@ app.use(session({
 app.set('trust proxy', true) // mainly for running with nginx
 app.engine('html', mustache());
 app.set('view engine', 'html');
-app.set('views', __dirname + '/components/web/public'); 
+app.set('views', __dirname + '/components/web'); 
 app.use(cookieParser());
 
 // apply middleware stack

@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
             message: 'No active session found. Please log in or create an account.',
             color: '#be9ddf'
         };
-        return res.redirect('../../web/login.html');
+        return res.redirect('/login.html');
     }
     try {
         const userRow = await database.getQuery(
@@ -31,10 +31,10 @@ router.get('/', async (req, res) => {
                 message: 'You do not have an account that needs activation! Try logging in again, or making a new account.',
                 color: '#be9ddf'
             };
-            return res.redirect('../../web/login.html');
+            return res.redirect('/login.html');
         }
         pretty.debug(`Displaying activation page for user "${username}".`);
-        res.render('../../web/activation.html', { username: username });
+        res.render('activation.html', { username: username });
     } catch (error) {
         pretty.error('Error in activation GET route:', error);
         req.session.toast = {
@@ -52,7 +52,7 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
     const userId = req.session.userId; 
     if (!userId) {
         pretty.warn("Activation process started without userId in session. Redirecting to login.");
-        return res.redirect('../../web/login.html');
+        return res.redirect('/login.html');
     }
     try {
         // validate user in the database
@@ -62,25 +62,25 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
         );
         if (!userRow) {
             pretty.warn(`Activation failed: User ID ${userId} not found in database. Redirecting to login.`);
-            notifs.sendToast(req, res, 'User not found. Please log in again.', '#be9ddf', '../../web/login.html');
+            notifs.sendToast(req, res, 'User not found. Please log in again.', '#be9ddf', 'login.html');
             return;
         }
         if (userRow.activation_status !== 'needsActivation') {
             pretty.warn(`Activation attempted for user ID ${userId} with status "${userRow.activation_status}", expected 'needsActivation'. Redirecting to monsters.`);
-            return res.redirect('../../web/monsters.html');
+            return res.redirect('/monsters.html');
         }
         // get the activation form data
         const { name, gender, country, birthMonth, birthDay, birthYear } = req.body;
         if (!name || !gender || !country || !birthMonth || !birthDay || !birthYear) {
             pretty.warn(`Activation form incomplete for user ID ${userId}. Missing fields.`);
-            notifs.sendToast(req, res, 'Please make sure you fill out all of the details!', '#be9ddf', '../../web/activation.html');
+            notifs.sendToast(req, res, 'Please make sure you fill out all of the details!', '#be9ddf', 'activation.html');
             return;
         }
         // validate that the monster name they chose is valid
         const isMonsterNameValid = monsterUtils.validateMonsterName(name);
         if (!isMonsterNameValid) {
             pretty.warn(`Activation failed: Monster name "${name}" is invalid for user ID ${userId}.`);
-            notifs.sendToast(req, res, 'There was an issue with your monster name, please select another one.', '#be9ddf', '../../web/activation.html');
+            notifs.sendToast(req, res, 'There was an issue with your monster name, please select another one.', '#be9ddf', 'activation.html');
             return; 
         }
         // calculate birthdate timestamp (into seconds)
@@ -94,7 +94,7 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
         const updateResult = await database.runQuery(updateSql, updateParams);
         if (!updateResult || updateResult.changes === 0) {
             pretty.error(`DATABASE: Failed to update user ID ${userId} during activation. Update result: ${JSON.stringify(updateResult)}`);
-            notifs.sendToast(req, res, 'Account activation failed due to a server error. Please try again later.', '#ffaaaa', '../../web/activation.html')
+            notifs.sendToast(req, res, 'Account activation failed due to a server error. Please try again later.', '#ffaaaa', 'activation.html')
             return;
         }
         pretty.print(`Account activated successfully for user ID ${userId} (Username: ${req.session.username}, Monster Name: ${name}).`, 'ACTION');
@@ -103,11 +103,11 @@ router.post("/", global.body_parser.urlencoded({ extended: true }), async (req, 
             if (err) {
                 pretty.error("Session destroy error during activation:", err);
             }
-            notifs.sendToast(req, res, 'Your account is now registered and you can login!', '#7eb8da', '../../web/login.html'); 
+            notifs.sendToast(req, res, 'Your account is now registered and you can login!', '#7eb8da', 'login.html'); 
         });
     } catch (error) {
         pretty.error('Unhandled error in activation function:', error);
-        notifs.sendToast(req, res, 'An unexpected error occurred during activation. Please try again later.', '#ffaaaa', '../../web/activation.html');
+        notifs.sendToast(req, res, 'An unexpected error occurred during activation. Please try again later.', '#ffaaaa', 'activation.html');
     }
 });
 
