@@ -48,5 +48,6 @@
     "/moshi/services/moshling/keep": "/moshlings/keep.js",
     "/moshi/services/moshling/free": "/moshlings/free.js",
     "/moshi/services/zoo/save": "/world/zoo.js",
-    "/moshi/services/rest/user/gifts": "/gifts/list.js"
+    "/moshi/services/rest/user/gifts": "/gifts/list.js",
+    "/moshi/services/monster/dressup/costume/load": "/clothing/room.js"
 }
