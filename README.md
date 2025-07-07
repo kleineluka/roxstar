@@ -77,11 +77,11 @@ After installing the dependencies in both `/client/` and `/server/`, simply run 
 - Only original code written specifically for this project is included in this repository.
 - This project does not assist in finding or using any files beyond the code provided.
 - You must stop using this project if the license terms change and you do not agree to the new ones.
-- Outside of any other specified terms, the code is licensed under the **RoxStar License** - a GNU v3 based license.
+- Outside of any other specified terms, the code is licensed under the **RoxStar License**.
 
 This code is provided under the terms listed above, otherwise, all rights reserved. **Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.**
 
-Here is a copy of the **RoxStar License** (based on GNU v3):
+Here is a copy of the **RoxStar License**:
 
 This license governs the use of the RoxStar software and its associated source code ("the Software"). By using, copying, modifying, or distributing the Software, you agree to the terms of this license.
 

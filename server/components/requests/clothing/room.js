@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
             database.getAllQuery('SELECT id, item_id FROM clothes WHERE user_id = ?', [userId]),
             database.getAllQuery('SELECT * FROM dressup WHERE user_id = ?', [userId])
         ]);
+        //
         // thankfully, the format is the same as other requests with clothing
         const formattedInventory = inventoryUtils.formatUserClothes(clothesData);
         const formattedCostume = inventoryUtils.formatUserCostume(dressupData);

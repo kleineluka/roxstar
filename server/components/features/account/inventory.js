@@ -116,20 +116,18 @@ function formatUserClothes(clothesData) {
         }
         // combine database row id with base item details
         formattedClothes.push({
-            item: { 
-                '@id': clothingItem.id,
-                '@srcId': clothingItem.item_id,
-                '@name': baseItem.name,
-                '@description': baseItem.description || '',
-                '@asset': baseItem.asset,
-                '@type': baseItem.type || 'clothing', 
-                '@zone': baseItem.zone || '',
-                '@animated': baseItem.animated || 'false',
-                '@handler': baseItem.handler || '',
-                '@args': baseItem.args || '',
-                '@health': baseItem.health || 0,
-                '@happiness': baseItem.happiness || 0,
-            }
+            '@id': clothingItem.id,
+            '@srcId': clothingItem.item_id,
+            '@name': baseItem.name,
+            '@description': baseItem.description || '',
+            '@asset': baseItem.asset,
+            '@type': baseItem.type || 'clothing',
+            '@zone': baseItem.zone || '',
+            '@animated': baseItem.animated || 'false',
+            '@handler': baseItem.handler || '',
+            '@args': baseItem.args || '',
+            '@health': baseItem.health || 0,
+            '@happiness': baseItem.happiness || 0
         });
     }
     return formattedClothes;
