@@ -3,10 +3,10 @@
 </h1>
 
 <p align="center">
-  Every Moshi's talking about the latest thing~ The fact that Moshi Monsters has been re-implemented in NodeJS! 
+  <i>Are you ready for the show?</i>
 </p>
 
-RoxStar is a **fan-made** client and server re-implementation of the Moshi Monsters flash game API! This is a love letter to the game that shaped many childhoods across the world. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE) (you may also read it [below](#notice--usage-terms-)).**
+RoxStar is a **fan-made** client and server re-implementation of the Moshi Monsters flash game API in NodeJS! This is a love letter to the game that shaped many childhoods across the world. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).**
 
 ## What is this, and why? 🎵
 Every online game relies on a central server. This stores data such as player's Moshlings, Rox balance, and high scores. When the official servers were shut down, the game became unplayable. While a few closed-source revival projects exist, RoxStar was created to be the first fully open-source, secure, and transparent implementation for everyone.
@@ -40,7 +40,7 @@ The second challenge is Flash, the technology the game was built on, which moder
 There is **a lot of stuff** covered that isn't listed here, this is just a general overview of some of the main things. I'll expand on this in the future! (for now.. focused on the actual code..)
 
 ## Code Structure 🛠️
-The client is a minimal Electron application that has Flash support enabled and the server runs through Express, Mustache, and Sqlite3.
+The `/client/` is a minimal Electron application that has Flash support enabled and the `/server/` on Express, Mustache, and Sqlite3. Due to the simple nature of the client, I'll only do an overview of the server structure here.
 
 - `/features/` hosts reusable helper functions for various tasks (ex. getting a user's level)
 - `/middleware/` hosts the stack that processes requests to the server (ex. routing requests or parsing data)

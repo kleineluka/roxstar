@@ -186,25 +186,23 @@ function formatUserCostume(dressupData) {
     const formattedCostume = [];
     for (const item of dressupData) {
         formattedCostume.push({
-            dressupitem: {
-                '@id': item.item_id,
-                '@costumeitemId': item.id,
-                '@x': item.x,
-                '@y': item.y,
-                '@z': item.z,
-                '@xscale': item.xscale,
-                '@yscale': item.yscale,
+            '@id': item.item_id,
+            '@costumeitemId': item.id,
+            '@x': item.x,
+            '@y': item.y,
+            '@z': item.z,
+            '@xscale': item.xscale,
+            '@yscale': item.yscale,
+            '@rotation': item.rotation,
+            '@layer': item.layer,
+            '@boneName': item.boneName,
+            '@direction': item.direction,
+            localTransform: {
                 '@rotation': item.rotation,
-                '@layer': item.layer,
-                '@boneName': item.boneName,
-                '@direction': item.direction,
-                localTransform: {
-                    '@rotation': item.rotation,
-                    '@x': item.x,
-                    '@xscale': item.xscale,
-                    '@y': item.y,
-                    '@yscale': item.yscale
-                }
+                '@x': item.x,
+                '@xscale': item.xscale,
+                '@y': item.y,
+                '@yscale': item.yscale
             }
         });
     }

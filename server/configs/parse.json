@@ -10,5 +10,6 @@
     "/moshi/services/garden/plant": "xml",
     "/services/rest/moshling/target": "json",
     "/moshi/services/moshling/keep": "xml",
-    "/moshi/services/zoo/save": "xml"
+    "/moshi/services/zoo/save": "xml",
+    "/moshi/services/monster/dressup/costume/update": "xml"
 }

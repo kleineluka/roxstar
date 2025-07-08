@@ -11,28 +11,28 @@ const socialUtils = require('../../features/account/socials.js');
  * Expects XML body like: <costume><attribute .../><item .../></costume>
  */
 router.post('/', async (req, res) => {
-    // sanity checks
     const userId = req.session.userId;
     if (!userId) {
         pretty.warn('Costume update request without user session.');
         return res.status(401).type('text/xml').send('<error code="AUTH_FAILED">Not logged in</error>');
     }
+    // get the costume data
     const costumeData = req.body?.costume;
     if (!costumeData) {
         pretty.warn(`Costume update for user ${userId} received invalid/empty XML. Body: ${JSON.stringify(req.body)}`);
         return res.status(400).type('text/xml').send('<error code="INVALID_XML">Invalid request format</error>');
     }
-    // get everything we need
+    // extract everything that we need
     const animationPrefix = costumeData.attribute?.$?.value || '';
     const itemsToWear = costumeData.item ? (Array.isArray(costumeData.item) ? costumeData.item : [costumeData.item]) : [];
-    // prepare data
     const newDressupItems = [];
-    const itemInstanceIds = []; // to validate ownership
+    const itemInstanceIds = [];
     for (const item of itemsToWear) {
         const itemAttrs = item.$;
-        const transformAttrs = item.localTransform?.$;
+        // this *should* correctly access the nested properties
+        const transformAttrs = item.localTransform?.[0]?.$;
         if (!itemAttrs?.id || !transformAttrs) {
-            pretty.warn(`Skipping invalid item in costume update for user ${userId}: ${JSON.stringify(item)}`);
+            pretty.warn(`Skipping invalid item in costume update for user ${userId}: Missing attributes or transform. Item: ${JSON.stringify(item)}`);
             continue;
         }
         const itemInstanceId = parseInt(itemAttrs.id, 10);
@@ -41,57 +41,55 @@ router.post('/', async (req, res) => {
             continue;
         }
         itemInstanceIds.push(itemInstanceId);
-        // add the new item to the list
         newDressupItems.push({
             user_id: userId,
             item_id: itemInstanceId, // instance id from the clothes table
             x: parseFloat(transformAttrs.x || 0),
             y: parseFloat(transformAttrs.y || 0),
-            z: parseFloat(transformAttrs.z || 0), // unsure about this one
+            z: parseFloat(transformAttrs.z || 0),
             xscale: parseFloat(transformAttrs.xscale || 1),
             yscale: parseFloat(transformAttrs.yscale || 1),
             rotation: parseFloat(transformAttrs.rotation || 0),
             layer: parseInt(itemAttrs.layer || 0, 10),
             boneName: itemAttrs.boneName || '',
-            direction: itemAttrs.direction || 'right', // default to right for direction
+            direction: itemAttrs.direction || 'right', // default to right
             date: clock.getTimestamp()
         });
     }
-    // now validate and save it
+    pretty.debug(`Dressup items (for update) prepared for insertion: ${JSON.stringify(newDressupItems)}`);
     try {
-        // make sure the items are good and the user has them before saving
+        // ensure the user actually has those items
         if (itemInstanceIds.length > 0) {
+            // get unique ids - client likes to send multiple instances of the same thing (for some reason)
+            const uniqueItemIdsToWear = new Set(itemInstanceIds);
             const ownedItems = await database.getAllQuery(
-                `SELECT id FROM clothes WHERE user_id = ? AND id IN (${itemInstanceIds.map(() => '?').join(',')})`,
-                [userId, ...itemInstanceIds]
+                `SELECT id FROM clothes WHERE user_id = ? AND id IN (${Array.from(uniqueItemIdsToWear).map(() => '?').join(',')})`,
+                [userId, ...uniqueItemIdsToWear]
             );
             const ownedItemIdsSet = new Set(ownedItems.map(item => item.id));
-            if (ownedItemIdsSet.size !== itemInstanceIds.length) {
-                const unownedItems = itemInstanceIds.filter(id => !ownedItemIdsSet.has(id));
-                pretty.warn(`User ${userId} tried to wear unowned clothing items: [${unownedItems.join(', ')}]. Aborting update.`);
+            pretty.debug(`Attempting to wear unique item instance IDs: [${Array.from(uniqueItemIdsToWear).join(', ')}]`);
+            pretty.debug(`Actually owned item instance IDs: [${Array.from(ownedItemIdsSet).join(', ')}]`);
+            if (ownedItemIdsSet.size !== uniqueItemIdsToWear.size) {
+                const unownedItems = Array.from(uniqueItemIdsToWear).filter(id => !ownedItemIdsSet.has(id));
+                pretty.warn(`User ${userId} tried to wear unowned clothing items (unique IDs): [${unownedItems.join(', ')}]. Aborting update.`);
                 return res.status(403).type('text/xml').send('<error code="OWNERSHIP_ERROR">Attempted to wear unowned item(s)</error>');
             }
         }
-        // perform database operations in a transaction for no half-finished update
+        // do it all in a transaction to make sure it's all good
         await database.runQuery('BEGIN TRANSACTION');
-        // first: update the dressup_prefix for the user
         await database.runQuery("UPDATE users SET dressup_prefix = ? WHERE id = ?", [animationPrefix, userId]);
-        // second: Delete all existing worn items for the user
         await database.runQuery("DELETE FROM dressup WHERE user_id = ?", [userId]);
-        // third: insert new dressup items user is wearing
         if (newDressupItems.length > 0) {
-            const placeholders = newDressupItems.map(() => '(?,?,?,?,?,?,?,?,?,?,?)').join(',');
-            const values = newDressupItems.flatMap(item => Object.values(item)); // flatten objects into single array of values
-            const columns = Object.keys(newDressupItems[0]).join(','); // get column names from first item
+            const placeholders = newDressupItems.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?)').join(',');
+            const values = newDressupItems.flatMap(item => Object.values(item));
+            const columns = Object.keys(newDressupItems[0]).join(',');
             const sql = `INSERT INTO dressup (${columns}) VALUES ${placeholders}`;
             await database.runQuery(sql, values);
         }
-        // finally: commit the transaction
         await database.runQuery('COMMIT');
-        // additionally, send bff news log
+        // log it and send success
         await socialUtils.logBffNews(userId, 'UpdatedMonsterDress', "null");
-        // and now.. the long awaited.. we did it!
-        pretty.debug(`Updated costume for user ${userId}.`, 'ACTION');
+        pretty.print(`Updated costume for user ${userId}.`, 'ACTION');
         const successXml = xmlbuilder.create({ xml: { status: { '@code': 0, '@text': 'success' } } }).end();
         res.type('text/xml').send(successXml);
     } catch (error) {
