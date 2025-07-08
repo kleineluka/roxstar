@@ -52,6 +52,7 @@ const setupEnvironment = () => {
     global.config_services = loadConfig('services.json');
     global.config_parse = loadConfig('parse.json');
     global.config_partials = loadConfig('partials.json');
+    global.config_statics = loadConfig('statics.json');
     pretty.print('Loaded configurations into volatile memory.', 'ACTION');
     global.storage_bags = loadStorage('bags.json');
     global.storage_clothes = loadStorage('clothes.json');

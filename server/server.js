@@ -27,6 +27,7 @@ const middleware_process = require('./components/middleware/process.js');
 const middleware_config = require('./components/middleware/config.js');
 const middleware_services = require('./components/middleware/services.js');
 const middleware_parse = require('./components/middleware/parse.js');
+const middleware_statics = require('./components/middleware/statics.js');
 
 // set up the server
 const app = express();
@@ -49,7 +50,7 @@ middleware_process.processor(app);
 middleware_parse.parser(app);
 app.use('/', middleware_config.router);
 middleware_services.servicer(app);
-app.use(express.static(path.join(__dirname, 'resources')));
+middleware_statics.serve(app, __dirname);
 
 // create the server
 app.listen(config_server['port'], config_server['host'], () => {

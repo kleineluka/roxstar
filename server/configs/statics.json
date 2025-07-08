@@ -1,0 +1,12 @@
+[
+    {
+        "comment": "Alias for incorrect /assets path from the client (ex. dressup).",
+        "virtualPath": "/assets",
+        "physicalPath": "/resources/media/assets"
+    },
+    {
+        "comment": "Main static directory for all other resources.",
+        "virtualPath": "/",
+        "physicalPath": "/resources"
+    }
+]
