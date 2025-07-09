@@ -1,5 +1,5 @@
 {
-  "flashroot": "%final_url%/media/game/",
+  "flashroot": "%final_url%/media/game",
   "statics.root": "%final_url%/media",
   "site.root": "%final_url%",
   "onlineindicator.enabled": "false",
@@ -15,7 +15,7 @@
   "whitelist.enabled": "true",
   "whitelist.root": "%final_url%/rmf",
   "featureConfig": "%final_url%/ct/live",
-  "clientroot": "%final_url%/media/game/",
+  "clientroot": "%final_url%/media/game",
   "medals.root": "%final_url%/medals",
   "globalmessagingsystem.root": "%final_url%/gms",
   "mynewsroot": "%final_url%/mynews",
