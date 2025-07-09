@@ -1,4 +1,6 @@
-This project is a fan-made, local-use-only tool created for archival, testing, and server research purposes. It is not affiliated with or endorsed by the original game's developers in any way. Please expand this and read the terms carefully or refer to the license file.
+# Terms and License 😇
+<details>
+<summary>This project is a fan-made, local-use-only tool created for archival, testing, and server research purposes. It is not affiliated with or endorsed by the original game's developers in any way. Please expand this and read the terms carefully or refer to the license file.</summary>
 
  ### Restrictions and Limitations
 - This project must not be used on public-facing networks, hosted servers, or redistributed in any form.
@@ -17,41 +19,44 @@ This project is a fan-made, local-use-only tool created for archival, testing, a
 - Only original code written specifically for this project is included in this repository.
 - This project does not assist in finding or using any files beyond the code provided.
 - You must stop using this project if the license terms change and you do not agree to the new ones.
-- Outside of any other specified terms, the code is licensed under the **RoxStar License**.
+- Outside of any other specified terms, the code is licensed under the **RoxStar License v2**.
 
-This code is provided under the terms listed above, otherwise, all rights reserved. **Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.**
+**Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.** Mind Candy has previously stated that implementations of the archived game are allowed for use that doesn't infringe on their rights, doesn't profit, and doesn't impersonate the original game - RoxStar's license is meant to reflect that. A copy of the **RoxStar License v2** is provided below.
 
-Here is a copy of the **RoxStar License**:
+<br>
 
-This license governs the use of the RoxStar software and its associated source code ("the Software"). By using, copying, modifying, or distributing the Software, you agree to the terms of this license.
+# RoxStar License v2
 
-### 1. Definitions
+This license governs the use of the RoxStar software and its associated source code ("the Software"). By using, copying, modifying, or distributing the Software, you unconditionally agree to all terms of this license.
+
+## 1. Definitions
 - "The Software" refers to all original code, files, and documentation contained in this repository.
-- "Personal Use" refers to running the Software on a machine under your direct, personal control for private, non-commercial purposes.
-- "Public Hosting" refers to making the Software accessible to others over a local network or the internet.
+- "Personal Use" refers to running the Software on a machine under your direct, personal control for private, non-commercial, non-public purposes.
+- "Public Hosting" refers to making the Software accessible to anyone other than yourself over a local network or the internet.
 
-### 2. Permissions Granted
-You are hereby granted a non-exclusive, worldwide, royalty-free license to:
-- **View and Fork:** View the Software's source code and create a personal fork for backup or private modification.
-- **Personal Use:** Run the Software on a local machine for your own Personal Use.
-- **Private Modification:** Modify the Software for your own Personal Use.
+## 2. Permissions Granted
+You are hereby granted a non-exclusive, revocable, worldwide, royalty-free license to:
+- View and Fork: View the Software's source code and create a personal fork for backup or private modification, subject to the terms herein.
+- Personal Use: Run the Software on a local machine for your own Personal Use only.
+- Private Modification: Modify the Software for your own Personal Use only.
 
-### 3. Restrictions and Limitations
-The permissions granted above are subject to the following restrictions. You may NOT:
-- **Redistribute:** Redistribute the Software, or any modified versions of it, in any form.
-- **Publicly Host:** Use the Software on public-facing networks or engage in any form of Public Hosting.
-- **Use Commercially:** Use the Software for any commercial purpose or monetary gain.
-- **Remove Notices:** Remove or alter this license or any copyright notices within the Software.
-- **Impersonate:** Use the Software to impersonate the original game, its creators, or its affiliates. This Software must always be identified as a fan project.
+## 3. Restrictions and Limitations
+The permissions granted above are subject to the following strict restrictions. You may NOT:
+- Redistribute: Redistribute, share, or make available the Software, or any modified versions of it, in any form, publicly or privately.
+- Publicly Host: Use the Software on public-facing networks or engage in any form of Public Hosting.
+- Use Commercially: Use the Software for any commercial purpose or monetary gain, including but not limited to accepting donations related to the use or access of this Software.
+- Remove Notices: Remove or alter this license or any copyright, attribution, or disclaimer notices within the Software.
+- Impersonate: Use the Software to impersonate the original game, its creators, or its affiliates. This Software must always be clearly and conspicuously identified as a fan project.
 
-### 4. Special Conditions
-- You must immediately cease all use of the Software if the original game, Moshi Monsters, becomes officially available to play again.
-- You must immediately cease all use of the Software if the copyright holder of this project requests it, or if the terms of this license change and you do not agree with the new terms.
+## 4. Special Conditions
+- You must immediately cease all use of the Software if the original game, Moshi Monsters, becomes officially available to play again through authorized channels.
+- You must immediately cease all use of the Software if the copyright holder of this project requests it, or if the terms of this license change and you do not agree with the new terms. Your continued use of the Software after any changes to the license constitutes your acceptance of the new terms.
 
-### 5. No Affiliation
-This project is a fan-made tool created for archival and educational purposes. It is not affiliated with, authorized, or endorsed by Mind Candy or the original creators of Moshi Monsters in any way.
+## 5. No Affiliation
+This project is a fan-made tool created for archival and educational purposes. It is not affiliated with, authorized, or endorsed by Mind Candy or the original creators of Moshi Monsters in any way. All original Moshi Monsters assets, names, and trademarks are the property of their respective owners.
 
-### 6. Disclaimer of Warranty & Limitation of Liability
+## 6. Disclaimer of Warranty & Limitation of Liability
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. USE OF THE SOFTWARE IS ENTIRELY AT YOUR OWN RISK.
+</details>
