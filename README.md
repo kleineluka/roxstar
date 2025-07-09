@@ -76,8 +76,6 @@ After installing the dependencies in both `/client/` and `/server/`, simply run 
 
 **Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.** Mind Candy has previously stated that implementations of the archived game are allowed for use that doesn't infringe on their rights, doesn't profit, and doesn't impersonate the original game - RoxStar's license is meant to reflect that. A copy of the **RoxStar License v2** is provided below.
 
-<br>
-
 # RoxStar License v2
 
 This license governs the use of the RoxStar software and its associated source code ("the Software"). By using, copying, modifying, or distributing the Software, you unconditionally agree to all terms of this license.
