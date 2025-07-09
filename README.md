@@ -6,41 +6,35 @@
   <i>Are you ready for the show?</i>
 </p>
 
-RoxStar is a **fan-made** client and server re-implementation of the Moshi Monsters flash game API in NodeJS! This is a love letter to the game that shaped many childhoods across the world. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).**
+RoxStar is a **fan-made** server (and client) re-implementation of the Moshi Monsters flash game API in NodeJS! This is a love letter to the game that shaped many childhoods across the world. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).**
 
 ## What is this, and why? 🎵
-Every online game relies on a central server. This stores data such as player's Moshlings, Rox balance, and high scores. When the official servers were shut down, the game became unplayable. While a few closed-source revival projects exist, RoxStar was created to be the first fully open-source, secure, and transparent implementation for everyone.
+RoxStar is a modern **fan-made** recreation of the Moshi Monsters server - the "engine" that ran the game. The game itself remains (mostly) the same, but those files need something to talk to, which is where RoxStar comes in. It allows you to experience Moshi Monsters all on your own computer! Think of RoxStar as a replacement for the missing puzzle piece that was taken away when the original game was shut down.
 
-The second challenge is Flash, the technology the game was built on, which modern browsers no longer support. The RoxStar client solves this. It's a lightweight, custom browser that enables Flash - allowing the game to run just as it used to. While I hope for a future where drop-in replacements like Ruffle make this unnecessary, for now, the client is a handy lil thing that brings the game back to life.
+Similarly, because Flash died quite a while ago, RoxStar also includes a small client that runs the game in a contained browser with Flash support enabled. On top of both of these, RoxStar offers a lot of tools and additional features to make your nostalgic experience even better~
 
-**TL;DR** - a **fan-made** project to make Moshi Monsters playable on your PC. RoxStar is not hosted anywhere online and is made strictly for offline use. It is not permitted to host public instances of this software, as this project's goal is purely one of preservation, driven by love and respect for the original creators. Please only use instances of RoxStar you host yourself for your own safety as well.
+RoxStar **is not** a live implementation of the original game (ex. RoxStar does not have a website or run the server emulator anywhere online), and it is not meant/allowed to be used as a public server. This is meant for you to enjoy offline on your own device. RoxStar is a tool, not a game or service.
 
 ## Features 💎
-- Fully open source, forever transparent and free.
-- Extremely lightweight and crazy stupidly fast.
-- Cross-platform, run on Windows, Mac, Linux, toaster, or anything else (that runs Node).
-- Run locally on your PC and be your own admin - no reliance on third-party servers.
-- Written in modern, secure languages, with extensive documentation.
-- A lot of progress complete! Around 80% of the core game is done.
-- A lot of tools for custom content! More on this soon!
-- A lot of custom features! Also.. more on this soon!
+- Fully open source~ forever transparent and free.
+- Extremely lightweight and can run on low-end devices.
+- Both the server and client run on any operating system
+- No reliance on third-party servers, only your own computer.
+- Written in a modern language with secure libraries.
+- Extensive documentation throughout the codebase.
+- Full feature parity with the original game - **almost done!**
+- Admin tools to manage your own server and users - **coming soon!**
+- Quality of life and customisation features - **coming soon!**
+- Extra tools to help you create your own content - **coming soon!**
+- A license that respects the original game and prevents abuse.
 
 ## Progress and Roadmap 🌈
-- [x] Moshling Zoo and Garden
-- [x] User Accounts and Login
-- [x] Minigames and Highscores
-- [x] Medals and Profiles
-- [x] Room Decor and House Customisation
-- [x] Streets and Shops
-- [ ] Gifts
-- [ ] Colourama
-- [ ] Extra Pages (ex. FAQ) 
-- [ ] Super Moshi Missions
-
-There is **a lot of stuff** covered that isn't listed here, this is just a general overview of some of the main things. I'll expand on this in the future! (for now.. focused on the actual code..)
+I'll update this section when the server emulator is more mature. While I estimate that around 80% of the core game is done, there are still many features and improvements to be made. Perhaps I'll make a Trello board to track progress, but as a **quick list of some things** that are completely done: accounts, room decoration, shopping, dressup, garden and zoo, minigames and scores, world locations, and social features.
 
 ## Code Structure 🛠️
-The `/client/` is a minimal Electron application that has Flash support enabled and the `/server/` on Express, Mustache, and Sqlite3. Due to the simple nature of the client, I'll only do an overview of the server structure here.
+The `/client/` is a minimal Electron application that has Flash support enabled and the `/server/` on Express, Mustache, and Sqlite3. Due to the simple nature of the client, I'll only do an overview of the server structure here. 
+
+**Note that** this section is irrelevant if you are not interested in learning about how the game worked, and is not required reading to run the game. **That being said -** I do suggest looking through the code regardless simply to promote safety, so that you know what is running on your computer.
 
 - `/features/` hosts reusable helper functions for various tasks (ex. getting a user's level)
 - `/middleware/` hosts the stack that processes requests to the server (ex. routing requests or parsing data)
@@ -52,9 +46,10 @@ The `/client/` is a minimal Electron application that has Flash support enabled 
 After installing the dependencies in both `/client/` and `/server/`, simply run `npm start` in each directive to start the client and server. **Please note that no game files or assets are supplied here, only original code for the server emulator and client.**
 
 ## Acknowledgements 🥰
-- The original creators of Moshi Monsters (Mind Candy) for building a world worth preserving. Mind Candy has previously stated that implementations of the archived game are allowed for use that doesn't infringe on their rights, doesn't profit, and doesn't impersonate the original game.
+- Mind Candy for creating the original game!
 - The teams behind the [Wayback Machine](https://archive.org/) and [Flashpoint](https://bluemaxima.org/flashpoint/) for their incredible archival work.
 - [FFDec](https://github.com/jindrapetrik/jpexs-decompiler) for making Flash reverse-engineering accessible.
+- And you, for taking an interest in my little hobby project~
 
 ## Notice & Usage Terms 😇
 <details>
