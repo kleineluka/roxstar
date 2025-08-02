@@ -125,8 +125,63 @@ async function getUserZooData(userId) {
     }
 }
 
+/**
+ * Augments the moshlingRequirements in a zoo data structure with storeInfo from global seeds storage.
+ * This modifies the passed object in place.
+ * @param {object} zooData - The zoo data object to augment.
+ */
+function augmentMoshlingRequirements(zooData) {
+    if (!zooData || !Array.isArray(zooData.moshlingSets)) {
+        pretty.warn("augmentMoshlingRequirements called with invalid zooData.");
+        return;
+    }
+    if (!global.storage_seeds) {
+        pretty.error("Cannot augment moshling requirements: global.storage_seeds not loaded.");
+        return;
+    }
+    // create a map of seed assets to their details for faster lookups
+    const seedAssetMap = new Map();
+    for (const seedId in global.storage_seeds) {
+        const seed = global.storage_seeds[seedId];
+        // use the base asset path as the key (e.g., 'items/seed/moon_orchid.swf')
+        seedAssetMap.set(seed.asset, {
+            id: seedId,
+            level: seed.level || 1,
+            membersOnly: String(seed.subscription === true || seed.subscription === 'true'),
+            price: seed.rocks || 0
+        });
+    }
+    // iterate through the zoo data and inject storeInfo
+    for (const set of zooData.moshlingSets) {
+        if (set.moshlings && Array.isArray(set.moshlings)) {
+            for (const moshling of set.moshlings) {
+                if (moshling.moshlingRequirements && Array.isArray(moshling.moshlingRequirements)) {
+                    for (const req of moshling.moshlingRequirements) {
+                        // the path in the requirement might have a colour, e.g., _blue.swf
+                        const reqPathBase = req.path.replace(/_(red|blue|yellow|black|pink|purple)\.swf$/, '.swf');
+                        const baseSeedDetails = seedAssetMap.get(reqPathBase);
+                        if (baseSeedDetails) {
+                            req.id = parseInt(baseSeedDetails.id, 10); // inject the base seed ID
+                            req.storeInfo = {
+                                '@id': baseSeedDetails.id,
+                                '@level': baseSeedDetails.level,
+                                '@membersOnly': baseSeedDetails.membersOnly,
+                                '@price': baseSeedDetails.price
+                            };
+                        } else {
+                            req.storeInfo = {};
+                            pretty.warn(`Could not find base seed for requirement path: ${req.path} (Base: ${reqPathBase})`);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 module.exports = {
     getMoshlingCount,
     formatUserMoshlings,
     getUserZooData,
+    augmentMoshlingRequirements,
 };

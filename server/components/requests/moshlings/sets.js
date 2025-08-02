@@ -19,6 +19,7 @@ async function sendUserZooResponse(targetUserId, res) {
             pretty.warn(`getUserZooData returned empty for target user ${targetUserId}. Sending empty response.`);
             return res.json({ moshlingSets: [] });
         }
+        moshlingUtils.augmentMoshlingRequirements(userZooData);
         res.json(userZooData);
     } catch (error) {
         pretty.error(`Error processing zoo sets request for target user ID ${targetUserId}:`, error);
