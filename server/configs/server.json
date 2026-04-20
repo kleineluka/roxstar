@@ -28,5 +28,9 @@
     "pretty-print-replies": true,
     "bff-news-log": true,
     "database": "roxstar.db",
-    "password-salt-rounds": 10
+    "password-salt-rounds": 10,
+    "debug-accounts": {
+        "1": { "username": "zoey" },
+        "2": { "username": "vixen" }
+    }
 }

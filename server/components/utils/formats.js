@@ -79,7 +79,7 @@ function buildXmlResponse(code, text, prettyPrint = false) {
  * @returns {number} - The user's age in years, or 0 if the timestamp is invalid.
  */
 function getUserAge(birthTimestamp) {
-    if (!birthTimestamp || typeof birthTimestamp !== 'number' || birthTimestamp <= 0) {
+    if (birthTimestamp == null || typeof birthTimestamp !== 'number' || isNaN(birthTimestamp)) {
         pretty.debug(`getUserAge: Invalid or missing birthTimestamp: ${birthTimestamp}. Returning age 0.`);
         return 0; // assume 0 on invalid input
     }

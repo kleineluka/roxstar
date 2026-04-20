@@ -15,7 +15,7 @@ function generateRandomString(length) {
   return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
 }
 const partitionName = generateRandomString(16);
-let partition_name = 'persist:roxstar';
+let partition_name = process.env.ROXSTAR_PARTITION || 'persist:roxstar';
 if (use_random_partition) {
   partition_name = `persist:roxstarinst_${partitionName}`;
 }
@@ -239,17 +239,18 @@ function createWindow() {
   });
 
   console.log(`Using partition: ${partition_name}`);
+  const startURL = process.env.ROXSTAR_URL || 'http://localhost:3000';
   mainWindow.webContents.setUserAgent(userAgent.toString());
   console.log(`Set User Agent: ${userAgent.toString()}`);
   mainWindow.setMenu(null);
   console.log("Attempting to clear cache...");
   mainWindow.webContents.session.clearCache().then(() => {
     console.log("Cache cleared (maybe). Loading URL...");
-    mainWindow.loadURL('http://localhost:3000');
-    console.log("Load URL command issued for http://localhost:3000");
+    mainWindow.loadURL(startURL);
+    console.log(`Load URL command issued for ${startURL}`);
   }).catch(err => {
     console.error("Failed to clear cache:", err);
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL(startURL);
     console.log("Load URL command issued after cache clear failure.");
   });
 
@@ -265,6 +266,12 @@ function createWindow() {
   mainWindow.webContents.on('did-finish-load', () => {
     console.log("WebContents finished loading.");
     mainWindow.setTitle("RoxStar Client");
+    if (process.env.ROXSTAR_MUTED === '1') {
+      mainWindow.webContents.setAudioMuted(true);
+    }
+    if (process.env.ROXSTAR_DEVTOOLS === '1') {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    }
   });
 
   mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {

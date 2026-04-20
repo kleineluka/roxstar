@@ -1,4 +1,5 @@
 {
+    "/debug/login": "/user/debug.js",
     "/services/rest/users/username/generate": "/user/suggestions.js",
     "/services/rest/users/availability/*": "/user/allowed.js",
     "/services/rest/users/adoption/start": "/user/adoption.js",
@@ -53,5 +54,6 @@
     "/moshi/services/monster/dressup/costume/update": "/clothing/update.js",
     "/moshi/services/rest/gift/bags": "/gifts/bags.js",
     "/moshi/services/rest/gift/info": "/gifts/info.js",
-    "/moshi/services/rest/gift/friend": "/gifts/friend.js"
+    "/moshi/services/rest/gift/friend": "/gifts/friend.js",
+    "/moshi/services/rest/gift/send": "/gifts/send.js"
 }
