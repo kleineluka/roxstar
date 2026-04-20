@@ -1,3 +1,4 @@
 notes.txt
 .vscode/
 .indev/
+*.code-workspace

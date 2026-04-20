@@ -50,5 +50,8 @@
     "/moshi/services/zoo/save": "/world/zoo.js",
     "/moshi/services/rest/user/gifts": "/gifts/list.js",
     "/moshi/services/monster/dressup/costume/load": "/clothing/room.js",
-    "/moshi/services/monster/dressup/costume/update": "/clothing/update.js"
+    "/moshi/services/monster/dressup/costume/update": "/clothing/update.js",
+    "/moshi/services/rest/gift/bags": "/gifts/bags.js",
+    "/moshi/services/rest/gift/info": "/gifts/info.js",
+    "/moshi/services/rest/gift/friend": "/gifts/friend.js"
 }
