@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs  Staff Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/staff/assets/staff.css">
+</head>
+<body>
+<div class="sp-layout">
+    <aside class="sp-sidebar">
+        <div class="sp-sidebar-header">
+            <div class="sp-sidebar-label">Staff Panel</div>
+            <div class="sp-sidebar-user" id="staffName">Loading...</div>
+        </div>
+        <nav class="sp-sidebar-nav">
+            <a href="/staff/dashboard" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a href="/staff/users" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Users
+            </a>
+            <a href="/staff/logs" class="sp-nav-link active">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Logs
+            </a>
+        </nav>
+        <div class="sp-sidebar-footer">
+            <button class="sp-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="sp-main">
+        <header class="sp-header">
+            <h1>Staff Logs</h1>
+            <p>Audit trail of all staff actions</p>
+        </header>
+        <main class="sp-content">
+            <div class="sp-search-bar">
+                <input class="sp-input" type="text" id="adminFilter" placeholder="Filter by admin username">
+                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="doFilter()">Filter</button>
+                <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearFilter()">Clear</button>
+            </div>
+
+            <div class="sp-card">
+                <div class="sp-table-wrap">
+                    <table class="sp-table">
+                        <thead>
+                            <tr><th>ID</th><th>Admin</th><th>Action</th><th>Target</th><th>Detail</th><th>Date</th></tr>
+                        </thead>
+                        <tbody id="logsTable">
+                            <tr><td colspan="6" class="sp-table-empty">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="sp-pagination">
+                    <span class="sp-pagination-info" id="pageInfo"></span>
+                    <div style="display:flex;gap:8px;">
+                        <button id="prevBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(-1)"> Prev</button>
+                        <button id="nextBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(1)">Next </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    let currentPage = 1, totalPages = 1, currentAdmin = '';
+
+    const ACTION_MAP = {
+        ban:       'red',
+        unban:     'green',
+        set_staff: 'purple',
+        set_rocks: 'amber',
+    };
+
+    async function logout() {
+        await fetch('/staff/api/auth/logout', { method: 'POST' });
+        window.location.href = '/staff/login';
+    }
+
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
+
+    function actionBadge(action) {
+        const c = ACTION_MAP[action] || 'slate';
+        return `<span class="sp-badge sp-badge-${c}">${action || '?'}</span>`;
+    }
+
+    async function loadLogs() {
+        const tbody = document.getElementById('logsTable');
+        tbody.innerHTML = '<tr><td colspan="6" class="sp-table-empty">Loading...</td></tr>';
+        const params = new URLSearchParams({ page: currentPage, limit: 25 });
+        if (currentAdmin) params.set('admin', currentAdmin);
+        try {
+            const r = await fetch('/staff/api/logs?' + params);
+            if (!r.ok) return;
+            const d = await r.json();
+            totalPages = Math.max(1, Math.ceil(d.total / d.limit));
+            document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} entries  page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+            if (!d.logs.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="sp-table-empty">No logs found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = d.logs.map(log => {
+                let parsed = {};
+                try { parsed = JSON.parse(log.payload); } catch {}
+                const detail = parsed.detail !== null && parsed.detail !== undefined ? String(parsed.detail) : '';
+                return `<tr>
+                    <td style="color:#aaa;font-size:11px">${log.id}</td>
+                    <td style="font-weight:800;color:var(--btn-purple)">${log.admin}</td>
+                    <td>${actionBadge(parsed.action)}</td>
+                    <td style="font-size:12px;color:#777">${parsed.targetId ?? ''}</td>
+                    <td style="font-size:11px;font-family:monospace;color:#888">${detail}</td>
+                    <td style="font-size:11px;color:#aaa">${fmtDate(log.date)}</td>
+                </tr>`;
+            }).join('');
+        } catch {}
+    }
+
+    function doFilter() { currentAdmin = document.getElementById('adminFilter').value.trim(); currentPage = 1; loadLogs(); }
+    function clearFilter() { document.getElementById('adminFilter').value = ''; currentAdmin = ''; currentPage = 1; loadLogs(); }
+    function changePage(dir) { const n = currentPage + dir; if (n < 1 || n > totalPages) return; currentPage = n; loadLogs(); }
+    document.getElementById('adminFilter').addEventListener('keydown', e => { if (e.key === 'Enter') doFilter(); });
+
+    async function loadMe() {
+        try {
+            const r = await fetch('/staff/api/auth/me');
+            if (!r.ok) { window.location.href = '/staff/login'; return; }
+            document.getElementById('staffName').textContent = (await r.json()).username;
+        } catch { window.location.href = '/staff/login'; }
+    }
+
+    loadMe(); loadLogs();
+</script>
+</body>
+</html>

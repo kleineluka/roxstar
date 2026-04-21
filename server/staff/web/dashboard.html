@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard  Staff Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/staff/assets/staff.css">
+</head>
+<body>
+<div class="sp-layout">
+    <aside class="sp-sidebar">
+        <div class="sp-sidebar-header">
+            <div class="sp-sidebar-label">Staff Panel</div>
+            <div class="sp-sidebar-user" id="staffName">Loading...</div>
+        </div>
+        <nav class="sp-sidebar-nav">
+            <a href="/staff/dashboard" class="sp-nav-link active">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a href="/staff/users" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Users
+            </a>
+            <a href="/staff/logs" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Logs
+            </a>
+        </nav>
+        <div class="sp-sidebar-footer">
+            <button class="sp-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="sp-main">
+        <header class="sp-header">
+            <h1>Dashboard</h1>
+            <p>Server overview at a glance</p>
+        </header>
+        <main class="sp-content">
+            <div class="sp-stats" id="statsGrid">
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+            </div>
+
+            <div class="sp-card">
+                <div class="sp-card-header">
+                    <h2>Recent Staff Activity</h2>
+                    <a href="/staff/logs">View all </a>
+                </div>
+                <div id="recentLogs"><div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Loading...</div></div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    async function logout() {
+        await fetch('/staff/api/auth/logout', { method: 'POST' });
+        window.location.href = '/staff/login';
+    }
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
+
+    async function loadMe() {
+        try {
+            const r = await fetch('/staff/api/auth/me');
+            if (!r.ok) { window.location.href = '/staff/login'; return; }
+            const d = await r.json();
+            document.getElementById('staffName').textContent = d.username;
+        } catch { window.location.href = '/staff/login'; }
+    }
+
+    async function loadStats() {
+        try {
+            const r = await fetch('/staff/api/stats');
+            if (!r.ok) return;
+            const d = await r.json();
+            const items = [
+                ['Total Users', d.totalUsers, ''],
+                ['Active Today', d.activeToday, 'color:var(--btn-purple)'],
+                ['Active This Week', d.activeWeek, 'color:var(--btn-purple)'],
+                ['New Today', d.newToday, 'color:var(--btn-green)'],
+                ['Staff Accounts', d.staffCount, 'color:var(--btn-amber)'],
+                ['Log Entries', d.totalLogs, ''],
+            ];
+            document.getElementById('statsGrid').innerHTML = items.map(([label, value, style]) =>
+                `<div class="sp-stat-card"><div class="sp-stat-label">${label}</div><div class="sp-stat-value" style="${style}">${Number(value).toLocaleString()}</div></div>`
+            ).join('');
+        } catch {}
+    }
+
+    async function loadRecentLogs() {
+        try {
+            const r = await fetch('/staff/api/logs?limit=10');
+            if (!r.ok) return;
+            const d = await r.json();
+            if (!d.logs.length) {
+                document.getElementById('recentLogs').innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">No activity yet.</div>';
+                return;
+            }
+            document.getElementById('recentLogs').innerHTML = d.logs.map(log => {
+                let parsed = {};
+                try { parsed = JSON.parse(log.payload); } catch {}
+                return `<div class="sp-log-row">
+                    <span class="sp-log-admin">${log.admin}</span>
+                    <span class="sp-log-payload">${JSON.stringify(parsed)}</span>
+                    <span class="sp-log-date">${fmtDate(log.date)}</span>
+                </div>`;
+            }).join('');
+        } catch {}
+    }
+
+    loadMe(); loadStats(); loadRecentLogs();
+</script>
+</body>
+</html>

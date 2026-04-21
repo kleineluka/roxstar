@@ -20,6 +20,9 @@ cache.initialise();
 global.body_parser = require('body-parser');
 require('body-parser-xml')(global.body_parser);
 
+// import staff panel
+const staff = require('./staff/index.js');
+
 // import middleware
 const middleware_partials = require('./components/middleware/partials.js');
 const middleware_rebundles = require('./components/middleware/rebundles.js'); 
@@ -44,6 +47,7 @@ app.set('views', __dirname + '/components/web');
 app.use(cookieParser());
 
 // apply middleware stack
+app.use('/staff', staff);
 app.use(middleware_partials.inject);
 app.use(middleware_rebundles.rebundler);
 middleware_process.processor(app);

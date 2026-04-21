@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users  Staff Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/staff/assets/staff.css">
+</head>
+<body>
+<div class="sp-layout">
+    <aside class="sp-sidebar">
+        <div class="sp-sidebar-header">
+            <div class="sp-sidebar-label">Staff Panel</div>
+            <div class="sp-sidebar-user" id="staffName">Loading...</div>
+        </div>
+        <nav class="sp-sidebar-nav">
+            <a href="/staff/dashboard" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a href="/staff/users" class="sp-nav-link active">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Users
+            </a>
+            <a href="/staff/logs" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Logs
+            </a>
+        </nav>
+        <div class="sp-sidebar-footer">
+            <button class="sp-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="sp-main">
+        <header class="sp-header">
+            <h1>Users</h1>
+            <p>Search and manage player accounts</p>
+        </header>
+        <main class="sp-content">
+            <div class="sp-search-bar">
+                <input class="sp-input" type="text" id="searchInput" placeholder="Search by username, monster name, or email">
+                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="doSearch()">Search</button>
+                <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearSearch()">Clear</button>
+            </div>
+
+            <div class="sp-card">
+                <div class="sp-table-wrap">
+                    <table class="sp-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>Username</th><th>Monster Name</th><th>Email</th>
+                                <th>Status</th><th>Rocks</th><th>Level</th><th>Joined</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTable">
+                            <tr><td colspan="9" class="sp-table-empty">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="sp-pagination">
+                    <span class="sp-pagination-info" id="pageInfo"></span>
+                    <div style="display:flex;gap:8px;">
+                        <button id="prevBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(-1)"> Prev</button>
+                        <button id="nextBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(1)">Next </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="sp-modal-overlay" id="modal">
+    <div class="sp-modal">
+        <div class="sp-modal-header">
+            <h2 class="sp-modal-title" id="modalTitle">User Details</h2>
+            <button class="sp-modal-close" onclick="closeModal()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="sp-modal-body" id="modalBody">Loading...</div>
+        <div class="sp-modal-actions" id="modalActions"></div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1, totalPages = 1, currentSearch = '', currentUserId = null;
+
+    async function logout() {
+        await fetch('/staff/api/auth/logout', { method: 'POST' });
+        window.location.href = '/staff/login';
+    }
+
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleDateString() : ''; }
+
+    function statusBadge(s) {
+        const map = { Member:'green', banned:'red', needsActivation:'amber' };
+        const c = map[s] || 'slate';
+        return `<span class="sp-badge sp-badge-${c}">${s}</span>`;
+    }
+
+    async function loadUsers() {
+        const tbody = document.getElementById('userTable');
+        tbody.innerHTML = '<tr><td colspan="9" class="sp-table-empty">Loading...</td></tr>';
+        const params = new URLSearchParams({ page: currentPage, limit: 25 });
+        if (currentSearch) params.set('search', currentSearch);
+        try {
+            const r = await fetch('/staff/api/users?' + params);
+            if (!r.ok) return;
+            const d = await r.json();
+            totalPages = Math.max(1, Math.ceil(d.total / d.limit));
+            document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} users  page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+            if (!d.users.length) {
+                tbody.innerHTML = '<tr><td colspan="9" class="sp-table-empty">No users found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = d.users.map(u => `<tr style="cursor:pointer" onclick="openModal(${u.id})">
+                <td style="color:#aaa;font-size:11px">${u.id}</td>
+                <td style="font-weight:800">${u.username}${u.staff ? ' <span class="sp-badge sp-badge-purple" style="font-size:9px">staff</span>' : ''}</td>
+                <td>${u.monster_name}</td>
+                <td style="font-size:11px;color:#888">${u.email}</td>
+                <td>${statusBadge(u.activation_status)}</td>
+                <td>${u.rocks.toLocaleString()}</td>
+                <td>${u.level}</td>
+                <td style="font-size:11px;color:#aaa">${fmtDate(u.creation_date)}</td>
+                <td><button class="sp-btn sp-btn-primary sp-btn-sm" onclick="event.stopPropagation();openModal(${u.id})">Details</button></td>
+            </tr>`).join('');
+        } catch {}
+    }
+
+    function doSearch() { currentSearch = document.getElementById('searchInput').value.trim(); currentPage = 1; loadUsers(); }
+    function clearSearch() { document.getElementById('searchInput').value = ''; currentSearch = ''; currentPage = 1; loadUsers(); }
+    function changePage(dir) { const n = currentPage + dir; if (n < 1 || n > totalPages) return; currentPage = n; loadUsers(); }
+    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    async function openModal(id) {
+        currentUserId = id;
+        document.getElementById('modal').classList.add('open');
+        document.getElementById('modalBody').innerHTML = 'Loading...';
+        document.getElementById('modalActions').innerHTML = '';
+        try {
+            const r = await fetch(`/staff/api/users/${id}`);
+            if (!r.ok) { document.getElementById('modalBody').innerHTML = 'Failed to load user.'; return; }
+            const u = await r.json();
+            document.getElementById('modalTitle').textContent = `${u.username} (#${u.id})`;
+            document.getElementById('modalBody').innerHTML = `
+                <dl class="sp-dl">
+                    <div><dt>Monster Name</dt><dd>${u.monster_name}</dd></div>
+                    <div><dt>Email</dt><dd style="font-size:12px">${u.email}</dd></div>
+                    <div><dt>Status</dt><dd>${statusBadge(u.activation_status)}</dd></div>
+                    <div><dt>Staff</dt><dd>${u.staff ? '<span class="sp-badge sp-badge-purple">Yes</span>' : 'No'}</dd></div>
+                    <div><dt>Rocks</dt><dd>${u.rocks.toLocaleString()}</dd></div>
+                    <div><dt>Level</dt><dd>${u.level}</dd></div>
+                    <div><dt>Gender</dt><dd>${u.gender ?? '—'}</dd></div>
+                    <div><dt>Country</dt><dd>${u.country ?? '—'}</dd></div>
+                    <div><dt>Joined</dt><dd>${fmtDate(u.creation_date)}</dd></div>
+                    <div><dt>Last Active</dt><dd>${fmtDate(u.last_active)}</dd></div>
+                    <div><dt>Register IP</dt><dd style="font-family:monospace;font-size:11px">${u.register_ip ?? '—'}</dd></div>
+                    <div><dt>Last IP</dt><dd style="font-family:monospace;font-size:11px">${u.last_ip ?? '—'}</dd></div>
+                </dl>
+                <div style="margin-top:16px;padding-top:14px;border-top:1.5px solid #f0f0f8;display:flex;align-items:center;gap:8px;">
+                    <label style="font-size:11px;font-weight:800;color:#9090b0;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;">Set Rocks</label>
+                    <input type="number" id="rocksInput" value="${u.rocks}" min="0"
+                        style="width:110px;padding:6px 12px;border:2px solid #d0d0e8;border-radius:999px;font-size:13px;font-family:inherit;outline:none;">
+                    <button class="sp-btn sp-btn-amber sp-btn-sm" onclick="setRocks()">Apply</button>
+                </div>`;
+            document.getElementById('modalActions').innerHTML = `
+                ${u.activation_status !== 'banned'
+                    ? `<button class="sp-btn sp-btn-danger sp-btn-sm" onclick="banUser()">Ban User</button>`
+                    : `<button class="sp-btn sp-btn-success sp-btn-sm" onclick="unbanUser()">Unban User</button>`}
+                ${u.staff
+                    ? `<button class="sp-btn sp-btn-amber sp-btn-sm" onclick="setStaff(0)">Remove Staff</button>`
+                    : `<button class="sp-btn sp-btn-primary sp-btn-sm" onclick="setStaff(1)">Grant Staff</button>`}`;
+        } catch { document.getElementById('modalBody').innerHTML = 'Error loading user.'; }
+    }
+
+    function closeModal() { document.getElementById('modal').classList.remove('open'); currentUserId = null; }
+    document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    async function apiAction(path, body = null) {
+        const opts = { method: 'POST', headers: {} };
+        if (body !== null) { opts.body = JSON.stringify(body); opts.headers['Content-Type'] = 'application/json'; }
+        const r = await fetch(`/staff/api/users/${currentUserId}/${path}`, opts);
+        const d = await r.json();
+        if (!r.ok) { alert(d.error || 'Action failed.'); return false; }
+        return true;
+    }
+
+    async function banUser() { if (!confirm('Ban this user?')) return; if (await apiAction('ban')) { closeModal(); loadUsers(); } }
+    async function unbanUser() { if (await apiAction('unban')) { closeModal(); loadUsers(); } }
+    async function setStaff(v) { if (!confirm(v ? 'Grant staff access?' : 'Remove staff access?')) return; if (await apiAction('staff', { value: v })) { closeModal(); loadUsers(); } }
+    async function setRocks() {
+        const amount = parseInt(document.getElementById('rocksInput').value);
+        if (isNaN(amount) || amount < 0) { alert('Enter a valid amount.'); return; }
+        if (await apiAction('rocks', { amount })) openModal(currentUserId);
+    }
+
+    async function loadMe() {
+        try {
+            const r = await fetch('/staff/api/auth/me');
+            if (!r.ok) { window.location.href = '/staff/login'; return; }
+            document.getElementById('staffName').textContent = (await r.json()).username;
+        } catch { window.location.href = '/staff/login'; }
+    }
+
+    loadMe();
+    loadUsers();
+</script>
+</body>
+</html>
