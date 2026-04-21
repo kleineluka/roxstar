@@ -61,10 +61,6 @@ router.get('/:locationId', async (req, res) => {
                 if (!pedestrians || pedestrians.length === 0) {
                     dynamicData.dynamic.actors.pedestrians = {}; // creates <pedestrians/>
                 }
-                // handle empty overrides
-                if (!overrides || overrides.length === 0) {
-                    dynamicData.dynamic.overrides = {}; // creates <overrides/>
-                }
                 break;
             // these are all handled the same way below (except giftshop which comes with gifts)
             case 'shop':
@@ -153,12 +149,12 @@ router.get('/:locationId', async (req, res) => {
             // merge properties into responseData.location if they are direct children like 'items' or 'gifts'
             if (dynamicData.items) responseData.location.items = dynamicData.items;
             if (dynamicData.gifts) responseData.gifts = dynamicData.gifts;
-            // if it's wrapped in 'dynamic', merge that object
-            if (dynamicData.dynamic) responseData.location.dynamic = dynamicData.dynamic;
+            // if it's wrapped in 'dynamic', add it as a sibling of location (not a child)
+            if (dynamicData.dynamic) responseData.dynamic = dynamicData.dynamic;
             // handle specific top-level elements like dancegameprogress
-            if (dynamicData.dancegameprogress) responseData.location.dancegameprogress = dynamicData.dancegameprogress;
+            if (dynamicData.dancegameprogress) responseData.dancegameprogress = dynamicData.dancegameprogress;
         }
-        const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8', standalone: true })
+        const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8' })
             .end({ pretty: global.config_server['pretty-print-replies'] });
         res.type('text/xml').send(xml);
         pretty.debug(`Sent location data for ID ${locationId}, Type: ${locationType}`);

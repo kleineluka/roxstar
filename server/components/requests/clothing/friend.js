@@ -42,23 +42,23 @@ router.get('/:username', async (req, res) => {
         const formattedInventory = inventoryUtils.formatUserClothes(clothesData);
         const formattedCostume = inventoryUtils.formatUserCostume(dressupData);
         const monsterParts = monsterUtils.getMonsterParts(targetUser.monster);
-        const responseData = {
+        const finalResponseData = {
             status: { '@code': 0, '@text': 'success' },
             room: {
                 mannequin: {
                     '@asset': '',
                     '@name': targetUser.monster,
                     zones: {},
-                    part: monsterParts.map(p => p.part) // extract the inner object
+                    parts: { part: monsterParts.map(p => p.part) }
                 },
                 inventory: {
                     '@type': 'dressup',
-                    item: formattedInventory // array of clothing items
+                    item: formattedInventory
                 },
                 costume: {
                     '@id': targetUserId,
-                    items: { // wrap the costume items in <items>
-                        dressupitem: formattedCostume.map(c => c) // array of worn items
+                    items: {
+                        dressupitem: formattedCostume
                     },
                     attributes: {
                         dressupattribute: {
@@ -69,21 +69,7 @@ router.get('/:username', async (req, res) => {
                 }
             }
         };
-        // build and send the
-        const finalResponseData = {
-            status: responseData.status,
-            room: {
-                mannequin: {
-                    '@asset': '',
-                    '@name': targetUser.monster,
-                    zones: {}, // represents <zones/>
-                    part: monsterParts.map(p => p.part)
-                },
-                inventory: responseData.room.inventory,
-                costume: responseData.room.costume
-            }
-        };
-        const xml = xmlbuilder.create({ xml: finalResponseData }, { encoding: 'UTF-8', standalone: true })
+        const xml = xmlbuilder.create({ xml: finalResponseData }, { encoding: 'UTF-8' })
             .end({ pretty: global.config_server['pretty-print-replies'] });
         res.type('text/xml').send(xml);
         pretty.print(`Successfully sent friend costume data for target user: ${targetUsername}`, 'ACTION');

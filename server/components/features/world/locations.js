@@ -7,9 +7,8 @@ const pretty = require('../../utils/pretty.js');
  * @returns {Array<object>} An array of formatted override objects for XML.
  */
 function formatLocationOverrides(overrides) {
-    const formattedOverrides = [];
     if (!overrides) {
-        return formattedOverrides;
+        return {};
     }
     let overrideList = [];
     if (Array.isArray(overrides)) {
@@ -18,24 +17,34 @@ function formatLocationOverrides(overrides) {
         overrideList = Object.values(overrides);
     } else {
         pretty.warn("Location overrides data is neither an array nor a valid object.");
-        return formattedOverrides;
+        return {};
     }
+    const orderedKeys = {
+        content:   ['args', 'animated', 'id', 'layer', 'handler', 'name', 'path', 'replacedefault', 'structureId', 'tiles', 'type', 'x', 'y', 'z'],
+        structure: ['args', 'handler', 'height', 'id', 'layer', 'type', 'width', 'x', 'y', 'z'],
+    };
+    const grouped = {};
     for (const override of overrideList) {
         if (!override || typeof override !== 'object') continue;
         const tagName = override.child;
-        if (!tagName) continue; 
-        // copy all attributes except 'child'
-        const attributes = { ...override };
-        delete attributes.child;
-        // prefix attributes with '@'
+        if (!tagName) continue;
         const xmlAttributes = {};
-        for (const key in attributes) {
-            // ensure value is a string for XML attributes, handle potential null/undefined
-            xmlAttributes[`@${key}`] = String(attributes[key] ?? '');
+        const keys = orderedKeys[tagName];
+        if (keys) {
+            for (const key of keys) {
+                xmlAttributes[`@${key}`] = String(override[key] ?? '');
+            }
+        } else {
+            const attrs = { ...override };
+            delete attrs.child;
+            for (const key in attrs) {
+                xmlAttributes[`@${key}`] = String(attrs[key] ?? '');
+            }
         }
-        formattedOverrides.push({ [tagName]: xmlAttributes });
+        if (!grouped[tagName]) grouped[tagName] = [];
+        grouped[tagName].push(xmlAttributes);
     }
-    return formattedOverrides;
+    return grouped;
 }
 
 module.exports = {

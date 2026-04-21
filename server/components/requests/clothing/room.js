@@ -45,8 +45,8 @@ router.get('/', async (req, res) => {
                 mannequin: {
                     '@asset': '', // constant
                     '@name': user.monster,
-                    zones: {}, // empty zone tags
-                    part: monsterParts.map(p => p.part) // extract inner object for multiple <part> tags
+                    zones: {},
+                    parts: { part: monsterParts.map(p => p.part) }
                 },
                 inventory: {
                     '@type': 'dressup',
@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
                 }
             }
         };
-        const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8', standalone: true })
+        const xml = xmlbuilder.create({ xml: responseData }, { encoding: 'UTF-8' })
             .end({ pretty: global.config_server['pretty-print-replies'] });
         res.type('text/xml').send(xml);
     } catch (error) {
