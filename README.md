@@ -1,55 +1,20 @@
-<h1 align="center">
+<h1 align="left">
  💎 RoxStar 🎤
 </h1>
 
-<p align="center">
-  <i>Are you ready for the show?</i>
-</p>
+> <i>Can you keep a secret?</i>
+<br>
+> <i>I'm a Moshi on a mission...</i>
+<br>
+> <i>I'M MISSY KIX!</i> 
+<br>
+> <i>The sassy secret agent slash musician!</i>
 
-RoxStar is a **fan-made** server (and client) re-implementation of the Moshi Monsters flash game API in NodeJS! This is a love letter to the game that shaped many childhoods across the world. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).**
-
-## What is this, and why? 🎵
-RoxStar is a modern **fan-made** recreation of the Moshi Monsters server - the "engine" that ran the game. The game itself remains (mostly) the same, but those files need something to talk to, which is where RoxStar comes in. It allows you to experience Moshi Monsters all on your own computer! Think of RoxStar as a replacement for the missing puzzle piece that was taken away when the original game was shut down.
-
-Similarly, because Flash died quite a while ago, RoxStar also includes a small client that runs the game in a contained browser with Flash support enabled. On top of both of these, RoxStar offers a lot of tools and additional features to make your nostalgic experience even better~
-
-RoxStar **is not** a live implementation of the original game (ex. RoxStar does not have a website or run the server emulator anywhere online), and it is not meant/allowed to be used as a public server. This is meant for you to enjoy offline on your own device. RoxStar is a tool, not a game or service.
-
-## Features 💎
-- Fully open source~ forever transparent and free.
-- Extremely lightweight and can run on low-end devices.
-- Both the server and client run on any operating system
-- No reliance on third-party servers, only your own computer.
-- Written in a modern language with secure libraries.
-- Extensive documentation throughout the codebase.
-- Full feature parity with the original game - **almost done!**
-- Admin tools to manage your own server and users - **coming soon!**
-- Quality of life and customisation features - **coming soon!**
-- Extra tools to help you create your own content - **coming soon!**
-- A license that respects the original game and prevents abuse.
-
-## Progress and Roadmap 🌈
-I'll update this section when the server emulator is more mature. While I estimate that around 80% of the core game is done, there are still many features and improvements to be made. Perhaps I'll make a Trello board to track progress, but as a **quick list of some things** that are completely done: accounts, room decoration, shopping, dressup, garden and zoo, minigames and scores, world locations, and social features.
-
-## Code Structure 🛠️
-The `/client/` is a minimal Electron application that has Flash support enabled and the `/server/` on Express, Mustache, and Sqlite3. Due to the simple nature of the client, I'll only do an overview of the server structure here. 
-
-**Note that** this section is irrelevant if you are not interested in learning about how the game worked, and is not required reading to run the game. **That being said -** I do suggest looking through the code regardless simply to promote safety, so that you know what is running on your computer.
-
-- `/features/` hosts reusable helper functions for various tasks (ex. getting a user's level)
-- `/middleware/` hosts the stack that processes requests to the server (ex. routing requests or parsing data)
-- `/requests/` hosts all the endpoints that the game calls (ex. when a user buys an item)
-- `/server/` hosts internal server-related functions (ex. database, cache, or session management)
-- `/utils/` contains random helper functions unrelated to anything in specific (ex. logging)
-- `/web/` hosts templates that are dynamically served and injected (ex. login page)
-
-After installing the dependencies in both `/client/` and `/server/`, simply run `npm start` in each directive to start the client and server. **Please note that no game files or assets are supplied here, only original code for the server emulator and client.**
+RoxStar is a **fan-made** server (and client) implementation of the Moshi Monsters flash game API in NodeJS. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).** While the server is mostly complete, this project is still in early development and not ready for general use.
 
 ## Acknowledgements 🥰
 - Mind Candy for creating the original game!
 - The teams behind the [Wayback Machine](https://archive.org/) and [Flashpoint](https://bluemaxima.org/flashpoint/) for their incredible archival work.
-- [FFDec](https://github.com/jindrapetrik/jpexs-decompiler) for making Flash reverse-engineering accessible.
-- And you, for taking an interest in my little hobby project~
 
 ## Terms and License 😇
 <details>
