@@ -2,13 +2,7 @@
  💎 RoxStar 🎤
 </h1>
 
-> <i>Can you keep a secret?</i>
-<br>
-> <i>I'm a Moshi on a mission...</i>
-<br>
-> <i>I'M MISSY KIX!</i> 
-<br>
-> <i>The sassy secret agent slash musician!</i>
+> <i>Can you keep a secret?</i><br><i>I'm a Moshi on a mission...</i><br><i>I'M MISSY KIX!</i><br><i>The sassy secret agent slash musician!</i>
 
 RoxStar is a **fan-made** server (and client) implementation of the Moshi Monsters flash game API in NodeJS. **By using, copying, or modifying this software you are agreeing to the terms laid out in the [license](https://github.com/kleineluka/roxstar/blob/main/LICENSE).** While the server is mostly complete, this project is still in early development and not ready for general use.
 
