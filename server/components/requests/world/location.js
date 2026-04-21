@@ -34,11 +34,11 @@ router.get('/:locationId', async (req, res) => {
             '@name': baseLocationData.name || 'Unknown Location',
             '@showTutorial': String(baseLocationData.showTutorial === true || baseLocationData.showTutorial === 'true'), // default false
             '@type': baseLocationData.type || 'unknown',
-            '@gifts': String(baseLocationData.gifts === true || baseLocationData.gifts === 'true'),
-            '@mysteryGifts': String(baseLocationData.mysteryGifts === true || baseLocationData.mysteryGifts === 'true'),
-            '@items': String(baseLocationData.items === true || baseLocationData.items === 'true'),
-            '@actors': String(baseLocationData.actors === true || baseLocationData.actors === 'true'),
-            '@games': String(baseLocationData.games === true || baseLocationData.games === 'true'),
+            '@gifts': baseLocationData.gifts || '0',
+            '@mysteryGifts': baseLocationData.mysteryGifts || '0',
+            '@items': baseLocationData.items || '0',
+            '@actors': baseLocationData.actors || '0',
+            '@games': baseLocationData.games || '0',
         }
     };
     // build dynamic section based on location type
@@ -74,7 +74,7 @@ router.get('/:locationId', async (req, res) => {
                 const storeData = global.storage_stores ? global.storage_stores[locationId] : null;
                 const shopItems = shopUtils.formatShopItems(baseLocationData, storeData);
                 if (locationType === 'giftshop') {
-                    dynamicData = { gifts: shopItems }; // array of {gift: {...}}
+                    dynamicData = { gifts: { gift: shopItems.map(g => g.gift) } };
                 } else {
                     dynamicData = { items: shopItems }; // array of {item: {...}}
                 }
@@ -152,7 +152,7 @@ router.get('/:locationId', async (req, res) => {
         if (Object.keys(dynamicData).length > 0) {
             // merge properties into responseData.location if they are direct children like 'items' or 'gifts'
             if (dynamicData.items) responseData.location.items = dynamicData.items;
-            if (dynamicData.gifts) responseData.location.gifts = dynamicData.gifts;
+            if (dynamicData.gifts) responseData.gifts = dynamicData.gifts;
             // if it's wrapped in 'dynamic', merge that object
             if (dynamicData.dynamic) responseData.location.dynamic = dynamicData.dynamic;
             // handle specific top-level elements like dancegameprogress

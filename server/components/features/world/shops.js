@@ -12,17 +12,17 @@ const levelUtils = require('../../features/account/levels.js');
 function formatShopItems(locationData, storeData) {
     const shopItems = [];
     const locationType = locationData.type;
-    if (!storeData || !storeData.itemIds || storeData.status === false) {
+    if (locationType !== 'giftshop' && (!storeData || !storeData.itemIds || storeData.status === false)) {
         pretty.debug(`Shop ${locationData.key} is inactive or has no itemIds defined.`);
         return []; // shop inactive or no items
     }
-    let itemIds = storeData.itemIds.split(',').map(id => id.trim()).filter(id => id !== '');
-    const maxToShow = storeData.maxToShow || itemIds.length; // default to all if not specified
-    const shouldRandomize = storeData.randomize === true; // explicitly check for true
+    let itemIds = (storeData && storeData.itemIds) ? storeData.itemIds.split(',').map(id => id.trim()).filter(id => id !== '') : [];
+    const maxToShow = (storeData && storeData.maxToShow) ? storeData.maxToShow : itemIds.length;
+    const shouldRandomize = storeData && storeData.randomize === true;
     if (shouldRandomize) {
         itemIds = formats.getRandomItems(itemIds, itemIds.length);
     }
-    const itemsToShow = itemIds.slice(0, maxToShow);
+    let itemsToShow = itemIds.slice(0, maxToShow);
     let baseItemStorage;
     let itemWrapperTag;
     let formatFunction;

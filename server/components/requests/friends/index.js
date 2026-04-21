@@ -108,6 +108,7 @@ router.get('/', async (req, res) => {
         }
         // format before sending
         const formattedFriends = [];
+        const seenFriendIds = new Set();
         for (const relation of friendRelations) {
             let friendId;
             let statusData = {};
@@ -134,6 +135,8 @@ router.get('/', async (req, res) => {
                 // bff status from target user's perspective (we didn't fetch this, default to false)
                 bffStatus = 'false';
             }
+            if (seenFriendIds.has(friendId)) continue;
+            seenFriendIds.add(friendId);
             const userfriend = friendDetailsMap.get(friendId);
             if (!userfriend) {
                 pretty.warn(`Friend details not found for ID ${friendId} in relation ID ${relation.id}`);
