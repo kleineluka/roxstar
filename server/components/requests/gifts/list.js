@@ -48,8 +48,9 @@ router.get('/', async (req, res) => {
             pretty.debug(`No active gifts found for user ${targetUserId}.`);
             // send empty list response
             const emptyResponse = {
+                '@maxGifts': global.config_game.gifts.max,
                 status: { '@code': 0, '@text': 'success' },
-                gifts: { '@global.config_game.gifts.max': global.config_game.gifts.max } // todo: may need double checked
+                gifts: {}
             };
             const xml = xmlbuilder.create({ giftRoom: emptyResponse }).end({ pretty: global.config_server['pretty-print-replies'] });
             return res.type('text/xml').send(xml);
@@ -71,9 +72,9 @@ router.get('/', async (req, res) => {
         // format the retrieved gifts
         const formattedGifts = giftUtils.formatGiftRoomGifts(gifts, senderDetailsMap);
         const responseData = {
+            '@maxGifts': global.config_game.gifts.max,
             status: { '@code': 0, '@text': 'success' },
             gifts: {
-                '@global.config_game.gifts.max': global.config_game.gifts.max,
                 gift: formattedGifts.map(g => g.gift) // extract inner object
             }
         };

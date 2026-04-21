@@ -55,5 +55,7 @@
     "/moshi/services/rest/gift/bags": "/gifts/bags.js",
     "/moshi/services/rest/gift/info": "/gifts/info.js",
     "/moshi/services/rest/gift/friend": "/gifts/friend.js",
-    "/moshi/services/rest/gift/send": "/gifts/send.js"
+    "/moshi/services/rest/gift/send": "/gifts/send.js",
+    "/moshi/services/rest/gift/remainingToSend": "/gifts/remaining.js",
+    "/moshi/services/rest/gift/": "/gifts/index.js"
 }

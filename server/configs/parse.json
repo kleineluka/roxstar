@@ -12,5 +12,6 @@
     "/moshi/services/moshling/keep": "xml",
     "/moshi/services/zoo/save": "xml",
     "/moshi/services/monster/dressup/costume/update": "xml",
-    "/moshi/services/rest/gift/send": "json"
+    "/moshi/services/rest/gift/send": "json",
+    "/moshi/services/rest/gift/": "xml"
 }

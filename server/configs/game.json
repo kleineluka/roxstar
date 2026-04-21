@@ -7,7 +7,7 @@
         "pinboard_history": 100
     },
     "gifts": {
-        "max": 24
+        "max": 10
     },
     "shops": {
         "randomize": true

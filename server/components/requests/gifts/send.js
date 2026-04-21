@@ -13,15 +13,12 @@ router.post('/', async (req, res) => {
         pretty.warn('Mystery gift send request without user session.');
         return res.status(401).json({ error: "Not logged in" });
     }
-
     const { userIDs, giftSetCode } = req.body;
     if (!Array.isArray(userIDs) || userIDs.length === 0 || !giftSetCode) {
         pretty.warn(`Invalid gift send payload from user ${userId}.`);
         return res.status(400).json({ error: "Invalid request body" });
     }
-
-    const dailyLimit = global.config_game?.gifts?.max ?? 24;
-
+    const dailyLimit = global.config_game?.gifts?.max ?? 10;
     try {
         const dailySince = clock.getTimestampDaily();
         const sentRow = await database.getQuery(
@@ -29,12 +26,10 @@ router.post('/', async (req, res) => {
             [userId, dailySince]
         );
         const sentToday = sentRow?.count || 0;
-
         if (sentToday >= dailyLimit) {
             pretty.warn(`User ${userId} has reached the daily mystery gift limit (${dailyLimit}).`);
             return res.status(403).json({ error: "Daily gift limit reached" });
         }
-
         const now = clock.getTimestamp();
         for (const receiverId of userIDs) {
             await database.runQuery(
@@ -42,8 +37,7 @@ router.post('/', async (req, res) => {
                 [userId, receiverId, giftSetCode, 1, 0, now]
             );
         }
-
-        res.json({ success: true });
+        res.status(200).end();
     } catch (error) {
         pretty.error(`Error sending mystery gifts from user ${userId}:`, error);
         res.status(500).json({ error: "Server error" });

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, screen } = require('electron');
 const path = require('path');
 const UserAgent = require('user-agents');
 const userAgent = new UserAgent();
@@ -75,9 +75,15 @@ app.on('window-all-closed', function () {
 
 function createWindow() {
   console.log("Executing createWindow function...");
+  const devtools = process.env.ROXSTAR_DEVTOOLS === '1';
+  const { width: screenW, height: screenH } = screen.getPrimaryDisplay().workAreaSize;
+  const winWidth = devtools ? screenW : 1270;
+  const winHeight = devtools ? screenH : 800;
   mainWindow = new BrowserWindow({
-    width: 1270,
-    height: 800,
+    width: winWidth,
+    height: winHeight,
+    x: devtools ? 0 : undefined,
+    y: devtools ? 0 : undefined,
     useContentSize: true,
     show: true,
     autoHideMenuBar: true,
@@ -270,7 +276,7 @@ function createWindow() {
       mainWindow.webContents.setAudioMuted(true);
     }
     if (process.env.ROXSTAR_DEVTOOLS === '1') {
-      mainWindow.webContents.openDevTools({ mode: 'detach' });
+      mainWindow.webContents.openDevTools({ mode: 'right' });
     }
   });
 
