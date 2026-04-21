@@ -1,18 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const database = require('../../components/server/database.js');
-const pretty = require('../../components/utils/pretty.js');
-
-/**
- * Logs a staff action to the database.
- */
-async function logAction(adminUsername, action, targetId, detail) {
-    const payload = JSON.stringify({ action, targetId, detail });
-    await database.runQuery(
-        'INSERT INTO logs_staff (admin, payload) VALUES (?, ?)',
-        [adminUsername, payload]
-    );
-}
+const database = require('../../server/database.js');
+const pretty = require('../../utils/pretty.js');
+const { logStaff } = require('../utils/log.js');
 
 /**
  * GET /staff/api/users
@@ -79,7 +69,7 @@ router.post('/:id/ban', async (req, res) => {
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID.' });
     try {
         await database.runQuery('UPDATE users SET activation_status = ? WHERE id = ?', ['banned', id]);
-        await logAction(req.session.staffUsername, 'ban', id, null);
+        await logStaff(req.session.staffUsername, 'ban', `User ID ${id} was banned`, 2);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff ban error:', err);
@@ -96,7 +86,7 @@ router.post('/:id/unban', async (req, res) => {
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID.' });
     try {
         await database.runQuery('UPDATE users SET activation_status = ? WHERE id = ?', ['Member', id]);
-        await logAction(req.session.staffUsername, 'unban', id, null);
+        await logStaff(req.session.staffUsername, 'unban', `User ID ${id} was unbanned`, 2);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff unban error:', err);
@@ -115,7 +105,7 @@ router.post('/:id/staff', express.json(), async (req, res) => {
     if (value !== 0 && value !== 1) return res.status(400).json({ error: 'Value must be 0 or 1.' });
     try {
         await database.runQuery('UPDATE users SET staff = ? WHERE id = ?', [value, id]);
-        await logAction(req.session.staffUsername, 'set_staff', id, value);
+        await logStaff(req.session.staffUsername, 'set_staff', `User ID ${id} staff status set to ${value}`, 2);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff toggle error:', err);
@@ -134,7 +124,7 @@ router.post('/:id/rocks', express.json(), async (req, res) => {
     if (typeof amount !== 'number' || amount < 0) return res.status(400).json({ error: 'Invalid rocks amount.' });
     try {
         await database.runQuery('UPDATE users SET rocks = ? WHERE id = ?', [amount, id]);
-        await logAction(req.session.staffUsername, 'set_rocks', id, amount);
+        await logStaff(req.session.staffUsername, 'set_rocks', `User ID ${id} rocks adjusted to ${amount}`, 1);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff set rocks error:', err);

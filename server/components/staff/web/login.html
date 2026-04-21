@@ -59,7 +59,7 @@
             });
             const data = await res.json();
             if (res.ok) {
-                window.location.href = '/staff/dashboard';
+                window.location.href = '/staff/home';
             } else {
                 errorEl.textContent = data.error || 'Login failed.';
                 errorEl.classList.add('show');

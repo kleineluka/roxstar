@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const database = require('../../components/server/database.js');
-const pretty = require('../../components/utils/pretty.js');
+const database = require('../../server/database.js');
+const pretty = require('../../utils/pretty.js');
 
 /**
  * GET /staff/api/stats

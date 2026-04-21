@@ -4,7 +4,9 @@
 CREATE TABLE IF NOT EXISTS logs_staff (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     admin TEXT NOT NULL,
-    payload TEXT NOT NULL,
+    event_name TEXT NOT NULL,
+    event_description TEXT NOT NULL,
+    severity INTEGER NOT NULL DEFAULT 0,
     date INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 

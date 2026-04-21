@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/staff/assets/staff.css">
 </head>
 <body>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="sp-layout">
     <aside class="sp-sidebar">
         <div class="sp-sidebar-header">
@@ -17,9 +18,9 @@
             <div class="sp-sidebar-user" id="staffName">Loading...</div>
         </div>
         <nav class="sp-sidebar-nav">
-            <a href="/staff/dashboard" class="sp-nav-link">
+            <a href="/staff/home" class="sp-nav-link">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Dashboard
+                Home
             </a>
             <a href="/staff/users" class="sp-nav-link">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -41,8 +42,13 @@
 
     <div class="sp-main">
         <header class="sp-header">
-            <h1>Staff Logs</h1>
-            <p>Audit trail of all staff actions</p>
+            <button class="sp-hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="sp-header-text">
+                <h1>Staff Logs</h1>
+                <p>Audit trail of all staff actions</p>
+            </div>
         </header>
         <main class="sp-content">
             <div class="sp-search-bar">
@@ -55,7 +61,7 @@
                 <div class="sp-table-wrap">
                     <table class="sp-table">
                         <thead>
-                            <tr><th>ID</th><th>Admin</th><th>Action</th><th>Target</th><th>Detail</th><th>Date</th></tr>
+                            <tr><th>ID</th><th>Admin</th><th>Event</th><th>Description</th><th>Severity</th><th>Date</th></tr>
                         </thead>
                         <tbody id="logsTable">
                             <tr><td colspan="6" class="sp-table-empty">Loading...</td></tr>
@@ -77,11 +83,24 @@
     let currentPage = 1, totalPages = 1, currentAdmin = '';
 
     const ACTION_MAP = {
-        ban:       'red',
-        unban:     'green',
-        set_staff: 'purple',
-        set_rocks: 'amber',
+        ban:          'red',
+        unban:        'green',
+        set_staff:    'purple',
+        set_rocks:    'amber',
+        edit_config:  'slate',
+        staff_login:  'green',
+        staff_logout: 'slate',
     };
+
+    function severityBadge(severity) {
+        const severityMap = {
+            0: { text: 'CASUAL', color: 'green' },
+            1: { text: 'MODERATE', color: 'blue' },
+            2: { text: 'SEVERE', color: 'red' }
+        };
+        const s = severityMap[severity] || { text: 'UNKNOWN', color: 'slate' };
+        return `<span class="sp-badge sp-badge-${s.color}">${s.text}</span>`;
+    }
 
     async function logout() {
         await fetch('/staff/api/auth/logout', { method: 'POST' });
@@ -113,15 +132,12 @@
                 return;
             }
             tbody.innerHTML = d.logs.map(log => {
-                let parsed = {};
-                try { parsed = JSON.parse(log.payload); } catch {}
-                const detail = parsed.detail !== null && parsed.detail !== undefined ? String(parsed.detail) : '';
                 return `<tr>
                     <td style="color:#aaa;font-size:11px">${log.id}</td>
                     <td style="font-weight:800;color:var(--btn-purple)">${log.admin}</td>
-                    <td>${actionBadge(parsed.action)}</td>
-                    <td style="font-size:12px;color:#777">${parsed.targetId ?? ''}</td>
-                    <td style="font-size:11px;font-family:monospace;color:#888">${detail}</td>
+                    <td>${actionBadge(log.event_name)}</td>
+                    <td style="font-size:12px;color:#777">${log.event_description}</td>
+                    <td>${severityBadge(log.severity)}</td>
                     <td style="font-size:11px;color:#aaa">${fmtDate(log.date)}</td>
                 </tr>`;
             }).join('');
@@ -139,6 +155,11 @@
             if (!r.ok) { window.location.href = '/staff/login'; return; }
             document.getElementById('staffName').textContent = (await r.json()).username;
         } catch { window.location.href = '/staff/login'; }
+    }
+
+    function toggleSidebar() {
+        document.querySelector('.sp-sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('open');
     }
 
     loadMe(); loadLogs();

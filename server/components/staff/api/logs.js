@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const database = require('../../components/server/database.js');
-const pretty = require('../../components/utils/pretty.js');
+const database = require('../../server/database.js');
+const pretty = require('../../utils/pretty.js');
 
 /**
  * GET /staff/api/logs
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
         const offset = (page - 1) * limit;
         const admin = req.query.admin ? `%${req.query.admin}%` : null;
         let countQuery = 'SELECT COUNT(*) as count FROM logs_staff';
-        let listQuery = 'SELECT id, admin, payload, date FROM logs_staff';
+        let listQuery = 'SELECT id, admin, event_name, event_description, severity, date FROM logs_staff';
         let params = [];
         if (admin) {
             countQuery += ' WHERE admin LIKE ?';

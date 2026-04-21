@@ -2,21 +2,10 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const pretty = require('../../components/utils/pretty.js');
-const database = require('../../components/server/database.js');
+const pretty = require('../../utils/pretty.js');
+const { logStaff } = require('../utils/log.js');
 
-const CONFIGS_DIR = path.resolve(__dirname, '../../configs');
-
-/**
- * Logs a staff action to the database for auditing purposes.
- */
-async function logAction(adminUsername, action, targetId, detail) {
-    const payload = JSON.stringify({ action, targetId, detail });
-    await database.runQuery(
-        'INSERT INTO logs_staff (admin, payload) VALUES (?, ?)',
-        [adminUsername, payload]
-    );
-}
+const CONFIGS_DIR = path.resolve(__dirname, '../../../configs');
 
 /**
  * Safely resolves a config file path from a given name, preventing directory traversal.
@@ -88,7 +77,7 @@ router.put('/:name', async (req, res) => {
     }
     try {
         fs.writeFileSync(filePath, serialized, 'utf8');
-        await logAction(req.session.staffUsername, 'edit_config', req.params.name, null);
+        await logStaff(req.session.staffUsername, 'edit_config', `Config '${req.params.name}' was modified`, 0);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff config write error:', err);

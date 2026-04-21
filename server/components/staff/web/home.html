@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard  Staff Panel</title>
+    <title>Home  Staff Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/staff/assets/staff.css">
 </head>
 <body>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="sp-layout">
     <aside class="sp-sidebar">
         <div class="sp-sidebar-header">
@@ -17,9 +18,9 @@
             <div class="sp-sidebar-user" id="staffName">Loading...</div>
         </div>
         <nav class="sp-sidebar-nav">
-            <a href="/staff/dashboard" class="sp-nav-link active">
+            <a href="/staff/home" class="sp-nav-link active">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Dashboard
+                Home
             </a>
             <a href="/staff/users" class="sp-nav-link">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -41,8 +42,13 @@
 
     <div class="sp-main">
         <header class="sp-header">
-            <h1>Dashboard</h1>
-            <p>What's going on in Monstro City?</p>
+            <button class="sp-hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="sp-header-text">
+                <h1>Home</h1>
+                <p>What's going on in Monstro City?</p>
+            </div>
         </header>
         <main class="sp-content">
             <div class="sp-stats" id="statsGrid">
@@ -70,6 +76,16 @@
         window.location.href = '/staff/login';
     }
     function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
+
+    function severityBadge(severity) {
+        const severityMap = {
+            0: { text: 'CASUAL', color: 'green' },
+            1: { text: 'MODERATE', color: 'blue' },
+            2: { text: 'SEVERE', color: 'red' }
+        };
+        const s = severityMap[severity] || { text: 'UNKNOWN', color: 'slate' };
+        return `<span class="sp-badge sp-badge-${s.color}">${s.text}</span>`;
+    }
 
     async function loadMe() {
         try {
@@ -109,15 +125,19 @@
                 return;
             }
             document.getElementById('recentLogs').innerHTML = d.logs.map(log => {
-                let parsed = {};
-                try { parsed = JSON.parse(log.payload); } catch {}
                 return `<div class="sp-log-row">
                     <span class="sp-log-admin">${log.admin}</span>
-                    <span class="sp-log-payload">${JSON.stringify(parsed)}</span>
+                    <span class="sp-log-payload">${log.event_description}</span>
+                    <span class="sp-log-severity">${severityBadge(log.severity)}</span>
                     <span class="sp-log-date">${fmtDate(log.date)}</span>
                 </div>`;
             }).join('');
         } catch {}
+    }
+
+    function toggleSidebar() {
+        document.querySelector('.sp-sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('open');
     }
 
     loadMe(); loadStats(); loadRecentLogs();

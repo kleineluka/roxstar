@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const database = require('../../components/server/database.js');
-const pretty = require('../../components/utils/pretty.js');
+const database = require('../../server/database.js');
+const pretty = require('../../utils/pretty.js');
+const { logStaff } = require('../utils/log.js');
 
 /**
  * POST /staff/api/auth/login
@@ -30,6 +31,7 @@ router.post('/login', express.json(), async (req, res) => {
         req.session.staffUserId = user.id;
         req.session.staffUsername = user.username;
         await req.session.save();
+        await logStaff(user.username, 'staff_login', `Staff member ${user.username} logged into the admin panel`, 1);
         res.json({ success: true });
     } catch (err) {
         pretty.error('Staff login error:', err);
@@ -41,7 +43,9 @@ router.post('/login', express.json(), async (req, res) => {
  * POST /staff/api/auth/logout
  * Logs out the current staff user by clearing their session.
  */
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
+    const staffUsername = req.session.staffUsername || 'Unknown';
+    await logStaff(staffUsername, 'staff_logout', `Staff member ${staffUsername} logged out from the admin panel`, 1);
     req.session.staffLoggedIn = false;
     req.session.staffUserId = null;
     req.session.staffUsername = null;

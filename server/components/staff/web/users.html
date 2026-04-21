@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/staff/assets/staff.css">
 </head>
 <body>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="sp-layout">
     <aside class="sp-sidebar">
         <div class="sp-sidebar-header">
@@ -17,9 +18,9 @@
             <div class="sp-sidebar-user" id="staffName">Loading...</div>
         </div>
         <nav class="sp-sidebar-nav">
-            <a href="/staff/dashboard" class="sp-nav-link">
+            <a href="/staff/home" class="sp-nav-link">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Dashboard
+                Home
             </a>
             <a href="/staff/users" class="sp-nav-link active">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -41,8 +42,13 @@
 
     <div class="sp-main">
         <header class="sp-header">
-            <h1>Users</h1>
-            <p>Search and manage player accounts</p>
+            <button class="sp-hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="sp-header-text">
+                <h1>Users</h1>
+                <p>Search and manage player accounts</p>
+            </div>
         </header>
         <main class="sp-content">
             <div class="sp-search-bar">
@@ -210,6 +216,11 @@
             if (!r.ok) { window.location.href = '/staff/login'; return; }
             document.getElementById('staffName').textContent = (await r.json()).username;
         } catch { window.location.href = '/staff/login'; }
+    }
+
+    function toggleSidebar() {
+        document.querySelector('.sp-sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('open');
     }
 
     loadMe();

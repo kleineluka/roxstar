@@ -16,7 +16,7 @@ router.use('/assets', express.static(path.join(__dirname, 'web')));
 
 // public routes
 router.get('/login', (req, res) => {
-    if (req.session.staffLoggedIn) return res.redirect('/staff/dashboard');
+    if (req.session.staffLoggedIn) return res.redirect('/staff/home');
     res.sendFile(path.join(__dirname, 'web', 'login.html'));
 });
 router.use('/api/auth', apiAuth);
@@ -25,8 +25,8 @@ router.use('/api/auth', apiAuth);
 router.use(auth.requireStaff);
 
 // web pages
-router.get('/', (req, res) => res.redirect('/staff/dashboard'));
-router.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'web', 'dashboard.html')));
+router.get('/', (req, res) => res.redirect('/staff/home'));
+router.get('/home', (req, res) => res.sendFile(path.join(__dirname, 'web', 'home.html')));
 router.get('/users', (req, res) => res.sendFile(path.join(__dirname, 'web', 'users.html')));
 router.get('/logs', (req, res) => res.sendFile(path.join(__dirname, 'web', 'logs.html')));
 router.get('/config', (req, res) => res.sendFile(path.join(__dirname, 'web', 'config.html')));

@@ -129,16 +129,21 @@ body {
     background: #fff;
     border-bottom: 2px solid var(--brand);
     padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.sp-header h1 {
+.sp-header-text { flex: 1; min-width: 0; }
+
+.sp-header h1, .sp-header-text h1 {
     font-size: 20px;
     font-weight: 800;
     margin: 0 0 2px;
     color: #1e1b2e;
 }
 
-.sp-header p {
+.sp-header p, .sp-header-text p {
     font-size: 13px;
     color: #7b7b9a;
     margin: 0;
@@ -651,4 +656,75 @@ table.sp-table tbody tr:hover { background: #f8f8ff; }
 @keyframes waveSlide {
     0% { transform: translate3d(0, 0, 0); }
     100% { transform: translate3d(-25%, 0, 0); }
+}
+
+/* log severity column */
+.sp-log-severity { flex-shrink: 0; }
+
+/* hamburger toggle button */
+.sp-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #1e1b2e;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    padding: 0;
+}
+.sp-hamburger:hover { background: #f0f0f8; }
+.sp-hamburger svg { width: 22px; height: 22px; }
+
+/* mobile sidebar backdrop */
+.sp-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30,27,46,0.55);
+    z-index: 19;
+    backdrop-filter: blur(2px);
+}
+.sp-sidebar-overlay.open { display: block; }
+
+/* ---- Responsive / Mobile ---- */
+@media (max-width: 768px) {
+    .sp-hamburger { display: flex; }
+
+    .sp-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sp-sidebar.open { transform: translateX(0); }
+
+    .sp-main { margin-left: 0; }
+
+    .sp-header { padding: 14px 16px; }
+
+    .sp-content { padding: 16px; }
+
+    .sp-search-bar { flex-wrap: wrap; }
+    .sp-search-bar .sp-input { min-width: 0; }
+
+    .sp-stats {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .sp-log-admin { width: 80px; }
+    .sp-log-payload { font-size: 10px; }
+    .sp-log-severity { display: none; }
+}
+
+@media (max-width: 480px) {
+    .sp-stats { grid-template-columns: 1fr 1fr; }
+    .sp-log-payload { display: none; }
+    .sp-dl { grid-template-columns: 1fr; }
+    .sp-modal { border-radius: 16px; }
+    .sp-modal-actions { flex-direction: column; }
+    .sp-modal-actions .sp-btn { width: 100%; justify-content: center; }
 }

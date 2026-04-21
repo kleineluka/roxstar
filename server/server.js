@@ -21,7 +21,7 @@ global.body_parser = require('body-parser');
 require('body-parser-xml')(global.body_parser);
 
 // import staff panel
-const staff = require('./staff/index.js');
+const staff = require('./components/staff/index.js');
 
 // import middleware
 const middleware_partials = require('./components/middleware/partials.js');
