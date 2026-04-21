@@ -57,5 +57,6 @@
     "/moshi/services/rest/gift/friend": "/gifts/friend.js",
     "/moshi/services/rest/gift/send": "/gifts/send.js",
     "/moshi/services/rest/gift/remainingToSend": "/gifts/remaining.js",
-    "/moshi/services/rest/gift/": "/gifts/index.js"
+    "/moshi/services/rest/gift/": "/gifts/index.js",
+    "/services/eventing/pageView": "/heartbeats/view.js"
 }

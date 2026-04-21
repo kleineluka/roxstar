@@ -104,7 +104,7 @@ async function main() {
     log('DEBUG', 'Starting server + two clients with separate sessions');
     await startServer();
     startClient('CLIENT-1', 'persist:roxstar_debug_1', '1', { ROXSTAR_MUTED: '1', ROXSTAR_DEVTOOLS: '1' });
-    startClient('CLIENT-2', 'persist:roxstar_debug_2', '2', { ROXSTAR_MUTED: '1' });
+    startClient('CLIENT-2', 'persist:roxstar_debug_2', '2', { ROXSTAR_MUTED: '1', ROXSTAR_DEVTOOLS: '1' });
     log('DEBUG', 'Both clients launched with auto-login!');
     log('DEBUG', 'Slot 1 and 2 mapped to usernames in server.json -> "debug-accounts".');
     log('DEBUG', 'Close both client windows or press Ctrl+C to shut everything down.');
