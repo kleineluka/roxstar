@@ -113,6 +113,19 @@ function decodeBase64(base64String) {
     }
 }
 
+/** Encode a utf8 string to base64
+ * @param {string} str - The utf8 string to encode.
+ * @returns {string} - The base64 encoded string.
+ */
+function encodeBase64(str) {
+    try {
+        return Buffer.from(str, 'utf8').toString('base64');
+    } catch (error) {
+        pretty.error('Error encoding base64 string:', error);
+        return null;
+    }
+}
+
 module.exports = {
     acceptUrl,
     sanitiseString,
@@ -123,4 +136,5 @@ module.exports = {
     buildXmlResponse,
     getUserAge,
     decodeBase64,
+    encodeBase64,
 };

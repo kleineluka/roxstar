@@ -33,14 +33,14 @@ function formatPinboardMessages(messages, senderDetailsMap) {
                 '@gender': sender.gender,
                 '@username': sender.username,
                 '@country': sender.country || '',
-            },
-            monster: {
-                '@name': sender.monster_name,
-                '@type': sender.monster,
-                '@primarycolour': sender.primary_colour,
-                '@secondarycolour': sender.secondary_colour,
-                ...monsterUtils.getUserColoramaData(sender.colorama),
-                '@b': 'true' // hardcoded
+                monster: {
+                    '@name': sender.monster_name,
+                    '@type': sender.monster,
+                    '@primarycolour': sender.primary_colour,
+                    '@secondarycolour': sender.secondary_colour,
+                    ...monsterUtils.getUserColoramaData(sender.colorama),
+                    '@b': 'true' // hardcoded
+                }
             }
         });
     }

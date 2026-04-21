@@ -38,6 +38,7 @@ router.post('/:targetUserId', async (req, res) => {
     const decodedMessage = formats.decodeBase64(messageText);
     const sanitizedMessage = formats.sanitiseString(decodedMessage);
     const censoredMessage = censor.filterWords(sanitizedMessage, global.config_censor).filtered;
+    const encodedMessage = formats.encodeBase64(censoredMessage);
     const status = (loggedInUserId === targetUserId) ? 'accepted' : 'pending';
     try {
         // make sure the target user exists
@@ -50,7 +51,7 @@ router.post('/:targetUserId', async (req, res) => {
         const insertResult = await database.runQuery(
             `INSERT INTO message_board (sender, receiver, message, status, watermark, colour, date)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [loggedInUserId, targetUserId, censoredMessage, status, watermark, colour, timestamp]
+            [loggedInUserId, targetUserId, encodedMessage, status, watermark, colour, timestamp]
         );
         if (insertResult && insertResult.lastID > 0) {
             pretty.print(`Comment created by ${loggedInUserId} for ${targetUserId}. Status: ${status}. ID: ${insertResult.lastID}`, 'ACTION');
