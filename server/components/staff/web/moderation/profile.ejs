@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('../partials/head', { title: 'Player Profile', extraStyles: `
+<style>
+    .pr-hero { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 16px; box-shadow: var(--card-shadow); padding: 20px 24px; margin-bottom: 18px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .pr-hero-info { flex: 1; min-width: 0; }
+    .pr-hero-name { font-size: 22px; font-weight: 900; color: #1e1b2e; margin: 0 0 4px; }
+    .pr-hero-monster { font-size: 14px; font-weight: 700; color: #7070a0; margin: 0 0 10px; }
+    .pr-hero-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pr-hero-stats { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+    .pr-stat { text-align: center; }
+    .pr-stat-val { font-size: 22px; font-weight: 900; color: #1e1b2e; line-height: 1; }
+    .pr-stat-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9090b0; margin-top: 3px; }
+    .pr-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 16px; padding: 8px 10px; box-shadow: var(--card-shadow); flex-wrap: wrap; }
+    .pr-tab { padding: 7px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; border: none; cursor: pointer; background: none; color: #8080a8; font-family: var(--font-main); transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .pr-tab:hover { background: #f0f0f8; color: #1e1b2e; }
+    .pr-tab.active { background: var(--brand); color: var(--brand-text); }
+    .pr-panel { display: none; }
+    .pr-panel.active { display: block; }
+    .pr-card { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 16px; box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 16px; }
+    .pr-card-header { padding: 12px 20px; border-bottom: 1.5px solid var(--card-border); background: #fafafa; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; color: #8080a8; display: flex; align-items: center; justify-content: space-between; }
+    .pr-card-body { padding: 16px 20px; }
+    .pr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .pr-field { display: flex; flex-direction: column; gap: 5px; }
+    .pr-field-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9090b0; }
+    .pr-field-row { display: flex; align-items: center; gap: 8px; }
+    .pr-input { flex: 1; padding: 7px 14px; border: 1.5px solid #d0d0e8; border-radius: 8px; font-size: 13px; font-family: var(--font-main); background: #f8f8ff; color: #1e1b2e; outline: none; transition: border-color 0.15s; min-width: 0; }
+    .pr-input:focus { border-color: var(--btn-purple); }
+    .pr-save-btn { padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; border: none; cursor: pointer; font-family: var(--font-main); background: linear-gradient(180deg, #5bc4f0 0%, var(--btn-purple) 100%); color: #fff; box-shadow: 0 3px 0 #0f4d6b; transition: filter 0.15s; white-space: nowrap; flex-shrink: 0; }
+    .pr-save-btn:hover { filter: brightness(1.1); }
+    .pr-save-btn:active { transform: scale(0.96); }
+    .pr-status-msg { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; opacity: 0; transition: opacity 0.4s; white-space: nowrap; }
+    .pr-status-msg.ok  { background: #dcfce7; color: #15803d; opacity: 1; }
+    .pr-status-msg.err { background: #fee2e2; color: #b91c1c; opacity: 1; }
+    .pr-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .pr-list { list-style: none; margin: 0; padding: 0; }
+    .pr-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #f0f0f8; transition: background 0.1s; }
+    .pr-list-item:last-child { border-bottom: none; }
+    .pr-list-item:hover { background: #f8f8ff; }
+    .pr-list-name { flex: 1; font-size: 13px; font-weight: 700; color: #1e1b2e; min-width: 0; }
+    .pr-list-meta { font-size: 11px; color: #9090b0; font-family: monospace; white-space: nowrap; }
+    .pr-del-btn { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: none; cursor: pointer; font-family: var(--font-main); background: #fee2e2; color: #b91c1c; transition: background 0.12s; flex-shrink: 0; }
+    .pr-del-btn:hover { background: #fecaca; }
+    .pr-empty { text-align: center; color: #aaaacc; font-size: 13px; font-weight: 700; padding: 32px 0; }
+    .pr-garden-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px 20px; }
+    .pr-plot { background: #f8f8ff; border: 1.5px solid #e0e0f0; border-radius: 12px; padding: 14px; }
+    .pr-plot-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9090b0; margin-bottom: 10px; }
+    .pr-plot-field { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .pr-plot-label { font-size: 11px; font-weight: 700; color: #7070a0; width: 60px; flex-shrink: 0; }
+    .pr-plot-input { flex: 1; padding: 4px 10px; border: 1.5px solid #d0d0e8; border-radius: 6px; font-size: 12px; font-family: var(--font-main); background: #fff; color: #1e1b2e; outline: none; transition: border-color 0.15s; }
+    .pr-plot-input:focus { border-color: var(--btn-purple); }
+    .pr-garden-raw { width: 100%; min-height: 80px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; border: none; outline: none; resize: vertical; background: #fcfcff; color: #1e1b2e; display: block; box-sizing: border-box; }
+    .pr-section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9090b0; margin-bottom: 8px; padding: 0 20px; }
+    .pr-count-badge { display: inline-flex; align-items: center; justify-content: center; padding: 1px 8px; border-radius: 999px; background: #dbeeff; color: var(--btn-purple); font-size: 11px; font-weight: 800; }
+    .pr-room-header { padding: 10px 20px; background: #f4f4fc; border-bottom: 1.5px solid var(--card-border); border-top: 1.5px solid var(--card-border); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #7070a0; display: flex; align-items: center; gap: 8px; }
+    .pr-msg-row { padding: 12px 20px; border-bottom: 1px solid #f0f0f8; }
+    .pr-msg-row:last-child { border-bottom: none; }
+    .pr-msg-meta { font-size: 11px; color: #9090b0; margin-bottom: 4px; }
+    .pr-msg-text { font-size: 13px; color: #2d2d3a; font-weight: 600; }
+    body.dark .pr-hero { }
+    body.dark .pr-hero-name { color: #e8e8f8; }
+    body.dark .pr-hero-monster { color: #6060a0; }
+    body.dark .pr-stat-val { color: #e0e0f4; }
+    body.dark .pr-card-header { background: #17152a; }
+    body.dark .pr-input { background: #17152a; border-color: rgba(255,255,255,0.12); color: #d0d0e8; }
+    body.dark .pr-plot { background: #17152a; border-color: rgba(255,255,255,0.08); }
+    body.dark .pr-plot-input { background: #1e1b2e; border-color: rgba(255,255,255,0.12); color: #d0d0e8; }
+    body.dark .pr-list-name { color: #d0d0e8; }
+    body.dark .pr-list-item:hover { background: #211e35; }
+    body.dark .pr-room-header { background: #17152a; border-color: rgba(255,255,255,0.08); }
+    body.dark .pr-garden-raw { background: #17152a; color: #d0d0e8; }
+    body.dark .pr-msg-text { color: #d0d0e8; }
+    body.dark .pr-tab:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    @media (max-width: 600px) { .pr-hero-stats { gap: 12px; } .pr-grid { grid-template-columns: 1fr; } }
+</style>
+` }) %>
+</head>
+<body><script>if(localStorage.getItem('sp-dark')==='1')document.body.classList.add('dark');</script>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sp-layout">
+    <%- include('../partials/sidebar', { page: 'profile' }) %>
+    <div class="sp-main">
+        <%- include('../partials/header', { title: 'Player Profile', subtitle: 'Search and fully manage any player' }) %>
+        <main class="sp-content">
+
+            <div class="sp-search-bar">
+                <input class="sp-input" type="text" id="prSearchInput" placeholder="Search by username, monster name, or ID…" autocomplete="off">
+                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="prSearch()">Find Player</button>
+            </div>
+
+            <div id="prDropdown" style="display:none;position:relative;z-index:10;margin-top:-10px;margin-bottom:14px;">
+                <div id="prDropList" style="background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden;"></div>
+            </div>
+
+            <div id="prContent" style="display:none">
+
+                <div class="pr-hero" id="prHero"></div>
+
+                <div class="pr-tabs" id="prTabs">
+                    <button class="pr-tab active" data-tab="account">Account</button>
+                    <button class="pr-tab" data-tab="garden">Garden</button>
+                    <button class="pr-tab" data-tab="zoo">Zoo</button>
+                    <button class="pr-tab" data-tab="room">Room</button>
+                    <button class="pr-tab" data-tab="wardrobe">Wardrobe</button>
+                    <button class="pr-tab" data-tab="dressup">Dress-Up</button>
+                    <button class="pr-tab" data-tab="seeds">Seeds</button>
+                    <button class="pr-tab" data-tab="social">Social</button>
+                </div>
+
+                <div class="pr-panel active" id="tab-account"></div>
+                <div class="pr-panel" id="tab-garden"></div>
+                <div class="pr-panel" id="tab-zoo"></div>
+                <div class="pr-panel" id="tab-room"></div>
+                <div class="pr-panel" id="tab-wardrobe"></div>
+                <div class="pr-panel" id="tab-dressup"></div>
+                <div class="pr-panel" id="tab-seeds"></div>
+                <div class="pr-panel" id="tab-social"></div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    <%- include('../partials/scripts', { section: 'moderation' }) %>
+
+    let profileData = null;
+    let currentUserId = null;
+    let searchTimer = null;
+
+    // Auto-load profile from URL parameter
+    const urlId = parseInt(new URLSearchParams(window.location.search).get('id'));
+    if (!isNaN(urlId)) loadProfile(urlId);
+
+    // Search functionality
+    document.getElementById('prSearchInput').addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(prSearch, 300);
+    });
+    document.getElementById('prSearchInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') prSearch();
+    });
+
+    async function prSearch() {
+        const q = document.getElementById('prSearchInput').value.trim();
+        if (!q) { document.getElementById('prDropdown').style.display = 'none'; return; }
+        try {
+            const r = await fetch('/staff/api/users?' + new URLSearchParams({ search: q, limit: 6 }));
+            if (!r.ok) return;
+            const d = await r.json();
+            renderDropdown(d.users ?? []);
+        } catch {}
+    }
+
+    function renderDropdown(users) {
+        const drop = document.getElementById('prDropdown');
+        const list = document.getElementById('prDropList');
+        if (!users.length) { drop.style.display = 'none'; return; }
+        drop.style.display = 'block';
+        list.innerHTML = users.map(u => `
+            <div onclick="loadProfile(${u.id})" style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #f0f0f8;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='#f5f5ff'" onmouseout="this.style.background=''">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:800;color:#1e1b2e">${esc(u.username)} <span style="font-size:11px;font-weight:600;color:#9090b0">#${u.id}</span></div>
+                    <div style="font-size:11px;color:#9090b0">${esc(u.monster_name)}</div>
+                </div>
+                <span class="sp-badge sp-badge-${u.activation_status === 'Member' ? 'green' : u.activation_status === 'banned' ? 'red' : 'amber'}">${esc(u.activation_status)}</span>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('click', e => {
+        if (!document.getElementById('prDropdown').contains(e.target) && e.target !== document.getElementById('prSearchInput'))
+            document.getElementById('prDropdown').style.display = 'none';
+    });
+
+    // Load and display user profile
+    async function loadProfile(id) {
+        document.getElementById('prDropdown').style.display = 'none';
+        document.getElementById('prContent').style.display = 'none';
+        currentUserId = id;
+        const url = new URL(window.location);
+        url.searchParams.set('id', id);
+        window.history.replaceState({}, '', url);
+
+        try {
+            const r = await fetch(`/staff/api/users/${id}/profile`);
+            if (!r.ok) { alert('Failed to load profile.'); return; }
+            profileData = await r.json();
+        } catch { alert('Error loading profile.'); return; }
+
+        renderHero();
+        renderAccount();
+        renderGarden();
+        renderZoo();
+        renderRoom();
+        renderWardrobe();
+        renderDressup();
+        renderSeeds();
+        renderSocial();
+
+        document.getElementById('prContent').style.display = 'block';
+
+        document.querySelectorAll('.pr-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pr-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('.pr-tab[data-tab="account"]').classList.add('active');
+        document.getElementById('tab-account').classList.add('active');
+    }
+
+    document.getElementById('prTabs').addEventListener('click', e => {
+        const btn = e.target.closest('.pr-tab');
+        if (!btn) return;
+        document.querySelectorAll('.pr-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pr-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+
+    // Utility helper functions
+    function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleDateString() : '—'; }
+    function statusBadge(s) {
+        const map = { Member:'green', banned:'red', needsActivation:'amber' };
+        return `<span class="sp-badge sp-badge-${map[s]||'slate'}">${esc(s)}</span>`;
+    }
+
+    function saveField(endpoint, body, statusEl) {
+        return fetch(`/staff/api/users/${currentUserId}/${endpoint}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        }).then(r => r.json()).then(d => {
+            const el = document.getElementById(statusEl);
+            el.textContent = d.success ? 'Saved!' : (d.error || 'Error');
+            el.className = 'pr-status-msg ' + (d.success ? 'ok' : 'err');
+            if (d.success) setTimeout(() => { el.className = 'pr-status-msg'; }, 2500);
+        }).catch(() => {
+            const el = document.getElementById(statusEl);
+            el.textContent = 'Network error'; el.className = 'pr-status-msg err';
+        });
+    }
+
+    async function deleteRow(endpoint, id, onSuccess) {
+        if (!confirm('Remove this item? This cannot be undone.')) return;
+        try {
+            const r = await fetch(`/staff/api/users/${currentUserId}/${endpoint}/${id}`, { method: 'DELETE' });
+            const d = await r.json();
+            if (d.success) onSuccess();
+            else alert(d.error || 'Failed to remove.');
+        } catch { alert('Network error.'); }
+    }
+
+    // Render hero profile section with stats
+    function renderHero() {
+        const u = profileData.user;
+        document.getElementById('prHero').innerHTML = `
+            <div class="pr-hero-info">
+                <div class="pr-hero-name">${esc(u.username)}</div>
+                <div class="pr-hero-monster">${esc(u.monster_name)} &mdash; <span style="font-family:monospace;font-size:12px">#${u.id}</span></div>
+                <div class="pr-hero-badges">
+                    ${statusBadge(u.activation_status)}
+                    ${u.staff ? '<span class="sp-badge sp-badge-purple">Staff</span>' : ''}
+                    <span class="sp-badge sp-badge-slate">${esc(u.gender || '?')}</span>
+                    ${u.country ? `<span class="sp-badge sp-badge-slate">${esc(u.country)}</span>` : ''}
+                </div>
+            </div>
+            <div class="pr-hero-stats">
+                <div class="pr-stat"><div class="pr-stat-val">${(u.rocks ?? 0).toLocaleString()}</div><div class="pr-stat-lbl">Rocks</div></div>
+                <div class="pr-stat"><div class="pr-stat-val">${u.level ?? 1}</div><div class="pr-stat-lbl">Level</div></div>
+                <div class="pr-stat"><div class="pr-stat-val">${u.happiness ?? 0}</div><div class="pr-stat-lbl">Happiness</div></div>
+                <div class="pr-stat"><div class="pr-stat-val">${u.health ?? 0}</div><div class="pr-stat-lbl">Health</div></div>
+                <div class="pr-stat"><div class="pr-stat-val">${profileData.friends.total}</div><div class="pr-stat-lbl">Friends</div></div>
+                <div class="pr-stat"><div class="pr-stat-val">${(profileData.moshlings ?? []).length}</div><div class="pr-stat-lbl">Moshlings</div></div>
+            </div>
+        `;
+    }
+
+    // Render account information tab
+    function renderAccount() {
+        const u = profileData.user;
+        document.getElementById('tab-account').innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">Core Info</div>
+                <div class="pr-card-body">
+                    <div class="pr-grid">
+                        <div class="pr-field">
+                            <div class="pr-field-label">Monster Name</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="monsterNameInput" value="${esc(u.monster_name)}" maxlength="30">
+                                <button class="pr-save-btn" onclick="saveField('monstername',{monster_name:document.getElementById('monsterNameInput').value},'monsterNameStatus')">Save</button>
+                                <span class="pr-status-msg" id="monsterNameStatus"></span>
+                            </div>
+                        </div>
+                        <div class="pr-field">
+                            <div class="pr-field-label">Rocks</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="rocksInput" type="number" value="${u.rocks ?? 0}" min="0">
+                                <button class="pr-save-btn" onclick="saveField('rocks',{amount:parseInt(document.getElementById('rocksInput').value)},'rocksStatus')">Save</button>
+                                <span class="pr-status-msg" id="rocksStatus"></span>
+                            </div>
+                        </div>
+                        <div class="pr-field">
+                            <div class="pr-field-label">Level</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="levelInput" type="number" value="${u.level ?? 1}" min="1" max="999">
+                                <button class="pr-save-btn" onclick="saveField('level',{level:parseInt(document.getElementById('levelInput').value)},'levelStatus')">Save</button>
+                                <span class="pr-status-msg" id="levelStatus"></span>
+                            </div>
+                        </div>
+                        <div class="pr-field">
+                            <div class="pr-field-label">Happiness (0-1000)</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="happinessInput" type="number" value="${u.happiness ?? 700}" min="0" max="1000">
+                                <button class="pr-save-btn" onclick="saveField('happiness',{happiness:parseInt(document.getElementById('happinessInput').value)},'happinessStatus')">Save</button>
+                                <span class="pr-status-msg" id="happinessStatus"></span>
+                            </div>
+                        </div>
+                        <div class="pr-field">
+                            <div class="pr-field-label">Health (0-1000)</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="healthInput" type="number" value="${u.health ?? 700}" min="0" max="1000">
+                                <button class="pr-save-btn" onclick="saveField('health',{health:parseInt(document.getElementById('healthInput').value)},'healthStatus')">Save</button>
+                                <span class="pr-status-msg" id="healthStatus"></span>
+                            </div>
+                        </div>
+                        <div class="pr-field">
+                            <div class="pr-field-label">House Style</div>
+                            <div class="pr-field-row">
+                                <input class="pr-input" id="houseStyleInput" value="${esc(u.house_style || 'default')}">
+                                <button class="pr-save-btn" onclick="saveField('housestyle',{house_style:document.getElementById('houseStyleInput').value},'houseStyleStatus')">Save</button>
+                                <span class="pr-status-msg" id="houseStyleStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pr-card">
+                <div class="pr-card-header">Read-Only Info</div>
+                <div class="pr-card-body">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px 24px;">
+                        ${roInfo('Email', u.email)}
+                        ${roInfo('Username', u.username)}
+                        ${roInfo('Gender', u.gender)}
+                        ${roInfo('Country', u.country || '—')}
+                        ${roInfo('Monster Type', u.monster)}
+                        ${roInfo('Joined', fmtDate(u.creation_date))}
+                        ${roInfo('Last Active', fmtDate(u.last_active))}
+                        ${roInfo('Register IP', u.register_ip, true)}
+                        ${roInfo('Last IP', u.last_ip, true)}
+                    </div>
+                </div>
+            </div>
+            <div class="pr-card">
+                <div class="pr-card-header">Account Actions</div>
+                <div class="pr-card-body">
+                    <div class="pr-actions">
+                        ${u.activation_status !== 'banned'
+                            ? `<button class="sp-btn sp-btn-danger sp-btn-sm" onclick="acctAction('ban','Ban this user?')">Ban User</button>`
+                            : `<button class="sp-btn sp-btn-success sp-btn-sm" onclick="acctAction('unban')">Unban User</button>`}
+                        ${u.staff
+                            ? `<button class="sp-btn sp-btn-amber sp-btn-sm" onclick="staffToggle(0)">Remove Staff</button>`
+                            : `<button class="sp-btn sp-btn-primary sp-btn-sm" onclick="staffToggle(1)">Grant Staff</button>`}
+                        <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="loadProfile(currentUserId)">&#8635; Refresh</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function roInfo(label, value, mono = false) {
+        return `<div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#9090b0;margin-bottom:3px">${label}</div>
+        <div style="font-size:13px;font-weight:700;color:#1e1b2e;${mono ? 'font-family:monospace;font-size:11px' : ''}">${esc(value ?? '—')}</div></div>`;
+    }
+
+    async function acctAction(action, confirmMsg) {
+        if (confirmMsg && !confirm(confirmMsg)) return;
+        try {
+            const r = await fetch(`/staff/api/users/${currentUserId}/${action}`, { method: 'POST' });
+            const d = await r.json();
+            if (d.success) loadProfile(currentUserId);
+            else alert(d.error || 'Failed.');
+        } catch { alert('Network error.'); }
+    }
+
+    async function staffToggle(value) {
+        if (!confirm(value ? 'Grant staff access to this user?' : 'Remove staff access from this user?')) return;
+        try {
+            const r = await fetch(`/staff/api/users/${currentUserId}/staff`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ value })
+            });
+            const d = await r.json();
+            if (d.success) loadProfile(currentUserId);
+            else alert(d.error || 'Failed.');
+        } catch { alert('Network error.'); }
+    }
+
+    // Render garden editor tab
+    function renderGarden() {
+        const raw = profileData.user.garden || '';
+        const plots = raw.split('|').map(p => p.split('~'));
+
+        const plotCards = plots.map((fields, i) => {
+            const [idx, color, seedId, x, y, growth] = fields;
+            return `
+                <div class="pr-plot">
+                    <div class="pr-plot-title">Plot ${parseInt(idx ?? i) + 1}</div>
+                    <div class="pr-plot-field"><span class="pr-plot-label">Seed ID</span><input class="pr-plot-input" data-plot="${i}" data-field="2" value="${esc(seedId ?? '-1')}"></div>
+                    <div class="pr-plot-field"><span class="pr-plot-label">Color</span><input class="pr-plot-input" data-plot="${i}" data-field="1" value="${esc(color ?? 'black')}"></div>
+                    <div class="pr-plot-field"><span class="pr-plot-label">Growth</span><input class="pr-plot-input" data-plot="${i}" data-field="5" value="${esc(growth ?? '0')}"></div>
+                    <div class="pr-plot-field"><span class="pr-plot-label">X / Y</span><input class="pr-plot-input" data-plot="${i}" data-field="3" value="${esc(x ?? '60000')}" style="max-width:70px"> <input class="pr-plot-input" data-plot="${i}" data-field="4" value="${esc(y ?? '60000')}" style="max-width:70px"></div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('tab-garden').innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">
+                    Garden Plots
+                    <button class="pr-save-btn" onclick="saveGardenFromPlots()">Save Plots</button>
+                </div>
+                <div class="pr-garden-grid" id="gardenPlots">${plotCards}</div>
+            </div>
+            <div class="pr-card" style="margin-top:0">
+                <div class="pr-card-header">
+                    Raw Garden String
+                    <button class="pr-save-btn" onclick="saveGardenRaw()">Save Raw</button>
+                </div>
+                <div>
+                    <textarea class="pr-garden-raw" id="gardenRaw" spellcheck="false">${esc(raw)}</textarea>
+                    <div style="padding:8px 16px 12px;display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:11px;color:#9090b0">Format: <code>plotIndex~color~seedId~x~y~growth</code> separated by <code>|</code></span>
+                        <span class="pr-status-msg" id="gardenStatus"></span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function saveGardenFromPlots() {
+        const plots = Array.from(document.querySelectorAll('#gardenPlots .pr-plot')).map((plot, i) => {
+            const inputs = plot.querySelectorAll('.pr-plot-input');
+            const fields = ['', '', '', '', '', ''];
+            inputs.forEach(inp => { fields[parseInt(inp.dataset.field)] = inp.value; });
+            fields[0] = String(i);
+            return fields.join('~');
+        });
+        const gardenStr = plots.join('|');
+        document.getElementById('gardenRaw').value = gardenStr;
+        saveField('garden', { garden: gardenStr }, 'gardenStatus');
+    }
+
+    function saveGardenRaw() {
+        const garden = document.getElementById('gardenRaw').value;
+        saveField('garden', { garden }, 'gardenStatus');
+    }
+
+    // Render moshlings inventory tab
+    function renderZoo() {
+        const list = profileData.moshlings ?? [];
+        const el = document.getElementById('tab-zoo');
+        el.innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">Moshlings <span class="pr-count-badge">${list.length}</span></div>
+                ${list.length ? `<ul class="pr-list" id="zooList">${list.map(m => `
+                    <li class="pr-list-item" id="mosh-${m.id}">
+                        <div class="pr-list-name">${esc(m.name || 'Moshling')} <span style="font-size:11px;color:#9090b0">ID ${m.srcId}</span></div>
+                        <span class="pr-list-meta">${fmtDate(m.date)}</span>
+                        <span class="pr-list-meta" style="margin-left:4px">${esc(m.in_room || '—')}</span>
+                        <button class="pr-del-btn" onclick="deleteRow('moshlings',${m.id},()=>document.getElementById('mosh-${m.id}').remove())">Remove</button>
+                    </li>`).join('')}</ul>`
+                : `<div class="pr-empty">No moshlings in zoo.</div>`}
+            </div>
+        `;
+    }
+
+    // Render room items tab
+    function renderRoom() {
+        const rooms = profileData.rooms ?? [];
+        const el = document.getElementById('tab-room');
+        if (!rooms.length) { el.innerHTML = '<div class="pr-card"><div class="pr-empty">No rooms found.</div></div>'; return; }
+        el.innerHTML = rooms.map((room, ri) => `
+            <div class="pr-card">
+                <div class="pr-card-header">Room #${room.id} <span class="pr-count-badge">${room.items.length} items</span></div>
+                ${room.items.length ? `<ul class="pr-list">${room.items.map(item => `
+                    <li class="pr-list-item" id="item-${item.id}">
+                        <div class="pr-list-name">${esc(item.name || 'Item')} <span style="font-size:11px;color:#9090b0">#${item.item_id}</span></div>
+                        <span class="pr-list-meta">x:${item.x} y:${item.y} z:${item.z}</span>
+                        <button class="pr-del-btn" onclick="deleteRow('items',${item.id},()=>document.getElementById('item-${item.id}').remove())">Remove</button>
+                    </li>`).join('')}</ul>`
+                : `<div class="pr-empty" style="padding:16px">Room is empty.</div>`}
+            </div>
+        `).join('');
+    }
+
+    // Render clothing inventory tab
+    function renderWardrobe() {
+        const list = profileData.clothes ?? [];
+        const el = document.getElementById('tab-wardrobe');
+        el.innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">Clothing Inventory <span class="pr-count-badge">${list.length}</span></div>
+                ${list.length ? `<ul class="pr-list">${list.map(c => `
+                    <li class="pr-list-item" id="cloth-${c.id}">
+                        <div class="pr-list-name">${esc(c.name || 'Clothing Item')} <span style="font-size:11px;color:#9090b0">#${c.item_id}</span></div>
+                        <span class="pr-list-meta">${fmtDate(c.date)}</span>
+                        <button class="pr-del-btn" onclick="deleteRow('clothes',${c.id},()=>document.getElementById('cloth-${c.id}').remove())">Remove</button>
+                    </li>`).join('')}</ul>`
+                : `<div class="pr-empty">No clothing items.</div>`}
+            </div>
+        `;
+    }
+
+    // Render currently worn items tab
+    function renderDressup() {
+        const list = profileData.dressup ?? [];
+        const el = document.getElementById('tab-dressup');
+        el.innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">Currently Worn Items <span class="pr-count-badge">${list.length}</span></div>
+                ${list.length ? `<ul class="pr-list">${list.map(d => `
+                    <li class="pr-list-item" id="dress-${d.id}">
+                        <div class="pr-list-name">${esc(d.name || 'Item')} <span style="font-size:11px;color:#9090b0">#${d.item_id}</span></div>
+                        <span class="pr-list-meta" style="font-family:monospace">layer:${d.layer} x:${d.x} y:${d.y}</span>
+                        <button class="pr-del-btn" onclick="deleteRow('dressup',${d.id},()=>document.getElementById('dress-${d.id}').remove())">Remove</button>
+                    </li>`).join('')}</ul>`
+                : `<div class="pr-empty">No dress-up items equipped.</div>`}
+            </div>
+        `;
+    }
+
+    // Render seeds inventory tab
+    function renderSeeds() {
+        const list = profileData.seeds ?? [];
+        const el = document.getElementById('tab-seeds');
+        el.innerHTML = `
+            <div class="pr-card">
+                <div class="pr-card-header">Seed Inventory <span class="pr-count-badge">${list.length}</span></div>
+                ${list.length ? `<ul class="pr-list">${list.map(s => `
+                    <li class="pr-list-item" id="seed-${s.id}">
+                        <div class="pr-list-name">${esc(s.name || 'Seed')} <span style="font-size:11px;color:#9090b0">#${s.item_id}</span></div>
+                        <span class="pr-list-meta">${fmtDate(s.date)}</span>
+                        <button class="pr-del-btn" onclick="deleteRow('seeds',${s.id},()=>document.getElementById('seed-${s.id}').remove())">Remove</button>
+                    </li>`).join('')}</ul>`
+                : `<div class="pr-empty">No seeds in inventory.</div>`}
+            </div>
+        `;
+    }
+
+    // Render friends and messages tab
+    function renderSocial() {
+        const msgs = profileData.messages ?? [];
+        document.getElementById('tab-social').innerHTML = `
+            <div class="pr-card" style="margin-bottom:16px">
+                <div class="pr-card-header">Friend Stats</div>
+                <div class="pr-card-body">
+                    <div style="display:flex;gap:28px;">
+                        <div class="pr-stat"><div class="pr-stat-val">${profileData.friends.total}</div><div class="pr-stat-lbl">Friends</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pr-card">
+                <div class="pr-card-header">Recent Pinboard Messages Received <span class="pr-count-badge">${msgs.length}</span></div>
+                ${msgs.length ? msgs.map(m => `
+                    <div class="pr-msg-row">
+                        <div class="pr-msg-meta">From <strong>${esc(m.sender_name || m.sender)}</strong> &rarr; <strong>${esc(m.receiver_name || m.receiver)}</strong> &middot; ${fmtDate(m.date)} &middot; <span class="sp-badge sp-badge-${m.status === 'accepted' ? 'green' : m.status === 'deleted' ? 'red' : 'amber'}">${esc(m.status)}</span></div>
+                        <div class="pr-msg-text">${esc(m.message)}</div>
+                    </div>
+                `).join('') : `<div class="pr-empty">No messages.</div>`}
+            </div>
+        `;
+    }
+
+</script>
+</body>
+</html>

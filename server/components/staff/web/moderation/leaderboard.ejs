@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('../partials/head', { title: 'Leaderboard' }) %></head>
+<body><script>if(localStorage.getItem('sp-dark')==='1')document.body.classList.add('dark');</script>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sp-layout">
+    <%- include('../partials/sidebar', { page: 'leaderboard' }) %>
+    <div class="sp-main">
+        <%- include('../partials/header', { title: 'Leaderboard', subtitle: 'Minigame high scores \u2014 spot the suspicious ones' }) %>
+        <main class="sp-content">
+            <div class="sp-search-bar">
+                <select class="sp-input" id="gameFilter" style="flex:0 0 auto;max-width:220px;">
+                    <option value="">All Games</option>
+                    <option value="1">Flutterby Field</option>
+                    <option value="2">En-Gen</option>
+                    <option value="4">Underground Disco</option>
+                    <option value="5">Ice-Scream</option>
+                    <option value="6">Moshling Boshling</option>
+                    <option value="7">Cleanup Moshlings</option>
+                    <option value="10">Quack Attack</option>
+                    <option value="11">Thump Glump</option>
+                    <option value="13">Shouty Shack</option>
+                    <option value="21">Beanstalk</option>
+                    <option value="22">Moshi vs Ghost</option>
+                    <option value="100">Daily Challenge</option>
+                    <option value="1000">Puzzle Palace Practice</option>
+                </select>
+                <input class="sp-input" type="text" id="searchInput" placeholder="Search by username">
+                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="doSearch()">Search</button>
+                <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearSearch()">Clear</button>
+            </div>
+            <div class="sp-card">
+                <div class="sp-table-wrap">
+                    <table class="sp-table">
+                        <thead>
+                            <tr><th>#</th><th>ID</th><th>Username</th><th>Game</th><th>Score</th><th>Date</th><th></th></tr>
+                        </thead>
+                        <tbody id="lbTable">
+                            <tr><td colspan="7" class="sp-table-empty">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="sp-pagination">
+                    <span class="sp-pagination-info" id="pageInfo"></span>
+                    <div style="display:flex;gap:8px;">
+                        <button id="prevBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(-1)">&#8249; Prev</button>
+                        <button id="nextBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(1)">Next &#8250;</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="sp-modal-overlay" id="confirmModal">
+    <div class="sp-modal">
+        <div class="sp-modal-header">
+            <h2 class="sp-modal-title">Delete Score Entry</h2>
+            <button class="sp-modal-close" onclick="closeConfirm()">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="sp-modal-body">
+            <p id="confirmText" style="margin:0;font-size:14px;color:#555575;font-weight:600;"></p>
+        </div>
+        <div class="sp-modal-actions">
+            <button class="sp-btn sp-btn-danger sp-btn-sm" onclick="confirmDelete()">Delete</button>
+            <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="closeConfirm()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    <%- include('../partials/scripts', { section: 'moderation' }) %>
+
+    const GAME_NAMES = {
+        1: 'Flutterby Field', 2: 'En-Gen', 4: 'Underground Disco', 5: 'Ice-Scream',
+        6: 'Moshling Boshling', 7: 'Cleanup Moshlings', 10: 'Quack Attack',
+        11: 'Thump Glump', 13: 'Shouty Shack', 21: 'Beanstalk',
+        22: 'Moshi vs Ghost', 100: 'Daily Challenge', 1000: 'Puzzle Palace Practice'
+    };
+
+    let currentPage = 1, totalPages = 1, currentGame = '', currentSearch = '';
+    let pendingDeleteId = null;
+
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
+
+    function gameBadge(id) {
+        const name = GAME_NAMES[id] || `Game ${id}`;
+        return `<span class="sp-badge sp-badge-purple">${name}</span>`;
+    }
+
+    async function loadLeaderboard() {
+        const tbody = document.getElementById('lbTable');
+        tbody.innerHTML = '<tr><td colspan="7" class="sp-table-empty">Loading...</td></tr>';
+        const params = new URLSearchParams({ page: currentPage, limit: 25 });
+        if (currentGame) params.set('game', currentGame);
+        if (currentSearch) params.set('search', currentSearch);
+        try {
+            const r = await fetch('/staff/api/social/leaderboard?' + params);
+            if (!r.ok) return;
+            const d = await r.json();
+            totalPages = Math.max(1, Math.ceil(d.total / d.limit));
+            document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} entries \u2014 page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+            if (!d.scores.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="sp-table-empty">No scores found.</td></tr>';
+                return;
+            }
+            const offset = (currentPage - 1) * 25;
+            tbody.innerHTML = d.scores.map((s, i) => `
+                <tr>
+                    <td style="color:#aaa;font-size:11px;font-weight:800;">${offset + i + 1}</td>
+                    <td style="color:#aaa;font-size:11px;">${s.id}</td>
+                    <td style="font-weight:800;">${s.username || `<span style="color:#aaa">User ${s.user_id}</span>`}</td>
+                    <td>${gameBadge(s.gameid)}</td>
+                    <td style="font-weight:900;font-size:15px;color:#1e1b2e;">${s.score?.toLocaleString() ?? '?'}</td>
+                    <td style="font-size:11px;color:#aaa;">${fmtDate(s.date)}</td>
+                    <td>
+                        <button class="sp-btn sp-btn-danger sp-btn-sm" onclick="promptDelete(${s.id}, '${(s.username || 'User ' + s.user_id).replace(/'/g, "\\'")}', ${s.gameid}, ${s.score})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch {}
+    }
+
+    function doSearch() {
+        currentGame = document.getElementById('gameFilter').value;
+        currentSearch = document.getElementById('searchInput').value.trim();
+        currentPage = 1;
+        loadLeaderboard();
+    }
+
+    function clearSearch() {
+        document.getElementById('gameFilter').value = '';
+        document.getElementById('searchInput').value = '';
+        currentGame = ''; currentSearch = ''; currentPage = 1;
+        loadLeaderboard();
+    }
+
+    function changePage(dir) { const n = currentPage + dir; if (n < 1 || n > totalPages) return; currentPage = n; loadLeaderboard(); }
+
+    function promptDelete(id, username, gameId, score) {
+        pendingDeleteId = id;
+        const gameName = GAME_NAMES[gameId] || `Game ${gameId}`;
+        document.getElementById('confirmText').textContent =
+            `Delete score of ${score?.toLocaleString()} by "${username}" in ${gameName}? This cannot be undone.`;
+        document.getElementById('confirmModal').classList.add('open');
+    }
+
+    function closeConfirm() { pendingDeleteId = null; document.getElementById('confirmModal').classList.remove('open'); }
+
+    async function confirmDelete() {
+        if (!pendingDeleteId) return;
+        const id = pendingDeleteId;
+        closeConfirm();
+        try {
+            const r = await fetch(`/staff/api/social/leaderboard/${id}`, { method: 'DELETE' });
+            if (r.ok) loadLeaderboard();
+        } catch {}
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    loadLeaderboard();
+</script>
+</body>
+</html>

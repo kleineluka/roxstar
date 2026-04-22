@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const ejs = require('ejs');
+
+function render(res, file, locals = {}) {
+    ejs.renderFile(path.join(__dirname, 'web', file), locals, {}, (err, html) => {
+        if (err) { console.error('EJS render error:', err); return res.status(500).send('Template error'); }
+        res.send(html);
+    });
+}
 const auth = require('./middleware/auth.js');
 const pretty = require('../utils/pretty.js');
 
@@ -29,13 +37,14 @@ router.use(auth.requireStaff);
 
 // web pages
 router.get('/', (req, res) => res.redirect('/staff/home'));
-router.get('/home', (req, res) => res.sendFile(path.join(__dirname, 'web', 'home.html')));
-router.get('/users', (req, res) => res.sendFile(path.join(__dirname, 'web', 'users.html')));
-router.get('/logs', (req, res) => res.sendFile(path.join(__dirname, 'web', 'logs.html')));
-router.get('/shops', (req, res) => res.sendFile(path.join(__dirname, 'web', 'shops.html')));
-router.get('/config', (req, res) => res.sendFile(path.join(__dirname, 'web', 'config.html')));
-router.get('/leaderboard', (req, res) => res.sendFile(path.join(__dirname, 'web', 'leaderboard.html')));
-router.get('/pinboard', (req, res) => res.sendFile(path.join(__dirname, 'web', 'pinboard.html')));
+router.get('/home', (req, res) => render(res, 'home.ejs'));
+router.get('/users', (req, res) => render(res, 'moderation/users.ejs'));
+router.get('/profile', (req, res) => render(res, 'moderation/profile.ejs'));
+router.get('/logs', (req, res) => render(res, 'moderation/logs.ejs'));
+router.get('/leaderboard', (req, res) => render(res, 'moderation/leaderboard.ejs'));
+router.get('/pinboard', (req, res) => render(res, 'moderation/pinboard.ejs'));
+router.get('/shops', (req, res) => render(res, 'management/shops.ejs'));
+router.get('/config', (req, res) => render(res, 'management/config.ejs'));
 
 // protected api
 router.use('/api/stats', apiStats);

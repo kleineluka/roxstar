@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pinboard  Staff Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/staff/assets/staff.css">
+<head><%- include('../partials/head', { title: 'Pinboard', extraStyles: `
     <style>
         .sp-pb-msg { font-size: 12px; color: #555575; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .sp-modal textarea.sp-input { border-radius: 12px; padding: 10px 14px; resize: vertical; min-height: 80px; width: 100%; font-family: inherit; }
@@ -15,75 +8,17 @@
         .sp-filter-tab { padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 800; border: 1.5px solid #d0d0e0; background: #fff; color: #555575; cursor: pointer; transition: background 0.12s, color 0.12s; }
         .sp-filter-tab.active { background: var(--btn-purple); color: #fff; border-color: var(--btn-purple); }
     </style>
-</head>
+` }) %></head>
 <body><script>if(localStorage.getItem('sp-dark')==='1')document.body.classList.add('dark');</script>
 <div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="sp-layout">
-    <aside class="sp-sidebar">
-        <div class="sp-sidebar-header">
-            <div class="sp-sidebar-label">Staff Panel</div>
-            <div class="sp-sidebar-user" id="staffName">Loading...</div>
-        </div>
-        <nav class="sp-sidebar-nav">
-            <a href="/staff/home" class="sp-nav-link">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Home
-            </a>
-            <div class="sp-nav-divider"></div>
-            <div class="sp-section-switcher">
-                <button class="sp-section-tab" data-section="moderation" onclick="setSection('moderation')">Mod</button>
-                <button class="sp-section-tab" data-section="management" onclick="setSection('management')">Mgmt</button>
-                <button class="sp-section-tab" data-section="development" onclick="setSection('development')">Dev</button>
-            </div>
-            <div class="sp-nav-section" data-section="moderation">
-                <a href="/staff/users" class="sp-nav-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Users
-                </a>
-                <a href="/staff/logs" class="sp-nav-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Logs
-                </a>
-                <a href="/staff/leaderboard" class="sp-nav-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-                    Leaderboard
-                </a>
-                <a href="/staff/pinboard" class="sp-nav-link active">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-                    Pinboard
-                </a>
-            </div>
-            <div class="sp-nav-section" data-section="management">
-                <a href="/staff/shops" class="sp-nav-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    Shops
-                </a>
-                <a href="/staff/config" class="sp-nav-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
-                    Config
-                </a>
-            </div>
-            <div class="sp-nav-section" data-section="development">
-                <span class="sp-nav-empty">Coming soon</span>
-            </div>
-        </nav>
-        <div class="sp-sidebar-footer">
-            <button class="sp-night-toggle" id="darkBtn" onclick="toggleDark()">☾ Night Mode</button>
-            <button class="sp-logout" onclick="logout()">Sign Out</button>
-        </div>
-    </aside>
-
+    <%- include('../partials/sidebar', { page: 'pinboard' }) %>
     <div class="sp-main">
-        <header class="sp-header">
-            <button class="sp-hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
-                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-            <div class="sp-header-text">
-                <h1>Pinboard</h1>
-                <p>View, moderate, and manage player message boards</p>
-            </div>
-            <button class="sp-btn sp-btn-success sp-btn-sm" onclick="openAddModal()" style="margin-left:auto;">+ Add Message</button>
-        </header>
+        <%- include('../partials/header', {
+            title: 'Pinboard',
+            subtitle: 'View, moderate, and manage player message boards',
+            actions: '<button class="sp-btn sp-btn-success sp-btn-sm" onclick="openAddModal()" style="margin-left:auto;">+ Add Message</button>'
+        }) %>
         <main class="sp-content">
             <div class="sp-search-bar" style="flex-wrap:wrap;gap:10px;">
                 <div class="sp-filter-tabs" id="filterTabs">
@@ -99,14 +34,11 @@
                     <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearSearch()">Clear</button>
                 </div>
             </div>
-
             <div class="sp-card">
                 <div class="sp-table-wrap">
                     <table class="sp-table">
                         <thead>
-                            <tr>
-                                <th>ID</th><th>Sender</th><th>Receiver</th><th>Message</th><th>Status</th><th>Reported By</th><th>Date</th><th></th>
-                            </tr>
+                            <tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Message</th><th>Status</th><th>Reported By</th><th>Date</th><th></th></tr>
                         </thead>
                         <tbody id="pbTable">
                             <tr><td colspan="8" class="sp-table-empty">Loading...</td></tr>
@@ -116,8 +48,8 @@
                 <div class="sp-pagination">
                     <span class="sp-pagination-info" id="pageInfo"></span>
                     <div style="display:flex;gap:8px;">
-                        <button id="prevBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(-1)"> Prev</button>
-                        <button id="nextBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(1)">Next </button>
+                        <button id="prevBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(-1)">&#8249; Prev</button>
+                        <button id="nextBtn" class="sp-btn sp-btn-ghost sp-btn-sm" onclick="changePage(1)">Next &#8250;</button>
                     </div>
                 </div>
             </div>
@@ -125,7 +57,6 @@
     </div>
 </div>
 
-<!-- edit message modal -->
 <div class="sp-modal-overlay" id="editModal">
     <div class="sp-modal">
         <div class="sp-modal-header">
@@ -146,7 +77,6 @@
     </div>
 </div>
 
-<!-- add message modal -->
 <div class="sp-modal-overlay" id="addModal">
     <div class="sp-modal">
         <div class="sp-modal-header">
@@ -176,7 +106,6 @@
     </div>
 </div>
 
-<!-- confirm delete modal -->
 <div class="sp-modal-overlay" id="confirmModal">
     <div class="sp-modal">
         <div class="sp-modal-header">
@@ -196,22 +125,19 @@
 </div>
 
 <script>
+    <%- include('../partials/scripts', { section: 'moderation' }) %>
+
     let currentPage = 1, totalPages = 1, currentStatus = 'all', currentSearch = '';
     let editingId = null, pendingDeleteId = null;
 
-    const STATUS_COLORS = {
-        pending: 'amber',
-        accepted: 'green',
-        reported: 'red',
-        deleted: 'slate',
-    };
+    const STATUS_COLORS = { pending: 'amber', accepted: 'green', reported: 'red', deleted: 'slate' };
+
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
 
     function statusBadge(s) {
         const c = STATUS_COLORS[s] || 'slate';
         return `<span class="sp-badge sp-badge-${c}">${s || '?'}</span>`;
     }
-
-    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
 
     function esc(str) {
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -228,7 +154,7 @@
             if (!r.ok) return;
             const d = await r.json();
             totalPages = Math.max(1, Math.ceil(d.total / d.limit));
-            document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} messages  page ${currentPage} of ${totalPages}`;
+            document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} messages \u2014 page ${currentPage} of ${totalPages}`;
             document.getElementById('prevBtn').disabled = currentPage <= 1;
             document.getElementById('nextBtn').disabled = currentPage >= totalPages;
             if (!d.messages.length) {
@@ -238,7 +164,7 @@
             tbody.innerHTML = d.messages.map(m => {
                 const senderLabel = m.sender_name ? `<strong>${esc(m.sender_name)}</strong> <span style="color:#aaa;font-size:10px;">#${m.sender}</span>` : `<span style="color:#aaa">#${m.sender}</span>`;
                 const receiverLabel = m.receiver_name ? `<strong>${esc(m.receiver_name)}</strong> <span style="color:#aaa;font-size:10px;">#${m.receiver}</span>` : `<span style="color:#aaa">#${m.receiver}</span>`;
-                const reportedBy = m.reported ? `<span style="color:#b91c1c;font-weight:700;">#${m.reported}</span>` : `<span style="color:#ccc">—</span>`;
+                const reportedBy = m.reported ? `<span style="color:#b91c1c;font-weight:700;">#${m.reported}</span>` : `<span style="color:#ccc">&mdash;</span>`;
                 const canApprove = m.status === 'pending' || m.status === 'reported';
                 const canDelete = m.status !== 'deleted';
                 const msgEscaped = esc(m.message || '').replace(/'/g, '&#39;');
@@ -263,33 +189,15 @@
     }
 
     function setStatus(s) {
-        currentStatus = s;
-        currentPage = 1;
+        currentStatus = s; currentPage = 1;
         document.querySelectorAll('.sp-filter-tab').forEach(b => b.classList.toggle('active', b.dataset.status === s));
         loadPinboard();
     }
 
-    function doSearch() {
-        currentSearch = document.getElementById('searchInput').value.trim();
-        currentPage = 1;
-        loadPinboard();
-    }
+    function doSearch() { currentSearch = document.getElementById('searchInput').value.trim(); currentPage = 1; loadPinboard(); }
+    function clearSearch() { document.getElementById('searchInput').value = ''; currentSearch = ''; currentPage = 1; loadPinboard(); }
+    function changePage(dir) { const n = currentPage + dir; if (n < 1 || n > totalPages) return; currentPage = n; loadPinboard(); }
 
-    function clearSearch() {
-        document.getElementById('searchInput').value = '';
-        currentSearch = '';
-        currentPage = 1;
-        loadPinboard();
-    }
-
-    function changePage(dir) {
-        const n = currentPage + dir;
-        if (n < 1 || n > totalPages) return;
-        currentPage = n;
-        loadPinboard();
-    }
-
-    // edit modal
     function openEdit(id, msg) {
         editingId = id;
         document.getElementById('editMsgId').textContent = id;
@@ -298,10 +206,7 @@
         document.getElementById('editModal').classList.add('open');
     }
 
-    function closeEdit() {
-        editingId = null;
-        document.getElementById('editModal').classList.remove('open');
-    }
+    function closeEdit() { editingId = null; document.getElementById('editModal').classList.remove('open'); }
 
     async function saveEdit() {
         const msg = document.getElementById('editMsgText').value;
@@ -325,7 +230,6 @@
         } catch {}
     }
 
-    // add modal
     function openAddModal() {
         document.getElementById('addSenderId').value = '';
         document.getElementById('addReceiverId').value = '';
@@ -334,9 +238,7 @@
         document.getElementById('addModal').classList.add('open');
     }
 
-    function closeAdd() {
-        document.getElementById('addModal').classList.remove('open');
-    }
+    function closeAdd() { document.getElementById('addModal').classList.remove('open'); }
 
     async function saveAdd() {
         const sid = document.getElementById('addSenderId').value.trim();
@@ -362,7 +264,6 @@
         } catch {}
     }
 
-    // approve
     async function approveMsg(id) {
         try {
             const r = await fetch(`/staff/api/social/pinboard/${id}/approve`, { method: 'POST' });
@@ -370,17 +271,13 @@
         } catch {}
     }
 
-    // delete
     function promptDelete(id) {
         pendingDeleteId = id;
         document.getElementById('confirmMsgId').textContent = id;
         document.getElementById('confirmModal').classList.add('open');
     }
 
-    function closeConfirm() {
-        pendingDeleteId = null;
-        document.getElementById('confirmModal').classList.remove('open');
-    }
+    function closeConfirm() { pendingDeleteId = null; document.getElementById('confirmModal').classList.remove('open'); }
 
     async function confirmDelete() {
         if (!pendingDeleteId) return;
@@ -394,40 +291,6 @@
 
     document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-    async function logout() {
-        await fetch('/staff/api/auth/logout', { method: 'POST' });
-        window.location.href = '/staff/login';
-    }
-
-    async function loadMe() {
-        try {
-            const r = await fetch('/staff/api/auth/me');
-            if (!r.ok) { window.location.href = '/staff/login'; return; }
-            document.getElementById('staffName').textContent = (await r.json()).username;
-        } catch { window.location.href = '/staff/login'; }
-    }
-
-    function toggleSidebar() {
-        document.querySelector('.sp-sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('open');
-    }
-
-    function toggleDark() {
-        const on = document.body.classList.toggle('dark');
-        localStorage.setItem('sp-dark', on ? '1' : '0');
-        document.getElementById('darkBtn').textContent = on ? '☀ Light Mode' : '☾ Night Mode';
-    }
-    if (document.body.classList.contains('dark')) document.getElementById('darkBtn').textContent = '☀ Light Mode';
-
-    const PAGE_SECTION = 'moderation';
-    function setSection(s) {
-        localStorage.setItem('sp-section', s);
-        document.querySelectorAll('.sp-section-tab').forEach(b => b.classList.toggle('active', b.dataset.section === s));
-        document.querySelectorAll('.sp-nav-section').forEach(d => d.classList.toggle('active', d.dataset.section === s));
-    }
-    setSection(PAGE_SECTION);
-
-    loadMe();
     loadPinboard();
 </script>
 </body>

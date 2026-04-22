@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('./partials/head', { title: 'Home' }) %></head>
+<body><script>if(localStorage.getItem('sp-dark')==='1')document.body.classList.add('dark');</script>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sp-layout">
+    <%- include('./partials/sidebar', { page: 'home' }) %>
+    <div class="sp-main">
+        <%- include('./partials/header', { title: 'Home', subtitle: "What's going on in Monstro City?" }) %>
+        <main class="sp-content">
+            <div class="sp-stats" id="statsGrid">
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+                <div class="sp-stat-card"><div class="sp-stat-label">Loading...</div><div class="sp-stat-value"></div></div>
+            </div>
+            <div class="sp-card">
+                <div class="sp-card-header">
+                    <h2>Recent Staff Activity</h2>
+                    <a href="/staff/logs">View all &#8250;</a>
+                </div>
+                <div id="recentLogs"><div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Loading...</div></div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    <%- include('./partials/scripts', { section: 'moderation' }) %>
+
+    function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
+
+    function severityBadge(severity) {
+        const severityMap = {
+            0: { text: 'CASUAL', color: 'green' },
+            1: { text: 'MODERATE', color: 'blue' },
+            2: { text: 'SEVERE', color: 'red' }
+        };
+        const s = severityMap[severity] || { text: 'UNKNOWN', color: 'slate' };
+        return `<span class="sp-badge sp-badge-${s.color}">${s.text}</span>`;
+    }
+
+    async function loadStats() {
+        try {
+            const r = await fetch('/staff/api/stats');
+            if (!r.ok) return;
+            const d = await r.json();
+            const items = [
+                ['Total Users', d.totalUsers, ''],
+                ['Active Today', d.activeToday, 'color:var(--btn-purple)'],
+                ['Active This Week', d.activeWeek, 'color:var(--btn-purple)'],
+                ['New Today', d.newToday, 'color:var(--btn-green)'],
+                ['Staff Accounts', d.staffCount, 'color:var(--btn-amber)'],
+                ['Log Entries', d.totalLogs, ''],
+            ];
+            document.getElementById('statsGrid').innerHTML = items.map(([label, value, style]) =>
+                `<div class="sp-stat-card"><div class="sp-stat-label">${label}</div><div class="sp-stat-value" style="${style}">${Number(value).toLocaleString()}</div></div>`
+            ).join('');
+        } catch {}
+    }
+
+    async function loadRecentLogs() {
+        try {
+            const r = await fetch('/staff/api/logs?limit=10');
+            if (!r.ok) return;
+            const d = await r.json();
+            if (!d.logs.length) {
+                document.getElementById('recentLogs').innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">No activity yet.</div>';
+                return;
+            }
+            document.getElementById('recentLogs').innerHTML = d.logs.map(log =>
+                `<div class="sp-log-row">
+                    <span class="sp-log-admin">${log.admin}</span>
+                    <span class="sp-log-payload">${log.event_description}</span>
+                    <span class="sp-log-severity">${severityBadge(log.severity)}</span>
+                    <span class="sp-log-date">${fmtDate(log.date)}</span>
+                </div>`
+            ).join('');
+        } catch {}
+    }
+
+    loadStats(); loadRecentLogs();
+</script>
+</body>
+</html>

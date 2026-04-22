@@ -5,8 +5,10 @@ const pretty = require('../../utils/pretty.js');
 const formats = require('../../utils/formats.js');
 const { logStaff } = require('../utils/log.js');
 
-// ===== PINBOARD =====
-
+/**
+ * GET /staff/api/social/pinboard
+ * Fetches a paginated list of pinboard messages, optionally filtered by status or sender/receiver username.
+ */
 router.get('/pinboard', async (req, res) => {
     try {
         const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -59,6 +61,10 @@ router.get('/pinboard', async (req, res) => {
     }
 });
 
+/**
+ * PUT /staff/api/social/pinboard/:id
+ * Updates the message text of a specific pinboard message.
+ */
 router.put('/pinboard/:id', express.json(), async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid message ID.' });
@@ -75,6 +81,10 @@ router.put('/pinboard/:id', express.json(), async (req, res) => {
     }
 });
 
+/**
+ * DELETE /staff/api/social/pinboard/:id
+ * Marks a pinboard message as deleted without removing it from the database.
+ */
 router.delete('/pinboard/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid message ID.' });
@@ -88,6 +98,10 @@ router.delete('/pinboard/:id', async (req, res) => {
     }
 });
 
+/**
+ * POST /staff/api/social/pinboard/:id/approve
+ * Approves a pinboard message by setting its status to 'accepted' and clearing any reports.
+ */
 router.post('/pinboard/:id/approve', async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid message ID.' });
@@ -101,6 +115,10 @@ router.post('/pinboard/:id/approve', async (req, res) => {
     }
 });
 
+/**
+ * POST /staff/api/social/pinboard
+ * Creates a new pinboard message on behalf of a user. Both sender and receiver must be specified.
+ */
 router.post('/pinboard', express.json(), async (req, res) => {
     const senderRaw = parseInt(req.body?.sender_id);
     const receiverRaw = parseInt(req.body?.receiver_id);
@@ -121,8 +139,10 @@ router.post('/pinboard', express.json(), async (req, res) => {
     }
 });
 
-// ===== LEADERBOARD =====
-
+/**
+ * GET /staff/api/social/leaderboard
+ * Fetches a paginated list of high scores, optionally filtered by game ID or player username.
+ */
 router.get('/leaderboard', async (req, res) => {
     try {
         const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -167,6 +187,10 @@ router.get('/leaderboard', async (req, res) => {
     }
 });
 
+/**
+ * DELETE /staff/api/social/leaderboard/:id
+ * Removes a high score entry from the leaderboard.
+ */
 router.delete('/leaderboard/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid score ID.' });

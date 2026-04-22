@@ -6,15 +6,15 @@
     --brand-dark:   #b0ba1a;
     --brand-darker: #8d940f;
     --brand-text:   #3b3f00;
-    --btn-purple:   #8B5CF6;
-    --btn-purple-d: #6D28D9;
+    --btn-purple:   #279DD7;
+    --btn-purple-d: #1b7aaa;
     --btn-green:    #22C55E;
     --btn-green-d:  #16A34A;
     --btn-red:      #EF4444;
     --btn-red-d:    #DC2626;
     --btn-amber:    #F59E0B;
     --btn-amber-d:  #D97706;
-    --sidebar-bg:   #1e1b2e;
+    --sidebar-bg:   #0d1e30;
     --sidebar-border: rgba(255,255,255,0.07);
     --card-bg:       #ffffff;
     --card-border:   #e8e8f0;
@@ -253,12 +253,12 @@ body {
 .sp-btn:active { transform: scale(0.96); }
 
 .sp-btn-primary {
-    background: linear-gradient(180deg, #9b72f8 0%, var(--btn-purple) 50%, var(--btn-purple-d) 100%);
+    background: linear-gradient(180deg, #5bc4f0 0%, var(--btn-purple) 50%, var(--btn-purple-d) 100%);
     color: #fff;
-    box-shadow: 0 4px 0 #4c1d95, 0 6px 16px rgba(109,40,217,0.35);
+    box-shadow: 0 4px 0 #0f4d6b, 0 6px 16px rgba(39,157,215,0.35);
     text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
-.sp-btn-primary:hover { filter: brightness(1.08); box-shadow: 0 5px 0 #4c1d95, 0 8px 20px rgba(109,40,217,0.4); }
+.sp-btn-primary:hover { filter: brightness(1.08); box-shadow: 0 5px 0 #0f4d6b, 0 8px 20px rgba(39,157,215,0.4); }
 
 .sp-btn-success {
     background: linear-gradient(180deg, #4ade80 0%, var(--btn-green) 50%, var(--btn-green-d) 100%);
@@ -325,7 +325,7 @@ body {
 
 .sp-input:focus {
     border-color: var(--btn-purple);
-    box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+    box-shadow: 0 0 0 3px rgba(39,157,215,0.15);
 }
 
 /* ---- Table ---- */
@@ -396,7 +396,8 @@ table.sp-table tbody tr:hover { background: #f8f8ff; }
 .sp-badge-green  { background: #dcfce7; color: #15803d; }
 .sp-badge-red    { background: #fee2e2; color: #b91c1c; }
 .sp-badge-amber  { background: #fef3c7; color: #b45309; }
-.sp-badge-purple { background: #ede9fe; color: #6d28d9; }
+.sp-badge-purple { background: #dbeeff; color: #0e6693; }
+.sp-badge-blue   { background: #dbeeff; color: #0e6693; }
 .sp-badge-slate  { background: #f1f5f9; color: #475569; }
 
 /* modal */
@@ -507,7 +508,7 @@ table.sp-table tbody tr:hover { background: #f8f8ff; }
 /* login page */
 .sp-login-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #2d1b6b 0%, #1e1b2e 60%, #0f172a 100%);
+    background: linear-gradient(135deg, #0a2540 0%, #0d1e30 60%, #060f1a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -585,7 +586,7 @@ table.sp-table tbody tr:hover { background: #f8f8ff; }
 
 .sp-field-input:focus {
     border-color: var(--btn-purple);
-    box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+    box-shadow: 0 0 0 4px rgba(39,157,215,0.15);
 }
 
 .sp-login-submit {

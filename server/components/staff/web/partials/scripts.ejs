@@ -1,0 +1,33 @@
+async function logout() {
+    await fetch('/staff/api/auth/logout', { method: 'POST' });
+    window.location.href = '/staff/login';
+}
+
+async function loadMe() {
+    try {
+        const r = await fetch('/staff/api/auth/me');
+        if (!r.ok) { window.location.href = '/staff/login'; return; }
+        document.getElementById('staffName').textContent = (await r.json()).username;
+    } catch { window.location.href = '/staff/login'; }
+}
+
+function toggleSidebar() {
+    document.querySelector('.sp-sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function toggleDark() {
+    const on = document.body.classList.toggle('dark');
+    localStorage.setItem('sp-dark', on ? '1' : '0');
+    document.getElementById('darkBtn').textContent = on ? '\u2600 Light Mode' : '\u263E Night Mode';
+}
+if (document.body.classList.contains('dark')) document.getElementById('darkBtn').textContent = '\u2600 Light Mode';
+
+const PAGE_SECTION = '<%= section %>';
+function setSection(s) {
+    localStorage.setItem('sp-section', s);
+    document.querySelectorAll('.sp-section-tab').forEach(b => b.classList.toggle('active', b.dataset.section === s));
+    document.querySelectorAll('.sp-nav-section').forEach(d => d.classList.toggle('active', d.dataset.section === s));
+}
+setSection(PAGE_SECTION);
+loadMe();
