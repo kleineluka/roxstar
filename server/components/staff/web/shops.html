@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shops  Staff Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/staff/assets/staff.css">
+    <style>
+        .sh-layout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
+
+        .sh-list {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: sticky;
+            top: 28px;
+            max-height: calc(100vh - 160px);
+            display: flex;
+            flex-direction: column;
+        }
+        .sh-list-header {
+            padding: 12px 16px;
+            border-bottom: 1.5px solid var(--card-border);
+            background: #fafafa;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #8080a8;
+            flex-shrink: 0;
+        }
+        .sh-list-scroll { overflow-y: auto; flex: 1; }
+
+        .sh-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2d2d3a;
+            background: none;
+            border: none;
+            border-bottom: 1px solid #f0f0f8;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+            font-family: var(--font-main);
+        }
+        .sh-item:last-child { border-bottom: none; }
+        .sh-item:hover { background: #f5f5ff; color: var(--btn-purple); }
+        .sh-item.active { background: var(--brand); color: var(--brand-text); }
+        .sh-item-info { flex: 1; min-width: 0; }
+        .sh-item-name { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-item-count { font-size: 10px; font-weight: 700; opacity: 0.65; margin-top: 1px; }
+        .sh-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .sh-item-dot.active { background: var(--btn-green); }
+        .sh-item-dot.inactive { background: #ccc; }
+
+        .sh-panel { display: flex; flex-direction: column; gap: 14px; }
+        .sh-panel-placeholder {
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            gap: 10px; min-height: 300px; color: #aaaacc; font-size: 14px; font-weight: 700;
+            background: var(--card-bg); border: 1.5px solid var(--card-border);
+            border-radius: 16px; box-shadow: var(--card-shadow);
+        }
+        .sh-panel-placeholder svg { opacity: 0.3; }
+
+        .sh-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .sh-panel-title { font-size: 15px; font-weight: 900; color: #1e1b2e; }
+        .sh-panel-actions { display: flex; gap: 8px; align-items: center; }
+
+        .sh-status { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; transition: opacity 0.3s; }
+        .sh-status.success { background: #dcfce7; color: #15803d; }
+        .sh-status.error   { background: #fee2e2; color: #b91c1c; }
+        .sh-status.hidden  { opacity: 0; pointer-events: none; }
+
+        .sh-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .sh-fields { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+        .sh-field-row { display: flex; align-items: center; gap: 12px; }
+        .sh-field-label {
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.08em; color: #8080a8; width: 110px; flex-shrink: 0;
+        }
+        .sh-field-input {
+            flex: 1; padding: 7px 14px; border: 1.5px solid #d0d0e8; border-radius: 8px;
+            font-size: 13px; font-family: var(--font-main); background: #f8f8ff;
+            color: #1e1b2e; outline: none; transition: border-color 0.15s;
+        }
+        .sh-field-input:focus { border-color: var(--btn-purple); }
+        .sh-field-input-sm { max-width: 130px; flex: none; }
+
+        .sh-toggle-wrap { display: flex; align-items: center; gap: 10px; }
+        .sh-toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+        .sh-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .sh-toggle-slider { position: absolute; inset: 0; background: #d0d0e0; border-radius: 999px; cursor: pointer; transition: background 0.2s; }
+        .sh-toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .sh-toggle input:checked + .sh-toggle-slider { background: var(--btn-green); }
+        .sh-toggle input:checked + .sh-toggle-slider::before { transform: translateX(18px); }
+        .sh-toggle-label { font-size: 12px; font-weight: 700; color: #7070a0; }
+
+        .sh-items-section { border-top: 1.5px solid var(--card-border); }
+        .sh-items-header {
+            padding: 10px 20px;
+            background: #fafafa;
+            border-bottom: 1.5px solid var(--card-border);
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 0.08em; color: #8080a8;
+        }
+        .sh-items-count { font-size: 10px; font-weight: 700; color: var(--btn-purple); }
+
+        .sh-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 14px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            border: none;
+            outline: none;
+            resize: vertical;
+            background: #fcfcff;
+            color: #1e1b2e;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .sh-type-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 999px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .sh-type-shop        { background: #ede9fe; color: #6d28d9; }
+        .sh-type-dressupshop { background: #fce7f3; color: #be185d; }
+        .sh-type-seedshop    { background: #dcfce7; color: #15803d; }
+        .sh-type-giftshop    { background: #fef9c3; color: #a16207; }
+
+        @media (max-width: 768px) {
+            .sh-layout { grid-template-columns: 1fr; }
+            .sh-list { position: static; max-height: 200px; }
+            .sh-panel-header { flex-wrap: wrap; }
+        }
+
+        body.dark .sh-list-header { background: #17152a; color: #6060a0; }
+        body.dark .sh-item { color: #c0c0e0; border-bottom-color: rgba(255,255,255,0.05); }
+        body.dark .sh-item:hover { background: #211e35; color: var(--btn-purple); }
+        body.dark .sh-item.active { background: var(--brand); color: var(--brand-text); }
+        body.dark .sh-items-header { background: #17152a; border-bottom-color: rgba(255,255,255,0.08); }
+        body.dark .sh-textarea { background: #17152a; color: #d0d0e8; }
+        body.dark .sh-field-input { background: #17152a; border-color: rgba(255,255,255,0.12); color: #d0d0e8; }
+        body.dark .sh-panel-title { color: #e8e8f8; }
+        body.dark .sh-panel-placeholder { color: #5858a0; }
+        body.dark .sh-fields { color: #d0d0e8; }
+
+        /* mode toggle */
+        .sh-mode-toggle { display: flex; background: #f0f0f8; border-radius: 999px; padding: 3px; gap: 2px; flex-shrink: 0; }
+        .sh-mode-btn { padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 800; border: none; cursor: pointer; background: none; color: #8080a8; font-family: var(--font-main); transition: background 0.15s, color 0.15s; }
+        .sh-mode-btn.active { background: #fff; color: #1e1b2e; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+        /* items toolbar */
+        .sh-items-toolbar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1.5px solid var(--card-border); background: #fafafa; flex-wrap: wrap; }
+        .sh-parsed-controls { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; flex-wrap: wrap; }
+
+        /* search */
+        .sh-cat-search { flex: 1; min-width: 120px; padding: 6px 12px; border: 1.5px solid #d0d0e8; border-radius: 999px; font-size: 12px; font-family: var(--font-main); outline: none; background: #f8f8ff; color: #2d2d3a; transition: border-color 0.15s; }
+        .sh-cat-search:focus { border-color: var(--btn-purple); }
+
+        /* catalog item list */
+        .sh-cat-list { max-height: 360px; overflow-y: auto; }
+
+        /* catalog item row */
+        .sh-cat-row { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid #f0f0f8; transition: background 0.1s; }
+        .sh-cat-row:last-child { border-bottom: none; }
+        .sh-cat-row:hover { background: #f8f8ff; }
+        .sh-cat-row-stocked { background: #f6fffe; }
+        .sh-cat-row-stocked:hover { background: #edfcf9; }
+
+        /* item info */
+        .sh-cat-info { flex: 1; min-width: 0; }
+        .sh-cat-name { display: block; font-size: 13px; font-weight: 700; color: #1e1b2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-cat-meta { font-size: 11px; color: #9090b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; margin-top: 1px; }
+        .sh-cat-id { font-size: 10px; color: #b0b0d0; font-family: monospace; flex-shrink: 0; white-space: nowrap; }
+
+        /* stock badges */
+        .sh-stock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; flex-shrink: 0; white-space: nowrap; }
+        .sh-badge-new      { background: #dcfce7; color: #15803d; }
+        .sh-badge-removing { background: #fee2e2; color: #b91c1c; }
+
+        /* add/remove buttons */
+        .sh-cat-btn { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; border: none; cursor: pointer; font-family: var(--font-main); transition: all 0.12s; flex-shrink: 0; white-space: nowrap; }
+        .sh-cat-btn-add    { background: #ede9fe; color: #6d28d9; }
+        .sh-cat-btn-add:hover    { background: #ddd6fe; }
+        .sh-cat-btn-remove { background: #fee2e2; color: #b91c1c; }
+        .sh-cat-btn-remove:hover { background: #fecaca; }
+
+        /* section divider + add toggle */
+        .sh-section-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1.5px solid #ebebf8; background: #f7f7fd; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: #8080a8; }
+        .sh-section-count { display: inline-flex; align-items: center; justify-content: center; padding: 1px 7px; border-radius: 999px; background: #e8e4ff; color: var(--btn-purple); font-size: 10px; font-weight: 900; margin-left: 6px; }
+        .sh-section-toggle { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1.5px solid #d0d0e8; background: #fff; color: #6060a8; cursor: pointer; font-family: var(--font-main); transition: all 0.12s; }
+        .sh-section-toggle:hover { background: #f0eeff; border-color: var(--btn-purple); color: var(--btn-purple); }
+        .sh-section-search { padding: 10px 16px 4px; }
+
+        /* pagination */
+        .sh-pagination { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 16px; border-top: 1px solid #f0f0f8; }
+        .sh-page-btn { padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1.5px solid #d0d0e8; background: none; color: #8080a8; cursor: pointer; font-family: var(--font-main); transition: all 0.12s; }
+        .sh-page-btn:hover { background: #f5f5ff; color: var(--btn-purple); border-color: var(--btn-purple); }
+        .sh-page-btn.active { background: var(--btn-purple); border-color: var(--btn-purple); color: #fff; }
+
+        /* dark overrides for new elements */
+        body.dark .sh-mode-toggle { background: rgba(255,255,255,0.07); }
+        body.dark .sh-mode-btn.active { background: #2a2640; color: #e0e0f4; }
+        body.dark .sh-items-toolbar { background: #17152a; border-bottom-color: rgba(255,255,255,0.08); }
+        body.dark .sh-cat-search { background: #211e35; border-color: rgba(255,255,255,0.12); color: #d0d0e8; }
+        body.dark .sh-cat-search::placeholder { color: #5858a0; }
+        body.dark .sh-section-header { background: #17152a; border-top-color: rgba(255,255,255,0.08); color: #5858a0; }
+        body.dark .sh-section-count { background: #2d1f5e; color: #c4b5fd; }
+        body.dark .sh-section-toggle { background: #211e35; border-color: rgba(255,255,255,0.12); color: #8080c0; }
+        body.dark .sh-section-toggle:hover { background: #2d2050; border-color: var(--btn-purple); color: #c4b5fd; }
+        body.dark .sh-pagination { border-top-color: rgba(255,255,255,0.05); }
+        body.dark .sh-page-btn { border-color: rgba(255,255,255,0.12); color: #6060a0; }
+        body.dark .sh-page-btn:hover { background: #211e35; color: var(--btn-purple); border-color: var(--btn-purple); }
+        body.dark .sh-page-btn.active { background: var(--btn-purple); border-color: var(--btn-purple); color: #fff; }
+        body.dark .sh-cat-row { border-bottom-color: rgba(255,255,255,0.05); }
+        body.dark .sh-cat-row:hover { background: #211e35; }
+        body.dark .sh-cat-row-stocked { background: #161f1e; }
+        body.dark .sh-cat-row-stocked:hover { background: #1c2a28; }
+        body.dark .sh-cat-name { color: #d0d0e8; }
+        body.dark .sh-cat-meta { color: #5858a0; }
+        body.dark .sh-cat-id { color: #4848a0; }
+        body.dark .sh-cat-btn-add    { background: #2d1f5e; color: #c4b5fd; }
+        body.dark .sh-cat-btn-add:hover    { background: #3d2a7a; }
+        body.dark .sh-cat-btn-remove { background: #3b1515; color: #fca5a5; }
+        body.dark .sh-cat-btn-remove:hover { background: #4a1c1c; }
+    </style>
+</head>
+<body><script>if(localStorage.getItem('sp-dark')==='1')document.body.classList.add('dark');</script>
+<div class="sp-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sp-layout">
+    <aside class="sp-sidebar">
+        <div class="sp-sidebar-header">
+            <div class="sp-sidebar-label">Staff Panel</div>
+            <div class="sp-sidebar-user" id="staffName">Loading...</div>
+        </div>
+        <nav class="sp-sidebar-nav">
+            <a href="/staff/home" class="sp-nav-link">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Home
+            </a>
+            <div class="sp-nav-divider"></div>
+            <div class="sp-section-switcher">
+                <button class="sp-section-tab" data-section="moderation" onclick="setSection('moderation')">Mod</button>
+                <button class="sp-section-tab" data-section="management" onclick="setSection('management')">Mgmt</button>
+                <button class="sp-section-tab" data-section="development" onclick="setSection('development')">Dev</button>
+            </div>
+            <div class="sp-nav-section" data-section="moderation">
+                <a href="/staff/users" class="sp-nav-link">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Users
+                </a>
+                <a href="/staff/logs" class="sp-nav-link">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Logs
+                </a>
+                <a href="/staff/leaderboard" class="sp-nav-link">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    Leaderboard
+                </a>
+                <a href="/staff/pinboard" class="sp-nav-link">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                    Pinboard
+                </a>
+            </div>
+            <div class="sp-nav-section" data-section="management">
+                <a href="/staff/shops" class="sp-nav-link active">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    Shops
+                </a>
+                <a href="/staff/config" class="sp-nav-link">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
+                    Config
+                </a>
+            </div>
+            <div class="sp-nav-section" data-section="development">
+                <span class="sp-nav-empty">Coming soon</span>
+            </div>
+        </nav>
+        <div class="sp-sidebar-footer">
+            <button class="sp-night-toggle" id="darkBtn" onclick="toggleDark()">☾ Night Mode</button>
+            <button class="sp-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="sp-main">
+        <header class="sp-header">
+            <button class="sp-hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="sp-header-text">
+                <h1>Shop Manager</h1>
+                <p>Edit what items are sold in each shop</p>
+            </div>
+        </header>
+        <main class="sp-content">
+            <div class="sh-layout">
+                <div class="sh-list">
+                    <div class="sh-list-header">Shops</div>
+                    <div class="sh-list-scroll" id="shopList">
+                        <div style="padding:20px;text-align:center;color:#aaa;font-size:12px;">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="sh-panel" id="shopPanel">
+                    <div class="sh-panel-placeholder">
+                        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        Select a shop to edit
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    let currentShopId = null;
+    let isDirty = false;
+    let currentMode = 'parsed';
+    let catalogItems = [];
+    let stockedIds = new Set();
+    let originalIds = new Set();
+    let catalogSearch = '';
+    let currentShopType = '';
+    const PAGE_SIZE = 25;
+    let addPage = 0;
+    let addOpen = false;
+
+    function esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function logout() {
+        await fetch('/staff/api/auth/logout', { method: 'POST' });
+        window.location.href = '/staff/login';
+    }
+
+    function typeBadge(type) {
+        const map = { shop: 'sh-type-shop', dressupshop: 'sh-type-dressupshop', seedshop: 'sh-type-seedshop', giftshop: 'sh-type-giftshop' };
+        return `<span class="sh-type-badge ${map[type] || 'sh-type-shop'}">${esc(type)}</span>`;
+    }
+
+    function markDirty() { isDirty = true; }
+
+    function showStatus(msg, cls) {
+        const el = document.getElementById('saveStatus');
+        if (!el) return;
+        el.textContent = msg;
+        el.className = `sh-status ${cls}`;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.className = 'sh-status hidden', 3000);
+    }
+
+    function updateCountBadge() {
+        const el = document.getElementById('itemCount');
+        if (el) el.textContent = `${stockedIds.size} in stock`;
+    }
+
+    // --- shop list ---
+    async function loadShopList() {
+        const list = document.getElementById('shopList');
+        try {
+            const r = await fetch('/staff/api/shops');
+            if (!r.ok) { list.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:12px;">Failed to load.</div>'; return; }
+            const d = await r.json();
+            list.innerHTML = d.shops.map(s => `
+                <button class="sh-item" data-id="${esc(s.id)}" onclick="openShop('${esc(s.id)}')">
+                    <span class="sh-item-dot ${s.status ? 'active' : 'inactive'}"></span>
+                    <span class="sh-item-info">
+                        <div class="sh-item-name">${esc(s.name)}</div>
+                        <div class="sh-item-count">${s.itemCount} items &middot; ${esc(s.type)}</div>
+                    </span>
+                </button>`).join('');
+        } catch {
+            list.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:12px;">Error loading shops.</div>';
+        }
+    }
+
+    // --- open shop ---
+    async function openShop(id) {
+        if (isDirty && !confirm('You have unsaved changes. Discard them?')) return;
+        isDirty = false;
+        currentShopId = id;
+        currentMode = 'parsed';
+        stockedIds = new Set();
+        originalIds = new Set();
+        catalogItems = [];
+        catalogSearch = '';
+        addPage = 0;
+        addOpen = false;
+
+        document.querySelectorAll('.sh-item').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+
+        const panel = document.getElementById('shopPanel');
+        panel.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;font-size:13px;">Loading...</div>';
+
+        try {
+            const shopRes = await fetch(`/staff/api/shops/${id}`);
+            if (!shopRes.ok) throw new Error('shop');
+            const s = await shopRes.json();
+            currentShopType = s.type;
+
+            const ids = s.itemIds ? s.itemIds.split(',').map(x => x.trim()).filter(Boolean) : [];
+            stockedIds  = new Set(ids);
+            originalIds = new Set(ids);
+
+            if (s.type !== 'giftshop') {
+                const catRes = await fetch(`/staff/api/shops/catalog/${s.type}`);
+                if (catRes.ok) catalogItems = (await catRes.json()).items || [];
+            }
+
+            renderPanel(s);
+        } catch {
+            panel.innerHTML = '<div style="padding:40px;text-align:center;color:#f00;font-size:13px;">Failed to load shop.</div>';
+        }
+    }
+
+    // --- panel render ---
+    function renderPanel(s) {
+        const isGiftShop = s.type === 'giftshop';
+        const panel = document.getElementById('shopPanel');
+        panel.innerHTML = `
+            <div class="sh-panel-header">
+                <div>
+                    <div class="sh-panel-title">${esc(s.name)}</div>
+                    <div style="margin-top:4px;">${typeBadge(s.type)}</div>
+                </div>
+                <div class="sh-panel-actions">
+                    <span class="sh-status hidden" id="saveStatus"></span>
+                    <button class="sp-btn sp-btn-success sp-btn-sm" onclick="saveShop()">Save Changes</button>
+                </div>
+            </div>
+
+            <div class="sh-card">
+                <div class="sh-fields">
+                    <div class="sh-field-row">
+                        <span class="sh-field-label">Status</span>
+                        <label class="sh-toggle-wrap">
+                            <label class="sh-toggle">
+                                <input type="checkbox" id="shopStatus" ${s.status ? 'checked' : ''}
+                                    onchange="markDirty();document.getElementById('statusLabel').textContent=this.checked?'Active':'Inactive'">
+                                <span class="sh-toggle-slider"></span>
+                            </label>
+                            <span class="sh-toggle-label" id="statusLabel">${s.status ? 'Active' : 'Inactive'}</span>
+                        </label>
+                    </div>
+                    <div class="sh-field-row">
+                        <span class="sh-field-label">Randomise</span>
+                        <label class="sh-toggle-wrap">
+                            <label class="sh-toggle">
+                                <input type="checkbox" id="shopRandomize" ${s.randomize ? 'checked' : ''} onchange="markDirty()">
+                                <span class="sh-toggle-slider"></span>
+                            </label>
+                            <span class="sh-toggle-label">Shuffle item order</span>
+                        </label>
+                    </div>
+                    <div class="sh-field-row">
+                        <span class="sh-field-label">Max to Show</span>
+                        <input type="number" id="shopMaxToShow" class="sh-field-input sh-field-input-sm"
+                            value="${s.maxToShow}" min="1" oninput="markDirty()">
+                    </div>
+                    <div class="sh-field-row">
+                        <span class="sh-field-label">Discount %</span>
+                        <input type="number" id="shopDiscount" class="sh-field-input sh-field-input-sm"
+                            value="${s.discount ?? 0}" min="0" max="100" oninput="markDirty()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sh-card" id="itemsCard">
+                <div class="sh-items-toolbar">
+                    <div class="sh-mode-toggle" ${isGiftShop ? 'style="display:none"' : ''}>
+                        <button class="sh-mode-btn active" id="modeParsed" onclick="setMode('parsed')">Parsed</button>
+                        <button class="sh-mode-btn" id="modeRaw" onclick="setMode('raw')">Raw</button>
+                    </div>
+                    <span class="sh-items-count" id="itemCount">${stockedIds.size} in stock</span>
+                </div>
+                <div id="itemsContent"></div>
+            </div>`;
+
+        if (isGiftShop) {
+            document.getElementById('itemsContent').innerHTML =
+                '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;font-weight:700;">Gift shops use a fixed catalog — item IDs are not configurable here.</div>';
+        } else {
+            renderItemsArea();
+        }
+    }
+
+    // --- items area ---
+    function renderItemsArea() {
+        if (currentMode === 'parsed') renderParsed();
+        else renderRaw();
+    }
+
+    function renderParsed() {
+        const content = document.getElementById('itemsContent');
+        if (!content) return;
+        updateCountBadge();
+
+        const catMap = new Map(catalogItems.map(i => [i.id, i]));
+
+        // --- stocked section ---
+        const stockedList = [...stockedIds].sort((a, b) => {
+            const na = catMap.get(a)?.name || a, nb = catMap.get(b)?.name || b;
+            return na.localeCompare(nb);
+        });
+        const stockedRows = stockedList.map(id => {
+            const item  = catMap.get(id);
+            const isNew = !originalIds.has(id);
+            const meta  = item ? [item.type, item.rocks ? `🪨 ${item.rocks}` : '', item.level ? `Lv.${item.level}` : ''].filter(Boolean).join(' · ') : '';
+            const name  = item ? esc(item.name) : `<span style="color:#aaa;font-style:italic;">Unknown item</span>`;
+            const badge = isNew ? '<span class="sh-stock-badge sh-badge-new">+ Added</span>' : '';
+            return `<div class="sh-cat-row sh-cat-row-stocked">
+                <div class="sh-cat-info">
+                    <span class="sh-cat-name">${name}</span>
+                    ${meta ? `<span class="sh-cat-meta">${esc(meta)}</span>` : ''}
+                </div>
+                <span class="sh-cat-id">#${esc(id)}</span>
+                ${badge}
+                <button class="sh-cat-btn sh-cat-btn-remove" onclick="removeItem('${esc(id)}')">Remove</button>
+            </div>`;
+        }).join('');
+        const stockedSection = stockedIds.size === 0
+            ? '<div style="padding:20px 16px;text-align:center;color:#aaa;font-size:13px;font-weight:700;">No items in stock yet.</div>'
+            : `<div class="sh-cat-list">${stockedRows}</div>`;
+
+        // --- add section ---
+        const q = catalogSearch.toLowerCase();
+        const addCandidates = catalogItems.filter(item =>
+            !stockedIds.has(item.id) &&
+            (!q || item.name.toLowerCase().includes(q) || String(item.id).includes(q))
+        ).sort((a, b) => a.name.localeCompare(b.name));
+
+        const totalAdd   = addCandidates.length;
+        const totalPages = Math.max(1, Math.ceil(totalAdd / PAGE_SIZE));
+        addPage = Math.min(addPage, totalPages - 1);
+        const pageItems  = addCandidates.slice(addPage * PAGE_SIZE, (addPage + 1) * PAGE_SIZE);
+
+        const addRows = pageItems.map(item => {
+            const isRemoving = originalIds.has(item.id);
+            const meta  = [item.type, item.rocks ? `🪨 ${item.rocks}` : '', item.level ? `Lv.${item.level}` : ''].filter(Boolean).join(' · ');
+            const badge = isRemoving ? '<span class="sh-stock-badge sh-badge-removing">− Removing</span>' : '';
+            return `<div class="sh-cat-row">
+                <div class="sh-cat-info">
+                    <span class="sh-cat-name">${esc(item.name)}</span>
+                    <span class="sh-cat-meta">${esc(meta)}</span>
+                </div>
+                <span class="sh-cat-id">#${esc(item.id)}</span>
+                ${badge}
+                <button class="sh-cat-btn sh-cat-btn-add" onclick="addItem('${esc(item.id)}')">+ Add</button>
+            </div>`;
+        }).join('');
+
+        let paginationHtml = '';
+        if (totalPages > 1) {
+            const btns = [];
+            for (let i = 0; i < totalPages; i++)
+                btns.push(`<button class="sh-page-btn${i === addPage ? ' active' : ''}" onclick="setAddPage(${i})">${i + 1}</button>`);
+            paginationHtml = `<div class="sh-pagination">${btns.join('')}</div>`;
+        }
+
+        const addInner = !addOpen ? '' : `
+            <div class="sh-section-search">
+                <input type="text" class="sh-cat-search" id="catSearch"
+                    placeholder="Search by name or ID…" oninput="onSearch()" value="${esc(catalogSearch)}">
+            </div>
+            ${totalAdd === 0
+                ? '<div style="padding:16px;text-align:center;color:#aaa;font-size:13px;font-weight:700;">No items to add.</div>'
+                : `<div class="sh-cat-list">${addRows}</div>${paginationHtml}`
+            }`;
+
+        content.innerHTML = `
+            ${stockedSection}
+            <div class="sh-section-header">
+                <span>Add Items${totalAdd > 0 ? ` <span class="sh-section-count">${totalAdd}</span>` : ''}</span>
+                <button class="sh-section-toggle" onclick="toggleAddSection()">${addOpen ? '▴ Collapse' : '▾ Expand'}</button>
+            </div>
+            <div id="addSection">${addInner}</div>`;
+
+        if (addOpen) {
+            const inp = document.getElementById('catSearch');
+            if (inp) inp.focus();
+        }
+    }
+
+    function renderRaw() {
+        const content = document.getElementById('itemsContent');
+        if (!content) return;
+        const rawVal = [...stockedIds].join(', ');
+        content.innerHTML = `<textarea class="sh-textarea" id="shopItemIds" spellcheck="false"
+            placeholder="Comma-separated item IDs, e.g. 1, 2, 3"
+            oninput="onRawInput()">${esc(rawVal)}</textarea>`;
+        updateCountBadge();
+    }
+
+    // --- mode switching ---
+    function setMode(m) {
+        if (m === currentMode) return;
+        if (m === 'parsed') syncFromRaw();
+        currentMode = m;
+        document.getElementById('modeParsed').classList.toggle('active', m === 'parsed');
+        document.getElementById('modeRaw').classList.toggle('active', m === 'raw');
+        renderItemsArea();
+    }
+
+    function syncFromRaw() {
+        const ta = document.getElementById('shopItemIds');
+        if (!ta) return;
+        stockedIds = new Set(ta.value.split(',').map(s => s.trim()).filter(Boolean));
+    }
+
+    function onRawInput() {
+        const ta = document.getElementById('shopItemIds');
+        if (!ta) return;
+        stockedIds = new Set(ta.value.split(',').map(s => s.trim()).filter(Boolean));
+        markDirty();
+        updateCountBadge();
+    }
+
+    // --- catalog interactions ---
+    function addItem(id) {
+        stockedIds.add(id);
+        markDirty();
+        renderParsed();
+    }
+
+    function removeItem(id) {
+        stockedIds.delete(id);
+        markDirty();
+        renderParsed();
+    }
+
+    function onSearch() {
+        catalogSearch = document.getElementById('catSearch')?.value || '';
+        addPage = 0;
+        renderParsed();
+    }
+
+    function toggleAddSection() {
+        addOpen = !addOpen;
+        if (!addOpen) catalogSearch = '';
+        addPage = 0;
+        renderParsed();
+    }
+
+    function setAddPage(p) { addPage = p; renderParsed(); }
+
+    // --- save ---
+    async function saveShop() {
+        if (!currentShopId) return;
+        if (currentMode === 'raw') syncFromRaw();
+        const body = {
+            status:    document.getElementById('shopStatus').checked,
+            randomize: document.getElementById('shopRandomize').checked,
+            maxToShow: document.getElementById('shopMaxToShow').value,
+            discount:  document.getElementById('shopDiscount').value,
+            itemIds:   [...stockedIds].join(','),
+        };
+        try {
+            const r = await fetch(`/staff/api/shops/${currentShopId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            const d = await r.json();
+            if (!r.ok) { showStatus(d.error || 'Save failed.', 'error'); return; }
+            isDirty = false;
+            originalIds = new Set(stockedIds);
+            showStatus('Saved!', 'success');
+            if (currentMode === 'parsed') { addPage = 0; renderParsed(); }
+            updateCountBadge();
+            const listItem = document.querySelector(`.sh-item[data-id="${currentShopId}"]`);
+            if (listItem) {
+                listItem.querySelector('.sh-item-count').textContent = `${stockedIds.size} items · ${d.shop.type}`;
+                listItem.querySelector('.sh-item-dot').className = `sh-item-dot ${body.status ? 'active' : 'inactive'}`;
+            }
+        } catch { showStatus('Network error.', 'error'); }
+    }
+
+    async function loadMe() {
+        try {
+            const r = await fetch('/staff/api/auth/me');
+            if (!r.ok) { window.location.href = '/staff/login'; return; }
+            document.getElementById('staffName').textContent = (await r.json()).username;
+        } catch { window.location.href = '/staff/login'; }
+    }
+
+    function toggleSidebar() {
+        document.querySelector('.sp-sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+
+    function toggleDark() {
+        const on = document.body.classList.toggle('dark');
+        localStorage.setItem('sp-dark', on ? '1' : '0');
+        document.getElementById('darkBtn').textContent = on ? '☀ Light Mode' : '☾ Night Mode';
+    }
+    if (document.body.classList.contains('dark')) document.getElementById('darkBtn').textContent = '☀ Light Mode';
+
+    const PAGE_SECTION = 'management';
+    function setSection(s) {
+        localStorage.setItem('sp-section', s);
+        document.querySelectorAll('.sp-section-tab').forEach(b => b.classList.toggle('active', b.dataset.section === s));
+        document.querySelectorAll('.sp-nav-section').forEach(d => d.classList.toggle('active', d.dataset.section === s));
+    }
+    setSection(PAGE_SECTION);
+
+    loadMe();
+    loadShopList();
+</script>
+</body>
+</html>

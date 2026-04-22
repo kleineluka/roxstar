@@ -14,6 +14,7 @@ const header_styling = {
     'SESSION MANAGER': chalk.greenBright,
     'SERVER': chalk.blueBright,
     'ROUTING': chalk.yellowBright,
+    "STAFF": chalk.grey,
 };
 
 const request_styling = {

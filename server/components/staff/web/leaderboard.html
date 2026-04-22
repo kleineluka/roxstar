@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logs  Staff Panel</title>
+    <title>Leaderboard  Staff Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -33,11 +33,11 @@
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Users
                 </a>
-                <a href="/staff/logs" class="sp-nav-link active">
+                <a href="/staff/logs" class="sp-nav-link">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                     Logs
                 </a>
-                <a href="/staff/leaderboard" class="sp-nav-link">
+                <a href="/staff/leaderboard" class="sp-nav-link active">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
                     Leaderboard
                 </a>
@@ -72,25 +72,43 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <div class="sp-header-text">
-                <h1>Staff Logs</h1>
-                <p>Audit trail of all staff actions</p>
+                <h1>Leaderboard</h1>
+                <p>Minigame high scores — spot the suspicious ones</p>
             </div>
         </header>
         <main class="sp-content">
             <div class="sp-search-bar">
-                <input class="sp-input" type="text" id="adminFilter" placeholder="Filter by admin username">
-                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="doFilter()">Filter</button>
-                <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearFilter()">Clear</button>
+                <select class="sp-input" id="gameFilter" style="flex:0 0 auto;max-width:220px;">
+                    <option value="">All Games</option>
+                    <option value="1">Flutterby Field</option>
+                    <option value="2">En-Gen</option>
+                    <option value="4">Underground Disco</option>
+                    <option value="5">Ice-Scream</option>
+                    <option value="6">Moshling Boshling</option>
+                    <option value="7">Cleanup Moshlings</option>
+                    <option value="10">Quack Attack</option>
+                    <option value="11">Thump Glump</option>
+                    <option value="13">Shouty Shack</option>
+                    <option value="21">Beanstalk</option>
+                    <option value="22">Moshi vs Ghost</option>
+                    <option value="100">Daily Challenge</option>
+                    <option value="1000">Puzzle Palace Practice</option>
+                </select>
+                <input class="sp-input" type="text" id="searchInput" placeholder="Search by username">
+                <button class="sp-btn sp-btn-primary sp-btn-sm" onclick="doSearch()">Search</button>
+                <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="clearSearch()">Clear</button>
             </div>
 
             <div class="sp-card">
                 <div class="sp-table-wrap">
                     <table class="sp-table">
                         <thead>
-                            <tr><th>ID</th><th>Admin</th><th>Event</th><th>Description</th><th>Severity</th><th>Date</th></tr>
+                            <tr>
+                                <th>#</th><th>ID</th><th>Username</th><th>Game</th><th>Score</th><th>Date</th><th></th>
+                            </tr>
                         </thead>
-                        <tbody id="logsTable">
-                            <tr><td colspan="6" class="sp-table-empty">Loading...</td></tr>
+                        <tbody id="lbTable">
+                            <tr><td colspan="7" class="sp-table-empty">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -105,75 +123,131 @@
         </main>
     </div>
 </div>
-<script>
-    let currentPage = 1, totalPages = 1, currentAdmin = '';
 
-    const ACTION_MAP = {
-        ban:          'red',
-        unban:        'green',
-        set_staff:    'purple',
-        set_rocks:    'amber',
-        edit_config:  'slate',
-        staff_login:  'green',
-        staff_logout: 'slate',
+<!-- confirm delete modal -->
+<div class="sp-modal-overlay" id="confirmModal">
+    <div class="sp-modal">
+        <div class="sp-modal-header">
+            <h2 class="sp-modal-title">Delete Score Entry</h2>
+            <button class="sp-modal-close" onclick="closeConfirm()">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="sp-modal-body">
+            <p id="confirmText" style="margin:0;font-size:14px;color:#555575;font-weight:600;"></p>
+        </div>
+        <div class="sp-modal-actions">
+            <button class="sp-btn sp-btn-danger sp-btn-sm" onclick="confirmDelete()">Delete</button>
+            <button class="sp-btn sp-btn-ghost sp-btn-sm" onclick="closeConfirm()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const GAME_NAMES = {
+        1: 'Flutterby Field', 2: 'En-Gen', 4: 'Underground Disco', 5: 'Ice-Scream',
+        6: 'Moshling Boshling', 7: 'Cleanup Moshlings', 10: 'Quack Attack',
+        11: 'Thump Glump', 13: 'Shouty Shack', 21: 'Beanstalk',
+        22: 'Moshi vs Ghost', 100: 'Daily Challenge', 1000: 'Puzzle Palace Practice'
     };
 
-    function severityBadge(severity) {
-        const severityMap = {
-            0: { text: 'CASUAL', color: 'green' },
-            1: { text: 'MODERATE', color: 'blue' },
-            2: { text: 'SEVERE', color: 'red' }
-        };
-        const s = severityMap[severity] || { text: 'UNKNOWN', color: 'slate' };
-        return `<span class="sp-badge sp-badge-${s.color}">${s.text}</span>`;
-    }
+    let currentPage = 1, totalPages = 1, currentGame = '', currentSearch = '';
+    let pendingDeleteId = null;
 
-    async function logout() {
-        await fetch('/staff/api/auth/logout', { method: 'POST' });
-        window.location.href = '/staff/login';
+    function gameBadge(id) {
+        const name = GAME_NAMES[id] || `Game ${id}`;
+        return `<span class="sp-badge sp-badge-purple">${name}</span>`;
     }
 
     function fmtDate(unix) { return unix ? new Date(unix * 1000).toLocaleString() : ''; }
 
-    function actionBadge(action) {
-        const c = ACTION_MAP[action] || 'slate';
-        return `<span class="sp-badge sp-badge-${c}">${action || '?'}</span>`;
-    }
-
-    async function loadLogs() {
-        const tbody = document.getElementById('logsTable');
-        tbody.innerHTML = '<tr><td colspan="6" class="sp-table-empty">Loading...</td></tr>';
+    async function loadLeaderboard() {
+        const tbody = document.getElementById('lbTable');
+        tbody.innerHTML = '<tr><td colspan="7" class="sp-table-empty">Loading...</td></tr>';
         const params = new URLSearchParams({ page: currentPage, limit: 25 });
-        if (currentAdmin) params.set('admin', currentAdmin);
+        if (currentGame) params.set('game', currentGame);
+        if (currentSearch) params.set('search', currentSearch);
         try {
-            const r = await fetch('/staff/api/logs?' + params);
+            const r = await fetch('/staff/api/social/leaderboard?' + params);
             if (!r.ok) return;
             const d = await r.json();
             totalPages = Math.max(1, Math.ceil(d.total / d.limit));
             document.getElementById('pageInfo').textContent = `${d.total.toLocaleString()} entries  page ${currentPage} of ${totalPages}`;
             document.getElementById('prevBtn').disabled = currentPage <= 1;
             document.getElementById('nextBtn').disabled = currentPage >= totalPages;
-            if (!d.logs.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="sp-table-empty">No logs found.</td></tr>';
+            if (!d.scores.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="sp-table-empty">No scores found.</td></tr>';
                 return;
             }
-            tbody.innerHTML = d.logs.map(log => {
-                return `<tr>
-                    <td style="color:#aaa;font-size:11px">${log.id}</td>
-                    <td style="font-weight:800;color:var(--btn-purple)">${log.admin}</td>
-                    <td>${actionBadge(log.event_name)}</td>
-                    <td style="font-size:12px;color:#777">${log.event_description}</td>
-                    <td>${severityBadge(log.severity)}</td>
-                    <td style="font-size:11px;color:#aaa">${fmtDate(log.date)}</td>
-                </tr>`;
-            }).join('');
+            const offset = (currentPage - 1) * 25;
+            tbody.innerHTML = d.scores.map((s, i) => `
+                <tr>
+                    <td style="color:#aaa;font-size:11px;font-weight:800;">${offset + i + 1}</td>
+                    <td style="color:#aaa;font-size:11px;">${s.id}</td>
+                    <td style="font-weight:800;">${s.username || `<span style="color:#aaa">User ${s.user_id}</span>`}</td>
+                    <td>${gameBadge(s.gameid)}</td>
+                    <td style="font-weight:900;font-size:15px;color:#1e1b2e;">${s.score?.toLocaleString() ?? '?'}</td>
+                    <td style="font-size:11px;color:#aaa;">${fmtDate(s.date)}</td>
+                    <td>
+                        <button class="sp-btn sp-btn-danger sp-btn-sm" onclick="promptDelete(${s.id}, '${(s.username || 'User ' + s.user_id).replace(/'/g, "\\'")}', ${s.gameid}, ${s.score})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
         } catch {}
     }
 
-    function doFilter() { currentAdmin = document.getElementById('adminFilter').value.trim(); currentPage = 1; loadLogs(); }
-    function clearFilter() { document.getElementById('adminFilter').value = ''; currentAdmin = ''; currentPage = 1; loadLogs(); }
-    function changePage(dir) { const n = currentPage + dir; if (n < 1 || n > totalPages) return; currentPage = n; loadLogs(); }
-    document.getElementById('adminFilter').addEventListener('keydown', e => { if (e.key === 'Enter') doFilter(); });
+    function doSearch() {
+        currentGame = document.getElementById('gameFilter').value;
+        currentSearch = document.getElementById('searchInput').value.trim();
+        currentPage = 1;
+        loadLeaderboard();
+    }
+
+    function clearSearch() {
+        document.getElementById('gameFilter').value = '';
+        document.getElementById('searchInput').value = '';
+        currentGame = '';
+        currentSearch = '';
+        currentPage = 1;
+        loadLeaderboard();
+    }
+
+    function changePage(dir) {
+        const n = currentPage + dir;
+        if (n < 1 || n > totalPages) return;
+        currentPage = n;
+        loadLeaderboard();
+    }
+
+    function promptDelete(id, username, gameId, score) {
+        pendingDeleteId = id;
+        const gameName = GAME_NAMES[gameId] || `Game ${gameId}`;
+        document.getElementById('confirmText').textContent =
+            `Delete score of ${score?.toLocaleString()} by "${username}" in ${gameName}? This cannot be undone.`;
+        document.getElementById('confirmModal').classList.add('open');
+    }
+
+    function closeConfirm() {
+        pendingDeleteId = null;
+        document.getElementById('confirmModal').classList.remove('open');
+    }
+
+    async function confirmDelete() {
+        if (!pendingDeleteId) return;
+        const id = pendingDeleteId;
+        closeConfirm();
+        try {
+            const r = await fetch(`/staff/api/social/leaderboard/${id}`, { method: 'DELETE' });
+            if (r.ok) loadLeaderboard();
+        } catch {}
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    async function logout() {
+        await fetch('/staff/api/auth/logout', { method: 'POST' });
+        window.location.href = '/staff/login';
+    }
 
     async function loadMe() {
         try {
@@ -203,7 +277,8 @@
     }
     setSection(PAGE_SECTION);
 
-    loadMe(); loadLogs();
+    loadMe();
+    loadLeaderboard();
 </script>
 </body>
 </html>
