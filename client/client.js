@@ -1,287 +1,146 @@
-const { app, BrowserWindow, Menu, screen } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Menu } = require('electron');
 const path = require('path');
-const UserAgent = require('user-agents');
-const userAgent = new UserAgent();
 const crypto = require('crypto');
+const UserAgent = require('user-agents');
+const { version } = require('./package.json');
 
-if (require('electron-squirrel-startup')) {
-  app.quit();
+// live-reload during development — watches all files, soft-reloads renderer, hard-restarts on main process change
+try { require('electron-reloader')(module, { ignore: [/node_modules/, /flash/] }); } catch (_) {}
+
+if (require('electron-squirrel-startup')) app.quit();
+
+// internal config
+const USE_RANDOM_PARTITION = false;
+const ALLOW_MULTIPLE_INSTANCES = true;
+const FLASH_PATH = path.join(__dirname, 'flash/pepflashplayer64_34_0_0_308');
+const FLASH_VERSION = '34.0.0.308';
+const DEFAULT_URL = process.env.ROXSTAR_URL || 'http://localhost:3000';
+
+// partioning to isolate client data for multiple instances
+let partitionName = process.env.ROXSTAR_PARTITION || 'persist:roxstar';
+if (USE_RANDOM_PARTITION) {
+  const rand = crypto.randomBytes(8).toString('hex');
+  partitionName = `persist:roxstarinst_${rand}`;
 }
 
-let mainWindow;
-const use_random_partition = false;
-const allow_multiple_instances = true;
-function generateRandomString(length) {
-  return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
-}
-const partitionName = generateRandomString(16);
-let partition_name = process.env.ROXSTAR_PARTITION || 'persist:roxstar';
-if (use_random_partition) {
-  partition_name = `persist:roxstarinst_${partitionName}`;
-}
+// flash support arguments
+app.commandLine.appendSwitch('ppapi-flash-path', FLASH_PATH);
+app.commandLine.appendSwitch('ppapi-flash-version', FLASH_VERSION);
+app.commandLine.appendSwitch('disable-http-cache');
 
-app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, 'flash/pepflashplayer64_34_0_0_308'));
-app.commandLine.appendSwitch('ppapi-flash-version', '34.0.0.308');
-app.commandLine.appendSwitch("disable-http-cache");
-if (!allow_multiple_instances) {
-  const singleLock = app.requestSingleInstanceLock();
-  if (!singleLock) {
-    console.log("Another instance is running, quitting this one.");
-    app.quit();
-  } else {
-    handleAppReadyAndActivation();
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
-      console.log("Second instance detected, focusing main window.");
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.focus();
-      }
-    });
+// single instance lock
+if (!ALLOW_MULTIPLE_INSTANCES) {
+  const gotLock = app.requestSingleInstanceLock();
+  if (!gotLock) { app.quit(); }
+  else {
+    app.on('second-instance', () => { if (mainWindow) { if (mainWindow.isMinimized()) mainWindow.restore(); mainWindow.focus(); } });
+    boot();
   }
 } else {
-  console.log("Multiple instances allowed. Launching without lock.");
-  handleAppReadyAndActivation();
+  boot();
 }
 
-function handleAppReadyAndActivation() {
+// cleanup on all windows closed (except on macOS where it's common for apps to stay open until explicitly quit)
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+
+let mainWindow = null;
+let _isMuted = false;
+let _zoomFactor = 1.0;
+
+// main windows etup
+function boot() {
   app.whenReady().then(() => {
-    console.log("App is ready! Creating window...");
     createWindow();
-    app.on('activate', function () {
-      console.log("Activate event triggered.");
-      if (BrowserWindow.getAllWindows().length === 0) {
-        console.log("No windows open, creating new one.");
-        createWindow();
-      } else {
-        console.log("Windows already open.");
-        if (mainWindow) mainWindow.focus();
-      }
-    });
-  }).catch(err => {
-    console.error("Error during app ready:", err);
-    app.quit();
-  });
+    app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); else if (mainWindow) mainWindow.focus(); });
+  }).catch(err => { console.error('App ready error:', err); app.quit(); });
 }
-
-app.on('window-all-closed', function () {
-  console.log("All windows closed.");
-  if (process.platform !== 'darwin') {
-    console.log("Quitting app (not macOS).");
-    app.quit();
-  } else {
-    console.log("Not quitting automatically (macOS).");
-  }
-});
 
 function createWindow() {
-  console.log("Executing createWindow function...");
   const devtools = process.env.ROXSTAR_DEVTOOLS === '1';
-  const { width: screenW, height: screenH } = screen.getPrimaryDisplay().workAreaSize;
-  const winWidth = devtools ? screenW : 1270;
-  const winHeight = devtools ? screenH : 800;
+  const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize;
+
   mainWindow = new BrowserWindow({
-    width: winWidth,
-    height: winHeight,
+    width: devtools ? sw : 1270,
+    height: devtools ? sh : 800,
     x: devtools ? 0 : undefined,
     y: devtools ? 0 : undefined,
     useContentSize: true,
-    show: true,
     autoHideMenuBar: true,
-    title: "Launching Client...",
+    title: 'RoxStar Client',
     icon: path.join(__dirname, 'favicon.ico'),
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: false,
-      // sandbox: false,
-      sandbox: true,
-      enableRemoteModule: true,
-      // webSecurity: false,
+      contextIsolation: true,
+      sandbox: false,
       webSecurity: true,
-      partition: partition_name,
-      session: null,
-      plugins: true
+      webviewTag: true,
+      partition: partitionName,
+      plugins: true,
+      preload: path.join(__dirname, 'src/preload.js'),
     }
   });
 
-  mainWindow.webContents.on('context-menu', (event, params) => { 
-    const contextMenu = Menu.buildFromTemplate([
-      // --- Navigation Submenu ---
-      {
-        label: 'Shortcuts',
-        submenu: [
-          {
-            label: 'Home (/)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/');
-            }
-          },
-          {
-            label: 'Login (/login)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/login');
-            }
-          },
-          {
-            label: 'Logout (/logout)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/logout');
-            }
-          },
-          { type: 'separator' },
-          {
-            label: 'Adopt (/adopt)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/adopt');
-            }
-          },
-          {
-            label: 'Activation (/activation)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/activation');
-            }
-          },
-          { type: 'separator' },
-          {
-            label: 'Game (/monsters)',
-            click: () => {
-              mainWindow.loadURL('http://localhost:3000/monsters');
-            }
-          }
-        ]
-      },
-      { type: 'separator' }, 
-      // --- Page Control ---
-      {
-        label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
-        click: () => {
-          mainWindow.webContents.reload();
-        }
-      },
-      {
-        label: 'Toggle Fullscreen',
-        accelerator: 'F11', // Common accelerator
-        click: () => {
-          mainWindow.setFullScreen(!mainWindow.isFullScreen());
-          console.log(`Fullscreen ${mainWindow.isFullScreen() ? 'enabled' : 'disabled'}`);
-        }
-      },
-      { type: 'separator' },
-      // --- Audio Control ---
-      {
-        label: 'Raise Volume',
-        click: () => {
-          const currentVolume = mainWindow.webContents.getAudioVolume ? mainWindow.webContents.getAudioVolume() : 1;
-          const newVolume = Math.min(1, currentVolume + 0.1).toFixed(1);
-          mainWindow.webContents.setAudioVolume(parseFloat(newVolume)); 
-          mainWindow.webContents.setAudioMuted(false);
-          console.log(`Volume set to ${newVolume}`);
-        }
-      },
-      {
-        label: 'Lower Volume',
-        click: () => {
-          const currentVolume = mainWindow.webContents.getAudioVolume ? mainWindow.webContents.getAudioVolume() : 1;
-          const newVolume = Math.max(0, currentVolume - 0.1).toFixed(1);
-          mainWindow.webContents.setAudioVolume(parseFloat(newVolume));
-          mainWindow.webContents.setAudioMuted(false);
-          console.log(`Volume set to ${newVolume}`);
-        }
-      },
-      {
-        label: 'Mute/Unmute',
-        click: () => {
-          const isMuted = mainWindow.webContents.isAudioMuted ? mainWindow.webContents.isAudioMuted() : false;
-          mainWindow.webContents.setAudioMuted(!isMuted);
-          console.log(`Audio ${!isMuted ? 'muted' : 'unmuted'}`);
-        }
-      },
-      { type: 'separator' },
-      // --- Developer Tools ---
-      {
-        label: 'Open DevTools (Internal)',
-        accelerator: 'CmdOrCtrl+Shift+I',
-        click: () => {
-          mainWindow.webContents.toggleDevTools();
-        }
-      },
-      {
-        label: 'Open DevTools (Docked)',
-        click: () => {
-          mainWindow.webContents.openDevTools({ mode: 'detach' });
-        }
-      },
-      {
-        label: 'Inspect Element',
-        click: () => {
-          mainWindow.webContents.inspectElement(params.x, params.y);
-        }
-      },
-      { type: 'separator' }, 
-      // --- Cache & App Control ---
-      {
-        label: 'Clear Cache and Reload',
-        click: () => {
-          mainWindow.webContents.session.clearCache().then(() => {
-            console.log("Cache cleared.");
-            mainWindow.webContents.reload();
-          }).catch(err => {
-            console.error("Failed to clear cache:", err);
-          });
-        }
-      },
-      { type: 'separator' },
-      {
-        label: 'Quit',
-        accelerator: 'CmdOrCtrl+Q',
-        click: () => {
-          app.quit();
-        }
-      }
-    ]);
-    contextMenu.popup({
-      window: mainWindow
-    });
-  });
-
-  console.log(`Using partition: ${partition_name}`);
-  const startURL = process.env.ROXSTAR_URL || 'http://localhost:3000';
-  mainWindow.webContents.setUserAgent(userAgent.toString());
-  console.log(`Set User Agent: ${userAgent.toString()}`);
   mainWindow.setMenu(null);
-  console.log("Attempting to clear cache...");
-  mainWindow.webContents.session.clearCache().then(() => {
-    console.log("Cache cleared (maybe). Loading URL...");
-    mainWindow.loadURL(startURL);
-    console.log(`Load URL command issued for ${startURL}`);
-  }).catch(err => {
-    console.error("Failed to clear cache:", err);
-    mainWindow.loadURL(startURL);
-    console.log("Load URL command issued after cache clear failure.");
+  mainWindow.loadFile(path.join(__dirname, 'src/renderer/index.html'));
+
+  // expose config and controls to the renderer process
+  ipcMain.handle('get-config', () => ({ defaultUrl: DEFAULT_URL, partition: partitionName, zoomFactor: _zoomFactor, muted: _isMuted, version, electronVersion: process.versions.electron, nodeVersion: process.versions.node }));
+
+  // audio controls
+  ipcMain.on('audio-mute', (_, muted) => { _isMuted = muted; mainWindow.webContents.setAudioMuted(muted); });
+
+  // zoom controls
+  ipcMain.on('set-zoom', (_, factor) => { _zoomFactor = Math.max(0.3, Math.min(factor, 3.0)); mainWindow.webContents.setZoomFactor(_zoomFactor); });
+
+  // cache controls
+  ipcMain.handle('clear-cache', () => mainWindow.webContents.session.clearCache());
+
+  // devtools shortcut
+  ipcMain.on('open-devtools', () => mainWindow.webContents.openDevTools({ mode: 'detach' }));
+
+  // reload shortcut (Ctrl+R or Cmd+R)
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.control && input.key.toLowerCase() === 'r' && input.type === 'keyDown') {
+      event.preventDefault();
+      mainWindow.webContents.send('shortcut-reload');
+    }
   });
 
-  mainWindow.on('closed', function () {
-    console.log("Main window closed.");
-    mainWindow = null;
-  });
- 
-  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
-    console.error(`Failed to load URL: ${errorDescription} (Code: ${errorCode})`);
-  });
+  // context menu with reload, zoom, mute, and devtools options
+  function buildContextMenu() {
+    return Menu.buildFromTemplate([
+      { label: '🔄️ Reload', click: () => mainWindow.webContents.send('shortcut-reload') },
+      { type: 'separator' },
+      { label: _isMuted ? '🔊 Unmute' : '🔇 Mute', click: () => {
+          _isMuted = !_isMuted;
+          mainWindow.webContents.setAudioMuted(_isMuted);
+          mainWindow.webContents.send('mute-changed', _isMuted);
+      }},
+      { type: 'separator' },
+      { label: '🔍 Zoom In', click: () => { _zoomFactor = +Math.min(_zoomFactor + 0.1, 3.0).toFixed(1); mainWindow.webContents.setZoomFactor(_zoomFactor); } },
+      { label: '🔭 Zoom Out', click: () => { _zoomFactor = +Math.max(_zoomFactor - 0.1, 0.3).toFixed(1); mainWindow.webContents.setZoomFactor(_zoomFactor); } },
+      { label: '♻️ Reset Zoom', click: () => { _zoomFactor = 1.0; mainWindow.webContents.setZoomFactor(1.0); } },
+      { type: 'separator' },
+      { label: '🔨 DevTools (Detached)', click: () => mainWindow.webContents.openDevTools({ mode: 'detach' }) },
+      { label: '✂️ DevTools (Docked)', click: () => mainWindow.webContents.openDevTools({ mode: 'right' }) },
+    ]);
+  }
+  mainWindow.webContents.on('context-menu', () => buildContextMenu().popup({ window: mainWindow }));
+  ipcMain.on('show-context-menu', () => buildContextMenu().popup({ window: mainWindow }));
 
+  // cleanup on close
+  mainWindow.on('closed', () => { mainWindow = null; ipcMain.removeAllListeners(); });
+
+  // for the dev suite
   mainWindow.webContents.on('did-finish-load', () => {
-    console.log("WebContents finished loading.");
-    mainWindow.setTitle("RoxStar Client");
-    if (process.env.ROXSTAR_MUTED === '1') {
-      mainWindow.webContents.setAudioMuted(true);
-    }
-    if (process.env.ROXSTAR_DEVTOOLS === '1') {
-      mainWindow.webContents.openDevTools({ mode: 'right' });
-    }
+    mainWindow.webContents.setZoomFactor(_zoomFactor);
+    if (process.env.ROXSTAR_MUTED === '1') mainWindow.webContents.setAudioMuted(true);
+    if (devtools) mainWindow.webContents.openDevTools({ mode: 'right' });
   });
 
-  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`Renderer Console [${sourceId}:${line}]: ${message}`);
-  });
+  mainWindow.webContents.on('did-fail-load', (_, code, desc) => console.error(`Load failed [${code}]: ${desc}`));
+  mainWindow.webContents.on('console-message', (_, _level, msg, line, src) => console.log(`[renderer ${src}:${line}] ${msg}`));
 
+  const ua = new UserAgent();
+  mainWindow.webContents.setUserAgent(ua.toString());
 }

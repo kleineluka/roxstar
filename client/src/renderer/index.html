@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-nav="sidebar">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self';">
+  <title>RoxStar Client</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- TOP BAR nav (hidden when sidebar mode active) -->
+  <header id="topbar" class="topbar hidden">
+    <div class="topbar-brand">
+      <span class="brand-icon">⭐</span>
+      <span class="brand-name">RoxStar</span>
+    </div>
+    <nav class="topbar-nav">
+      <button class="nav-btn active" data-page="game">🎮 Play</button>
+      <button class="nav-btn" data-page="servers">☁️ Servers</button>
+      <button class="nav-btn" data-page="settings">⚙️ Settings</button>
+      <button class="nav-btn" data-page="about">💎 About</button>
+    </nav>
+    <div class="topbar-server">
+      <span class="status-dot offline" id="si-dot-top"></span>
+      <span id="si-name-top">–</span>
+    </div>
+
+  </header>
+
+  <!-- LAYOUT WRAPPER -->
+  <div id="layout">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="brand-icon">⭐</span>
+        <span class="brand-name sidebar-brand-text">RoxStar</span>
+        <button id="sidebar-collapse-btn" class="icon-btn collapse-btn" title="Collapse">></button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-page="game">
+          <span class="nav-icon">🎮</span>
+          <span class="nav-label">Play</span>
+        </button>
+        <button class="nav-btn" data-page="servers">
+          <span class="nav-icon">☁️</span>
+          <span class="nav-label">Servers</span>
+        </button>
+        <button class="nav-btn" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </button>
+        <button class="nav-btn" data-page="about">
+          <span class="nav-icon">💎</span>
+          <span class="nav-label">About</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot offline" id="si-dot"></span>
+        <span class="nav-label si-server-name" id="si-name">–</span>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="content">
+      <div id="page-game" class="page active"></div>
+      <div id="page-servers" class="page"></div>
+      <div id="page-settings" class="page"></div>
+      <div id="page-about" class="page"></div>
+    </main>
+  </div>
+
+  <script src="data/themes.js"></script>
+  <script src="data/servers.js"></script>
+  <script src="data/settings.js"></script>
+  <script src="pages/game.js"></script>
+  <script src="pages/servers.js"></script>
+  <script src="pages/settings.js"></script>
+  <script src="pages/about.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

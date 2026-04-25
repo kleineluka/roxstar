@@ -61,5 +61,8 @@
     "/services/eventing/pageView": "/heartbeats/view.js",
     "/moshi/services/comment/accept": "/pinboard/accept.js",
     "/moshi/services/comment/delete": "/pinboard/delete.js",
-    "/moshi/services/comment/report": "/pinboard/report.js"
+    "/moshi/services/comment/report": "/pinboard/report.js",
+    "/ping": "/roxstar/ping.js",
+    "/health": "/roxstar/health.js",
+    "/manifest": "/roxstar/manifest.js"
 }

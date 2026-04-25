@@ -1,7 +1,7 @@
 {
   "name": "roxstar-client",
   "version": "0.0.1",
-  "description": "RoxStar Client to load Flash in a modern browser.",
+  "description": "RoxStar Client to load Flash in a modern(ish) browser.",
   "main": "client.js",
   "scripts": {
     "start": "electron ."
@@ -12,7 +12,8 @@
   "devDependencies": {
     "electron": "^10.4.7",
     "electron-builder": "^22.9.1",
-    "electron-packager": "15.5.1"
+    "electron-packager": "15.5.1",
+    "electron-reloader": "^1.2.3"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",

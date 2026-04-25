@@ -29,6 +29,7 @@
     "bff-news-log": true,
     "database": "roxstar.db",
     "password-salt-rounds": 10,
+    "resources-manifest": false,
     "debug-accounts": {
         "1": { "username": "zoey" },
         "2": { "username": "vixen" }

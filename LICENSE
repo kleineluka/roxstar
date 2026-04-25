@@ -1,59 +1,87 @@
-This project is a fan-made, local-use-only tool created for archival, testing, and server research purposes. It is not affiliated with or endorsed by the original game's developers in any way. Please expand this and read the terms carefully or refer to the license file.
+<h2>License, End User License Agreement, and Terms of Service for RoxStar</h2>
+<b>License Version 1.0 and Effective Date 25-04-2026.</b>
+<br>
 
- ### Restrictions and Limitations
-- This project must not be used on public-facing networks, hosted servers, or redistributed in any form.
-- It is not secure in its current state and may contain vulnerabilities.
-- No assistance or support is offered for setup or usage.
-- Monetary gain or commercial use is strictly prohibited.
-- The schemas and structure may change frequently — old databases will likely break.
-- Do not use this project to violate local laws, spread malware, or cause harm to others in any way.
-- You must clearly identify this as a fan project and must not impersonate the original developers or game.
-- You must immediately cease use of this project if:
-    - The original game becomes available to play again
-    - The project is taken down or the terms are changed and you disagree with them
- 
-### Development and License
-- The project follows a clean-room philosophy: contributions are not accepted to maintain this approach.
-- Only original code written specifically for this project is included in this repository.
-- This project does not assist in finding or using any files beyond the code provided.
-- You must stop using this project if the license terms change and you do not agree to the new ones.
-- Outside of any other specified terms, the code is licensed under the **RoxStar License v2**.
+### Preamble and Disclosure of Intent
 
-**Please reach out to me if you have any questions or concerns, or if you want the repository to be modified or taken down.** Mind Candy has previously stated that implementations of the archived game are allowed for use that doesn't infringe on their rights, doesn't profit, and doesn't impersonate the original game - RoxStar's license is meant to reflect that. A copy of the **RoxStar License v2** is provided below.
+This project is a clean-room, fan-made reimplementation of the server-side API that once powered Moshi Monsters, a game originally created and owned by Mind Candy Ltd. It was built entirely from independent research, observation, and reverse engineering of publicly observable behaviour - no proprietary source code, internal documentation, or confidential assets belonging to Mind Candy were used or accessed in its creation.
 
+Moshi Monsters was officially discontinued in 2019. This project exists solely to preserve the experience of a game for the people who grew up with it. It is a labour of love, not a commercial venture, and carries no intention to infringe upon, replace, or misrepresent the original work or its creators.
 
-# RoxStar License v2
-
-This license governs the use of the RoxStar software and its associated source code ("the Software"). By using, copying, modifying, or distributing the Software, you unconditionally agree to all terms of this license.
+Mind Candy Ltd retains all intellectual property rights to the Moshi Monsters name, branding, characters, assets, and associated trademarks. This project makes no claim to any of those rights.
 
 ## 1. Definitions
-- "The Software" refers to all original code, files, and documentation contained in this repository.
-- "Personal Use" refers to running the Software on a machine under your direct, personal control for private, non-commercial, non-public purposes.
-- "Public Hosting" refers to making the Software accessible to anyone other than yourself over a local network or the internet.
 
-## 2. Permissions Granted
-You are hereby granted a non-exclusive, revocable, worldwide, royalty-free license to:
-- View and Fork: View the Software's source code and create a personal fork for backup or private modification, subject to the terms herein.
-- Personal Use: Run the Software on a local machine for your own Personal Use only.
-- Private Modification: Modify the Software for your own Personal Use only.
+- **"The Software"** means this repository and all source code, documentation, and configuration files contained within it.
+- **"You"** means any individual or entity accessing, using, copying, modifying, or distributing the Software.
+- **"Original Work"** means the *Moshi Monsters* game, service, and associated intellectual property owned by Mind Candy Ltd.
+- **Instances"** means any deployment or hosting of the Software.
+- **"Public Instance"** means any deployment of the Software that is accessible to users outside of your own household or private network.
+- **"Commercial Use"** means any use of the Software in exchange for monetary compensation, or as part of a product or service sold or monetised in any form.
 
-## 3. Restrictions and Limitations
-The permissions granted above are subject to the following strict restrictions. You may NOT:
-- Redistribute: Redistribute, share, or make available the Software, or any modified versions of it, in any form, publicly or privately.
-- Publicly Host: Use the Software on public-facing networks or engage in any form of Public Hosting.
-- Use Commercially: Use the Software for any commercial purpose or monetary gain, including but not limited to accepting donations related to the use or access of this Software.
-- Remove Notices: Remove or alter this license or any copyright, attribution, or disclaimer notices within the Software.
-- Impersonate: Use the Software to impersonate the original game, its creators, or its affiliates. This Software must always be clearly and conspicuously identified as a fan project.
+## 2. Grant of License
 
-## 4. Special Conditions
-- You must immediately cease all use of the Software if the original game, Moshi Monsters, becomes officially available to play again through authorized channels.
-- You must immediately cease all use of the Software if the copyright holder of this project requests it, or if the terms of this license change and you do not agree with the new terms. Your continued use of the Software after any changes to the license constitutes your acceptance of the new terms.
+Subject to the terms and conditions of this Agreement, you are granted a **non-exclusive, non-transferable, royalty-free license** to:
 
-## 5. No Affiliation
-This project is a fan-made tool created for archival and educational purposes. It is not affiliated with, authorized, or endorsed by Mind Candy or the original creators of Moshi Monsters in any way. All original Moshi Monsters assets, names, and trademarks are the property of their respective owners.
+- Use the Software for **personal, private, and non-commercial purposes**;
+- Study, modify, and adapt the Software for personal learning or preservation purposes;
+- Share the Software or your modifications thereof, provided you do so under **these same terms** and include this license in full.
 
-## 6. Disclaimer of Warranty & Limitation of Liability
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+## 3. Restrictions
 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. USE OF THE SOFTWARE IS ENTIRELY AT YOUR OWN RISK.
-</details>
+You may **not**:
+
+**3.1 Commercial Use**
+Use the Software, in whole or in part, for any commercial purpose, including but not limited to: selling access to a hosted instance, accepting donations in exchange for access, incorporating the Software into a paid product or service, or running advertisements of any kind in connection with any hosted instance or derivative of the Software.
+
+**3.2 Impersonation of the Original**
+Operate any Public Instance in a manner that represents, implies, or could reasonably cause users to believe they are accessing an official *Moshi Monsters* service, a continuation of Mind Candy's original service, or any product endorsed or affiliated with Mind Candy Ltd. This includes, but is not limited to, use of the *Moshi Monsters* name, logo, or branding in ways that suggest official affiliation.
+
+**3.3 Unapproved Instances**
+Run Instances without prominently disclosing to all users that the service is:
+- An **unofficial**, **fan-made** preservation project;
+- **Not affiliated with or endorsed by Mind Candy Ltd**;
+- Built on this open-source Software, with a link to this repository.
+
+Such a disclosure must be clearly visible to users before they interact with any hosted service.
+
+**3.4 Harmful or Malicious Use**
+Use the Software in any way that is illegal, harmful, abusive, or that could damage the reputation of Mind Candy Ltd or the *Moshi Monsters* brand.
+
+## 4. Attribution
+
+Any use, distribution, or hosting of the Software must include:
+
+- A clear credit to this project and a link to its source repository;
+- An acknowledgment that *Moshi Monsters* is the intellectual property of **Mind Candy Ltd**;
+- This license, reproduced in full or linked prominently.
+
+## 5. Intellectual Property
+
+This license grants no rights to any intellectual property belonging to Mind Candy Ltd, including but not limited to: the *Moshi Monsters* name, characters, artwork, audio, game design, or trademarks. You are responsible for ensuring that your use of this Software does not infringe on those rights.
+
+The authors of this Software make no claim of ownership over any element of the Original Work.
+
+## 6. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+The authors of the Software are not responsible for how it is used, and make no guarantees about its accuracy, completeness, or suitability for any particular purpose.
+
+## 7. Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING FROM THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+## 8. Termination
+
+Your rights under this license terminate automatically if you fail to comply with any of its terms. Upon termination, you must cease all use and distribution of the Software and destroy any copies in your possession.
+
+## 9. Governing Principles
+
+This license is intended to be interpreted in the spirit in which it was written: **good faith preservation**. When in doubt about whether a particular use is permitted, ask yourself whether it honours the original creators, avoids misleading users, and serves the goal of preservation rather than exploitation. If the answer is yes, it is likely within the spirit of this license.
+
+## 10. Contact
+
+If you have questions about permitted use, or believe this project infringes on any rights, please open an issue in this repository.
+
+*This license was written for a fan preservation project and is not a substitute for legal advice. If you are Mind Candy Ltd or a representative thereof and have concerns about this project, please reach out - this project exists out of love for the work you created, and we welcome dialogue.*
