@@ -1,4 +1,4 @@
-/* ===== FONTS ===== */
+/* fonts */
 @font-face {
   font-family: 'Nunito';
   src: url('assets/fonts/Nunito-VariableFont_wght.ttf') format('truetype');
@@ -6,6 +6,7 @@
   font-weight: 100 900;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Nunito';
   src: url('assets/fonts/Nunito-Italic-VariableFont_wght.ttf') format('truetype');
@@ -14,7 +15,7 @@
   font-display: swap;
 }
 
-/* ===== VARIABLES ===== */
+/* variables */
 :root {
   --sidebar-w: 200px;
   --sidebar-w-collapsed: 60px;
@@ -24,11 +25,11 @@
   --radius-sm: 8px;
 }
 
-/* ===== RESET ===== */
+/* reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--text); }
 
-/* ===== TOPBAR ===== */
+/* topbar */
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h);
   background: var(--nav-bg); border-bottom: 1.5px solid var(--border);
@@ -42,14 +43,14 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 .topbar-nav .nav-btn { padding: 6px 14px; font-size: 13px; }
 .topbar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 
-/* ===== LAYOUT ===== */
+/* layout */
 #layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
 [data-nav="topbar"] #layout { padding-top: var(--topbar-h); height: 100vh; box-sizing: border-box; }
 [data-nav="topbar"] #sidebar { display: none; }
 [data-nav="topbar"] #topbar { display: flex; }
 
-/* ===== SIDEBAR ===== */
+/* sidebar */
 .sidebar {
   width: var(--sidebar-w); flex-shrink: 0;
   background: var(--nav-bg); border-right: 3px solid var(--border);
@@ -83,7 +84,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 
 .topbar-server { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
 
-/* ===== NAV BUTTONS ===== */
+/* nav buttons */
 .nav-btn {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; border-radius: var(--radius-sm);
@@ -96,7 +97,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 .nav-btn.active { background: var(--nav-active-bg); color: var(--nav-active-text); }
 .nav-icon { font-size: 18px; flex-shrink: 0; }
 
-/* ===== ICON BUTTONS ===== */
+/* icon buttons */
 .icon-btn {
   border: none; background: transparent; cursor: pointer; font-size: 18px;
   padding: 6px; border-radius: var(--radius-sm);
@@ -104,12 +105,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 }
 .icon-btn:hover { background: var(--nav-hover); }
 
-/* ===== CONTENT ===== */
+/* content */
 #content { flex: 1; overflow: hidden; position: relative; background: var(--bg); display: flex; flex-direction: column; min-height: 0; }
 .page { display: none; width: 100%; overflow: hidden; min-height: 0; }
 .page.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 
-/* ===== INNER PAGES ===== */
+/* inner pages */
 .inner-page { flex: 1; overflow-y: auto; padding: 32px; }
 .inner-page h1 {
   font-size: 24px; font-weight: 800; margin-bottom: 6px;
@@ -118,7 +119,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 }
 .inner-page .subtitle { color: var(--text-2); font-size: 14px; margin-bottom: 28px; }
 
-/* Cards */
+/* cards */
 .card {
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: var(--radius); padding: 20px 24px;
@@ -127,7 +128,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 }
 .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
 
-/* Settings rows */
+/* settings rows */
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 0; border-bottom: 1px solid var(--border);
@@ -135,7 +136,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Nunito',
 .setting-row:last-child { border-bottom: none; }
 .setting-label { font-size: 14px; font-weight: 600; }
 
-/* Scrollbar */
+/* scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }

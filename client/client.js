@@ -44,8 +44,9 @@ if (!ALLOW_MULTIPLE_INSTANCES) {
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 
 let mainWindow = null;
-let _isMuted = false;
+let _isMuted = process.env.ROXSTAR_MUTED === '1';
 let _zoomFactor = 1.0;
+let _webviewContents = null;
 
 // main windows etup
 function boot() {
@@ -84,10 +85,14 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'src/renderer/index.html'));
 
   // expose config and controls to the renderer process
-  ipcMain.handle('get-config', () => ({ defaultUrl: DEFAULT_URL, partition: partitionName, zoomFactor: _zoomFactor, muted: _isMuted, version, electronVersion: process.versions.electron, nodeVersion: process.versions.node }));
+  ipcMain.handle('get-config', () => ({ defaultUrl: DEFAULT_URL, partition: partitionName, zoomFactor: _zoomFactor, muted: _isMuted, version, electronVersion: process.versions.electron, nodeVersion: process.versions.node, isDebugMode: process.env.ROXSTAR_DEBUG_MODE === '1' }));
 
   // audio controls
-  ipcMain.on('audio-mute', (_, muted) => { _isMuted = muted; mainWindow.webContents.setAudioMuted(muted); });
+  ipcMain.on('audio-mute', (_, muted) => { 
+    _isMuted = muted; 
+    mainWindow.webContents.setAudioMuted(muted); 
+    if (_webviewContents) _webviewContents.setAudioMuted(muted);
+  });
 
   // zoom controls
   ipcMain.on('set-zoom', (_, factor) => { _zoomFactor = Math.max(0.3, Math.min(factor, 3.0)); mainWindow.webContents.setZoomFactor(_zoomFactor); });
@@ -96,7 +101,7 @@ function createWindow() {
   ipcMain.handle('clear-cache', () => mainWindow.webContents.session.clearCache());
 
   // devtools shortcut
-  ipcMain.on('open-devtools', () => mainWindow.webContents.openDevTools({ mode: 'detach' }));
+  ipcMain.on('open-devtools', () => (_webviewContents ?? mainWindow.webContents).openDevTools({ mode: 'detach' }));
 
   // reload shortcut (Ctrl+R or Cmd+R)
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -114,6 +119,7 @@ function createWindow() {
       { label: _isMuted ? '🔊 Unmute' : '🔇 Mute', click: () => {
           _isMuted = !_isMuted;
           mainWindow.webContents.setAudioMuted(_isMuted);
+          if (_webviewContents) _webviewContents.setAudioMuted(_isMuted);
           mainWindow.webContents.send('mute-changed', _isMuted);
       }},
       { type: 'separator' },
@@ -121,7 +127,7 @@ function createWindow() {
       { label: '🔭 Zoom Out', click: () => { _zoomFactor = +Math.max(_zoomFactor - 0.1, 0.3).toFixed(1); mainWindow.webContents.setZoomFactor(_zoomFactor); } },
       { label: '♻️ Reset Zoom', click: () => { _zoomFactor = 1.0; mainWindow.webContents.setZoomFactor(1.0); } },
       { type: 'separator' },
-      { label: '🔨 DevTools (Detached)', click: () => mainWindow.webContents.openDevTools({ mode: 'detach' }) },
+      { label: '🔨 DevTools (Detached)', click: () => (_webviewContents ?? mainWindow.webContents).openDevTools({ mode: 'detach' }) },
       { label: '✂️ DevTools (Docked)', click: () => mainWindow.webContents.openDevTools({ mode: 'right' }) },
     ]);
   }
@@ -135,8 +141,29 @@ function createWindow() {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.setZoomFactor(_zoomFactor);
     if (process.env.ROXSTAR_MUTED === '1') mainWindow.webContents.setAudioMuted(true);
-    if (devtools) mainWindow.webContents.openDevTools({ mode: 'right' });
   });
+
+  // track the webview's webContents so DevTools always targets the game, not the shell
+  mainWindow.webContents.on('did-attach-webview', (_, webviewContents) => {
+    _webviewContents = webviewContents;
+    
+    webviewContents.on('console-message', (_, level, msg, line, src) => {
+      console.log(`[game ${src}:${line}] ${msg}`);
+      if (mainWindow) {
+        const methods = ['debug', 'log', 'warn', 'error'];
+        const method = methods[level] || 'log';
+        mainWindow.webContents.executeJavaScript(`console.${method}(${JSON.stringify('[game ' + src + ':' + line + '] ' + msg)})`).catch(() => {});
+      }
+    });
+
+    if (_isMuted) {
+      webviewContents.setAudioMuted(true);
+    }
+  });
+
+  if (devtools) {
+    mainWindow.webContents.openDevTools({ mode: 'right' });
+  }
 
   mainWindow.webContents.on('did-fail-load', (_, code, desc) => console.error(`Load failed [${code}]: ${desc}`));
   mainWindow.webContents.on('console-message', (_, _level, msg, line, src) => console.log(`[renderer ${src}:${line}] ${msg}`));

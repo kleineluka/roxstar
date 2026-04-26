@@ -6,6 +6,8 @@ const SERVER_DIR = path.join(__dirname, 'server');
 const CLIENT_DIR = path.join(__dirname, 'client');
 const ELECTRON_PATH = path.join(CLIENT_DIR, 'node_modules', 'electron', 'dist', 'electron.exe');
 const SERVER_URL = 'http://localhost:3000';
+const AUTO_CLOSE_SERVER = false;
+const AUTO_OPEN_DEVTOOLS = true;
 
 const children = [];
 
@@ -55,7 +57,7 @@ function startClient(name, partition, loginSlot, extraEnv = {}) {
     const client = spawn(ELECTRON_PATH, ['.'], {
         cwd: CLIENT_DIR,
         stdio: ['ignore', 'pipe', 'pipe'],
-        env: { ...process.env, ROXSTAR_PARTITION: partition, ROXSTAR_URL: startURL, ...extraEnv },
+        env: { ...process.env, ROXSTAR_PARTITION: partition, ROXSTAR_URL: startURL, ROXSTAR_DEBUG_MODE: '1', ...extraEnv },
         shell: false
     });
     children.push(client);
@@ -76,8 +78,11 @@ function checkAllClosed() {
     const alive = children.filter(c => !c.killed && c.exitCode === null);
     const aliveClients = alive.filter(c => c !== children[0]);
     if (aliveClients.length === 0) {
-        log('DEBUG', 'All clients closed. Shutting down server...');
-        cleanup();
+        log('DEBUG', 'All clients closed.');
+        if (AUTO_CLOSE_SERVER) {
+            log('DEBUG', 'Shutting down server...');
+            cleanup();
+        }
     }
 }
 
@@ -103,8 +108,12 @@ async function main() {
     log('DEBUG', 'RoxStar Dev Launcher!');
     log('DEBUG', 'Starting server + two clients with separate sessions');
     await startServer();
-    startClient('CLIENT-1', 'persist:roxstar_debug_1', '1', { ROXSTAR_MUTED: '1', ROXSTAR_DEVTOOLS: '1' });
-    startClient('CLIENT-2', 'persist:roxstar_debug_2', '2', { ROXSTAR_MUTED: '1', ROXSTAR_DEVTOOLS: '1' });
+    const sharedClientEnv = {
+        ROXSTAR_MUTED: '1',
+        ROXSTAR_DEVTOOLS: AUTO_OPEN_DEVTOOLS ? '1' : '0'
+    };
+    startClient('CLIENT-1', 'persist:roxstar_debug_1', '1', sharedClientEnv);
+    startClient('CLIENT-2', 'persist:roxstar_debug_2', '2', sharedClientEnv);
     log('DEBUG', 'Both clients launched with auto-login!');
     log('DEBUG', 'Slot 1 and 2 mapped to usernames in server.json -> "debug-accounts".');
     log('DEBUG', 'Close both client windows or press Ctrl+C to shut everything down.');

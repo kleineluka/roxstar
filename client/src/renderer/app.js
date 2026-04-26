@@ -22,9 +22,10 @@ const collapseBtn = document.getElementById('sidebar-collapse-btn');
 async function init() {
   const config = await window.roxstar.getConfig();
   state.gameUrl = config.defaultUrl;
+  if (config.muted) state.muted = true;
   applyTheme(state.theme);
   applyNavStyle(state.navStyle);
-  if (state.sidebarCollapsed) {
+  if (state.sidebarCollapsed || config.isDebugMode) {
     sidebar.classList.add('collapsed');
     collapseBtn.textContent = '\u203a';
   }
