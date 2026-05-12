@@ -128,7 +128,6 @@ function createWindow() {
       { label: '♻️ Reset Zoom', click: () => { _zoomFactor = 1.0; mainWindow.webContents.setZoomFactor(1.0); } },
       { type: 'separator' },
       { label: '🔨 DevTools (Detached)', click: () => (_webviewContents ?? mainWindow.webContents).openDevTools({ mode: 'detach' }) },
-      { label: '✂️ DevTools (Docked)', click: () => mainWindow.webContents.openDevTools({ mode: 'right' }) },
     ]);
   }
   mainWindow.webContents.on('context-menu', () => buildContextMenu().popup({ window: mainWindow }));
@@ -159,11 +158,11 @@ function createWindow() {
     if (_isMuted) {
       webviewContents.setAudioMuted(true);
     }
-  });
 
-  if (devtools) {
-    mainWindow.webContents.openDevTools({ mode: 'right' });
-  }
+    if (devtools) {
+      webviewContents.openDevTools({ mode: 'detach' });
+    }
+  });
 
   mainWindow.webContents.on('did-fail-load', (_, code, desc) => console.error(`Load failed [${code}]: ${desc}`));
   mainWindow.webContents.on('console-message', (_, _level, msg, line, src) => console.log(`[renderer ${src}:${line}] ${msg}`));

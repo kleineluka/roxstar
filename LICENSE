@@ -1,23 +1,30 @@
-<h2>License, End User License Agreement, and Terms of Service for RoxStar</h2>
-<b>License Version 1.0 and Effective Date 25-04-2026.</b>
-<br>
+## License, End User License Agreement, and Terms of Service for RoxStar
+
+**License Version 2.0 and Effective Date 12-05-2026.**
+
+---
 
 ### Preamble and Disclosure of Intent
 
-This project is a clean-room, fan-made reimplementation of the server-side API that once powered Moshi Monsters, a game originally created and owned by Mind Candy Ltd. It was built entirely from independent research, observation, and reverse engineering of publicly observable behaviour - no proprietary source code, internal documentation, or confidential assets belonging to Mind Candy were used or accessed in its creation.
+This project is a clean-room, fan-made reimplementation of the server-side API that once powered Moshi Monsters, a game originally created and owned by Mind Candy Ltd. It was built entirely from independent research, observation, and reverse engineering of publicly observable behaviour — no proprietary source code, internal documentation, or confidential assets belonging to Mind Candy were used or accessed in its creation.
 
 Moshi Monsters was officially discontinued in 2019. This project exists solely to preserve the experience of a game for the people who grew up with it. It is a labour of love, not a commercial venture, and carries no intention to infringe upon, replace, or misrepresent the original work or its creators.
 
 Mind Candy Ltd retains all intellectual property rights to the Moshi Monsters name, branding, characters, assets, and associated trademarks. This project makes no claim to any of those rights.
+
+---
 
 ## 1. Definitions
 
 - **"The Software"** means this repository and all source code, documentation, and configuration files contained within it.
 - **"You"** means any individual or entity accessing, using, copying, modifying, or distributing the Software.
 - **"Original Work"** means the *Moshi Monsters* game, service, and associated intellectual property owned by Mind Candy Ltd.
-- **Instances"** means any deployment or hosting of the Software.
+- **"Instances"** means any deployment or hosting of the Software.
 - **"Public Instance"** means any deployment of the Software that is accessible to users outside of your own household or private network.
 - **"Commercial Use"** means any use of the Software in exchange for monetary compensation, or as part of a product or service sold or monetised in any form.
+- **"Corresponding Source"** means the complete source code necessary for users to build, run, and modify the Software, including all scripts, configuration, and build tooling required to reproduce any deployed instance.
+
+---
 
 ## 2. Grant of License
 
@@ -25,19 +32,42 @@ Subject to the terms and conditions of this Agreement, you are granted a **non-e
 
 - Use the Software for **personal, private, and non-commercial purposes**;
 - Study, modify, and adapt the Software for personal learning or preservation purposes;
-- Share the Software or your modifications thereof, provided you do so under **these same terms** and include this license in full.
+- Share the Software or your modifications thereof, provided you do so under **these same terms**, in their entirety, with no additional restrictions, and include this license in full.
 
-## 3. Restrictions
+You may not sublicense the Software. Any attempt to impose terms beyond those in this Agreement on downstream recipients is void and terminates your rights under Section 8.
+
+---
+
+## 3. Network Use and Source Code Availability
+
+If you operate a Public Instance of the Software — whether modified or unmodified — you must make the complete Corresponding Source available to all users of that instance. This requirement applies regardless of whether you have distributed the Software in a traditional sense; making it accessible over a network is sufficient to trigger this obligation.
+
+The Corresponding Source must be provided by:
+
+- prominently linking to a publicly accessible repository containing the complete Corresponding Source from within the hosted service's user interface; **or**
+- offering in writing to provide the Corresponding Source upon request, at no charge, to any user who asks.
+
+This obligation runs with the software. If you modify the Software and operate a Public Instance of your modified version, the Corresponding Source you provide must reflect those modifications.
+
+---
+
+## 4. Patent Grant
+
+Each contributor to the Software grants You a non-exclusive, worldwide, royalty-free licence under any patent claims they hold that are necessarily infringed by their contribution to the Software, solely for use consistent with this Agreement. This grant does not extend to any use that falls outside the permissions granted herein, including Commercial Use.
+
+---
+
+## 5. Restrictions
 
 You may **not**:
 
-**3.1 Commercial Use**
+**5.1 Commercial Use**
 Use the Software, in whole or in part, for any commercial purpose, including but not limited to: selling access to a hosted instance, accepting donations in exchange for access, incorporating the Software into a paid product or service, or running advertisements of any kind in connection with any hosted instance or derivative of the Software.
 
-**3.2 Impersonation of the Original**
+**5.2 Impersonation of the Original**
 Operate any Public Instance in a manner that represents, implies, or could reasonably cause users to believe they are accessing an official *Moshi Monsters* service, a continuation of Mind Candy's original service, or any product endorsed or affiliated with Mind Candy Ltd. This includes, but is not limited to, use of the *Moshi Monsters* name, logo, or branding in ways that suggest official affiliation.
 
-**3.3 Unapproved Instances**
+**5.3 Unapproved Instances**
 Run Instances without prominently disclosing to all users that the service is:
 - An **unofficial**, **fan-made** preservation project;
 - **Not affiliated with or endorsed by Mind Candy Ltd**;
@@ -45,10 +75,15 @@ Run Instances without prominently disclosing to all users that the service is:
 
 Such a disclosure must be clearly visible to users before they interact with any hosted service.
 
-**3.4 Harmful or Malicious Use**
+**5.4 Harmful or Malicious Use**
 Use the Software in any way that is illegal, harmful, abusive, or that could damage the reputation of Mind Candy Ltd or the *Moshi Monsters* brand.
 
-## 4. Attribution
+**5.5 No Further Restrictions**
+You may not impose any additional legal terms, contractual obligations, or technical measures — such as DRM or obfuscation — that restrict others from exercising the rights granted by this license. You may not use this Software as a component of a system designed to deny users the freedoms this license provides.
+
+---
+
+## 6. Attribution
 
 Any use, distribution, or hosting of the Software must include:
 
@@ -56,32 +91,58 @@ Any use, distribution, or hosting of the Software must include:
 - An acknowledgment that *Moshi Monsters* is the intellectual property of **Mind Candy Ltd**;
 - This license, reproduced in full or linked prominently.
 
-## 5. Intellectual Property
+---
+
+## 7. Intellectual Property
 
 This license grants no rights to any intellectual property belonging to Mind Candy Ltd, including but not limited to: the *Moshi Monsters* name, characters, artwork, audio, game design, or trademarks. You are responsible for ensuring that your use of this Software does not infringe on those rights.
 
 The authors of this Software make no claim of ownership over any element of the Original Work.
 
-## 6. No Warranty
+---
+
+## 8. No Warranty
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
 
 The authors of the Software are not responsible for how it is used, and make no guarantees about its accuracy, completeness, or suitability for any particular purpose.
 
-## 7. Limitation of Liability
+---
+
+## 9. Limitation of Liability
 
 IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING FROM THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-## 8. Termination
+---
 
-Your rights under this license terminate automatically if you fail to comply with any of its terms. Upon termination, you must cease all use and distribution of the Software and destroy any copies in your possession.
+## 10. Termination
 
-## 9. Governing Principles
+Your rights under this license terminate automatically and without notice if you fail to comply with any of its terms. Upon termination, you must cease all use, distribution, and operation of the Software and destroy any copies in your possession.
 
-This license is intended to be interpreted in the spirit in which it was written: **good faith preservation**. When in doubt about whether a particular use is permitted, ask yourself whether it honours the original creators, avoids misleading users, and serves the goal of preservation rather than exploitation. If the answer is yes, it is likely within the spirit of this license.
+Rights of parties who have received the Software from you under this license are not terminated by the termination of your own rights, provided those parties remain in full compliance.
 
-## 10. Contact
+---
+
+## 11. Severability
+
+If any provision of this Agreement is found by a court of competent jurisdiction to be invalid, illegal, or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, or if modification is not possible, severed from this Agreement entirely. The validity and enforceability of the remaining provisions shall not be affected. The parties agree that a court should endeavour to give effect to the original intent of any severed or modified provision as closely as the law permits.
+
+---
+
+## 12. Interpretation
+
+Where the terms of this Agreement are ambiguous, they shall be construed in accordance with the following principles, which reflect the intent of the authors and form part of the Agreement:
+
+- **Preservation over exploitation.** This license is designed to enable good-faith preservation of a discontinued game. Uses that serve that goal are to be read permissively; uses that exploit the Software or the Original Work commercially or deceptively are to be read restrictively.
+- **User clarity.** Any ambiguity about whether a disclosure or attribution obligation has been met shall be resolved in favour of the interpretation that better informs users of the Software's unofficial, fan-made nature.
+- **Source availability.** Any ambiguity about whether the Corresponding Source obligation in Section 3 has been triggered shall be resolved in favour of requiring disclosure.
+
+These principles do not override the plain meaning of any provision, but shall guide interpretation where the plain meaning is genuinely unclear.
+
+---
+
+## 13. Contact
 
 If you have questions about permitted use, or believe this project infringes on any rights, please open an issue in this repository.
 
-*This license was written for a fan preservation project and is not a substitute for legal advice. If you are Mind Candy Ltd or a representative thereof and have concerns about this project, please reach out - this project exists out of love for the work you created, and we welcome dialogue.*
+*This license was written for a fan preservation project and is not a substitute for legal advice. If you are Mind Candy Ltd or a representative thereof and have concerns about this project, please reach out — this project exists out of love for the work you created, and we welcome dialogue.*
