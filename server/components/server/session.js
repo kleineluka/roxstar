@@ -56,9 +56,10 @@ async function confirmKey(username, key) {
         if (!userRow) {
             return false;
         }
-        if (userRow.session_key === key) {
-            return true;
-        } else {
+        try {
+            return crypto.timingSafeEqual(Buffer.from(userRow.session_key), Buffer.from(key));
+        } catch (error) {
+            // If timingSafeEqual fails (e.g., keys have different lengths), return false
             return false;
         }
     } catch (error) {
@@ -75,7 +76,7 @@ async function confirmKey(username, key) {
  * @param {string} rememberMe - Optional. If true, updates the 'remember_me' field in the database.
  **/
 async function updateUserSession(id, sessionKey, ip, rememberMe = null) {
-    const timestamp = await clock.getTimestamp();
+    const timestamp = clock.getTimestamp();
     try {
         // parameters to always include
         let updateQuery = `

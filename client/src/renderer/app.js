@@ -134,7 +134,6 @@ function bindControls() {
 
 }
 
-
 // server management
 function setConnectedServer(server) {
   state.connectedServer = server;

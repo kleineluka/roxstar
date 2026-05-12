@@ -80,7 +80,7 @@ router.post('/', global.body_parser.xml(), async (req, res) => {
             pretty.error(`Failed to create initial room for new user ID ${newUserId}. Continuing with inventory.`);
         } else {
             // only give starter house items if the room was successfully created
-            await homeUtils.giveStarterHouse(newUserId, newRoomId, global.config_starter);
+            await homeUtils.giveStarterHouse(newUserId, newRoomId);
         }
         await inventoryUtils.giveStarterInventory(newUserId, global.config_starter);
         pretty.debug(`Session updated for new user ${newUserId}.`);

@@ -49,6 +49,7 @@ const setupEnvironment = () => {
     global.config_garden = loadConfig('garden.json');
     global.config_provided = loadProvided(loadConfig('provided.json'));
     global.config_rebundles = loadConfig('rebundles.json');
+    global.config_rooms = loadConfig('rooms.json');
     global.config_services = loadConfig('services.json');
     global.config_parse = loadConfig('parse.json');
     global.config_partials = loadConfig('partials.json');

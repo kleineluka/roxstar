@@ -11,7 +11,7 @@ function parser(app) {
         Object.entries(global.config_parse).forEach(([routeName, parseType]) => {
             pretty.debug('Adding parse type for -> ' + routeName + ' (' + parseType + ')');
             switch (parseType) {
-                case 'json':
+                case "json":
                     app.use(routeName, global.body_parser.json());
                     break;
                 case "xml":

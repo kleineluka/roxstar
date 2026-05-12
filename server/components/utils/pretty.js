@@ -4,17 +4,17 @@ const header_styling = {
     'LOGS': chalk.magentaBright,
     'DEBUG': chalk.magenta,
     'ERROR': chalk.redBright,
-    "TIMESTAMP": chalk.yellowBright,
-    "REQUEST": chalk.blue,
-    "REDIRECT": chalk.yellowBright,
-    "DATABASE": chalk.cyanBright,
+    'TIMESTAMP': chalk.yellowBright,
+    'REQUEST': chalk.blue,
+    'REDIRECT': chalk.yellowBright,
+    'DATABASE': chalk.cyanBright,
     'ACTION': chalk.greenBright,
     'WARN': chalk.yellowBright,
     'CACHE': chalk.redBright,
     'SESSION MANAGER': chalk.greenBright,
     'SERVER': chalk.blueBright,
     'ROUTING': chalk.yellowBright,
-    "STAFF": chalk.grey,
+    'STAFF': chalk.grey,
 };
 
 const request_styling = {
@@ -22,9 +22,9 @@ const request_styling = {
     'POST': chalk.blueBright.bold,
     'PUT': chalk.yellowBright.bold,
     'DELETE': chalk.redBright.bold,
-    "URL": chalk.cyan.bold,
-    "IP": chalk.magenta.bold,
-    "USERAGENT": chalk.yellow,
+    'URL': chalk.cyan.bold,
+    'IP': chalk.magenta.bold,
+    'USERAGENT': chalk.yellow,
 };
 
 /**
@@ -48,9 +48,9 @@ function pretty_rainbow(msg) {
  */
 function print(msg, source = 'LOGS') {
     if (!global.pretty_name) global.pretty_name = pretty_rainbow(config_server['name']);
-    var header = '[';
+    let header = '[';
     header += global.pretty_name + ' @ ';
-    var date = new Date();
+    let date = new Date();
     let formatted_date = (date.getHours() < 10 ? '0' : '') + date.getHours();
     formatted_date += ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
     header += header_styling['TIMESTAMP'](formatted_date) + '] -> ';

@@ -35,7 +35,7 @@ function alphaNumericString(input) {
  * @returns {Array} - The array of random items 
  */
 function getRandomItems(arr, num = 1) {
-    const shuffled = arr.sort(() => 0.5 - Math.random());
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, num);
 }
 
@@ -51,12 +51,12 @@ function getRandomItem(arr) {
 /**
  * Validate an email address using regex
  * @param {*} email - The email address to validate
- * @returns {string} - The email address if valid, 'invalid' if not
+ * @returns {string|null} - The email address if valid, null if not
  */
 function validateEmail(email) {
     // regex to match an email
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    return isValid ? email : 'invalid';
+    return isValid ? email : null;
 }
 
 /**
